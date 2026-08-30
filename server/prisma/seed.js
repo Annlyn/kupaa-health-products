@@ -11,14 +11,16 @@ const prisma = new PrismaClient();
 /** Passwords that have appeared in this repo's docs and must never reach production. */
 const INSECURE_DEFAULTS = new Set(['Admin@12345', 'admin', 'password', 'changeme']);
 const uploadDir = path.resolve(process.cwd(), 'uploads');
-fs.mkdirSync(uploadDir, { recursive: true });
+const ensureUploadDir = () => fs.mkdirSync(uploadDir, { recursive: true });
+ensureUploadDir();
 
 /**
  * Demo imagery is generated locally as SVG so the storefront looks finished
  * without depending on any external CDN. Replace via Admin > Products.
  */
-function writePlaceholder(slug, label, [from, to]) {
+function writePlaceholder(slug, label, [from, to], { onlyIfMissing = false } = {}) {
   const file = `seed-${slug}.svg`;
+  if (onlyIfMissing && fs.existsSync(path.join(uploadDir, file))) return `/uploads/${file}`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -37,6 +39,12 @@ function writePlaceholder(slug, label, [from, to]) {
   fs.writeFileSync(path.join(uploadDir, file), svg);
   return `/uploads/${file}`;
 }
+
+const slugFor = (name) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 
 const PALETTES = [
   ['#0f766e', '#14b8a6'], ['#7c3aed', '#a78bfa'], ['#b45309', '#f59e0b'],
@@ -162,7 +170,43 @@ const coupons = [
   { code: 'FREESHIP', description: '₹59 off — shipping on us', type: 'FLAT', value: 59, minOrder: 0, usageLimit: 500 },
 ];
 
+const SEED_VERSION = 1;
+const MARKER_KEY = 'seed.catalogue';
+
+/** Rewrites any seed placeholder SVG that has gone missing. Returns how many. */
+function restorePlaceholders() {
+  ensureUploadDir();
+  let count = 0;
+
+  categories.forEach((c, i) => {
+    const file = path.join(uploadDir, `seed-cat-${c.slug}.svg`);
+    if (!fs.existsSync(file)) {
+      writePlaceholder(`cat-${c.slug}`, c.name.split(' ')[0], PALETTES[i % PALETTES.length]);
+      count += 1;
+    }
+  });
+
+  products.forEach((p, i) => {
+    const slug = slugFor(p.name);
+    const palette = PALETTES[i % PALETTES.length];
+    for (const [key, label, colours] of [
+      [slug, p.name.split(' ')[0], palette],
+      [`${slug}-alt`, 'Kupaa', [palette[1], palette[0]]],
+    ]) {
+      if (!fs.existsSync(path.join(uploadDir, `seed-${key}.svg`))) {
+        writePlaceholder(key, label, colours);
+        count += 1;
+      }
+    }
+  });
+
+  return count;
+}
+
 async function main() {
+  const reset = process.argv.includes('--reset') || process.env.SEED_RESET === '1';
+  const marker = await prisma.setting.findUnique({ where: { key: MARKER_KEY } });
+
   console.log('Seeding Kupaa Health Products…');
 
   // --- admin + demo customer
@@ -235,6 +279,39 @@ async function main() {
     },
   });
 
+  // The demo catalogue is written once. Re-running the seed must never delete a
+  // product the admin added, nor bring back one they deleted — so after the
+  // first run we leave the catalogue alone unless explicitly asked to reset.
+  if (marker && !reset) {
+    // The placeholder art lives in uploads/, which a deploy or cleanup can wipe.
+    // Regenerate anything missing so seeded products never show broken images.
+    const restored = restorePlaceholders();
+    if (restored) console.log(`Restored ${restored} missing placeholder image(s).`);
+
+    console.log('\nDemo catalogue already seeded — products, categories and coupons left untouched.');
+    console.log('Your own products are safe. To wipe the demo data and start over:');
+    console.log('  npm run seed:reset -w server\n');
+    await reportAdmin();
+    return;
+  }
+
+  if (reset && marker) {
+    // Only remove what a previous seed created; anything the admin added stays.
+    const previous = JSON.parse(marker.value)?.skus ?? [];
+    const owned = await prisma.product.findMany({
+      where: { sku: { in: previous } },
+      include: { _count: { select: { orderItems: true } } },
+    });
+    for (const product of owned) {
+      if (product._count.orderItems > 0) {
+        await prisma.product.update({ where: { id: product.id }, data: { isActive: false, isFeatured: false } });
+      } else {
+        await prisma.product.delete({ where: { id: product.id } });
+      }
+    }
+    console.log(`Reset: removed ${owned.length} previously seeded product(s). Admin-created products untouched.`);
+  }
+
   // --- categories
   const categoryBySlug = {};
   for (const [i, c] of categories.entries()) {
@@ -248,10 +325,7 @@ async function main() {
 
   // --- products
   for (const [i, p] of products.entries()) {
-    const slug = p.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    const slug = slugFor(p.name);
     const palette = PALETTES[i % PALETTES.length];
     const images = [
       writePlaceholder(slug, p.name.split(' ')[0], palette),
@@ -296,22 +370,6 @@ async function main() {
     }
   }
 
-  // --- drop demo products that are no longer in this file (e.g. after a rename),
-  //     archiving any that appear in an order so invoices keep resolving
-  const keepSkus = products.map((p) => p.sku);
-  const stale = await prisma.product.findMany({
-    where: { sku: { notIn: keepSkus } },
-    include: { _count: { select: { orderItems: true } } },
-  });
-  for (const product of stale) {
-    if (product._count.orderItems > 0) {
-      await prisma.product.update({ where: { id: product.id }, data: { isActive: false, isFeatured: false } });
-    } else {
-      await prisma.product.delete({ where: { id: product.id } });
-    }
-  }
-  if (stale.length) console.log(`  Removed ${stale.length} product(s) no longer in the seed.`);
-
   // --- coupons
   for (const c of coupons) {
     await prisma.coupon.upsert({
@@ -320,6 +378,12 @@ async function main() {
       create: { ...c, expiresAt: new Date(Date.now() + 180 * 86400_000) },
     });
   }
+
+  await prisma.setting.upsert({
+    where: { key: MARKER_KEY },
+    create: { key: MARKER_KEY, value: JSON.stringify({ version: SEED_VERSION, seededAt: new Date().toISOString(), skus: products.map((p) => p.sku) }) },
+    update: { value: JSON.stringify({ version: SEED_VERSION, seededAt: new Date().toISOString(), skus: products.map((p) => p.sku) }) },
+  });
 
   const counts = {
     users: await prisma.user.count(),
@@ -330,23 +394,27 @@ async function main() {
   };
 
   console.log('Seed complete:', counts);
+  await reportAdmin();
 
-  console.log(`\n  Admin sign-in:    ${adminEmail}`);
-  if (generated) {
-    console.log(`  Admin password:   ${adminPassword}`);
-    console.log('  ^ generated once and stored only as a hash. Save it now, or set');
-    console.log('    ADMIN_PASSWORD in server/.env and re-run `npm run seed`.');
-  } else if (configured) {
-    console.log(`  Admin password:   reset to the ADMIN_PASSWORD value in server/.env`);
-  } else {
-    console.log('  Admin password:   unchanged. To reset it, put a new ADMIN_PASSWORD');
-    console.log('                    in server/.env and re-run `npm run seed`.');
-  }
+  /** Sign-in summary. Declared here so it closes over the admin variables. */
+  async function reportAdmin() {
+    console.log(`\n  Admin sign-in:    ${adminEmail}`);
+    if (generated) {
+      console.log(`  Admin password:   ${adminPassword}`);
+      console.log('  ^ generated once and stored only as a hash. Save it now, or set');
+      console.log('    ADMIN_PASSWORD in server/.env and re-run `npm run seed`.');
+    } else if (configured) {
+      console.log('  Admin password:   reset to the ADMIN_PASSWORD value in server/.env');
+    } else {
+      console.log('  Admin password:   unchanged. To reset it, put a new ADMIN_PASSWORD');
+      console.log('                    in server/.env and re-run `npm run seed`.');
+    }
 
-  if (configured && INSECURE_DEFAULTS.has(configured)) {
-    console.warn('\n  WARNING: this admin password is a well-known default. Change it before going live.');
+    if (configured && INSECURE_DEFAULTS.has(configured)) {
+      console.warn('\n  WARNING: this admin password is a well-known default. Change it before going live.');
+    }
+    console.log('\n  Demo customer:    customer@example.com (password in the README)\n');
   }
-  console.log('\n  Demo customer:    customer@example.com (password in the README)\n');
 }
 
 main()

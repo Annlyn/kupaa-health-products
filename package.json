@@ -15,7 +15,8 @@
     "build": "npm run build -w client",
     "start": "npm run start -w server",
     "seed": "npm run seed -w server",
-    "bootstrap": "node scripts/bootstrap.mjs"
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "seed:reset": "npm run seed:reset -w server"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

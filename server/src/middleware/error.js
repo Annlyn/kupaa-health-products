@@ -21,6 +21,18 @@ export function errorHandler(err, _req, res, _next) {
   } else if (err.type === 'entity.too.large') {
     status = 413;
     message = 'Uploaded file is too large';
+  } else if (err.name === 'MulterError') {
+    // Multer throws for client-side mistakes; these are 400s, not server faults.
+    status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+    message =
+      {
+        LIMIT_FILE_SIZE: `That file is too large. The limit is ${Math.round(Number(process.env.MAX_UPLOAD_MB || 5))} MB per image.`,
+        LIMIT_FILE_COUNT: 'Too many files — upload up to 8 images at a time.',
+        LIMIT_UNEXPECTED_FILE: `Unexpected upload field "${err.field}". Images must be sent as "images".`,
+      }[err.code] || `Upload failed: ${err.message}`;
+  } else if (err.code === 'ENOENT' && String(err.path || '').includes('uploads')) {
+    status = 500;
+    message = 'The upload folder is missing on the server. It is recreated automatically — please retry.';
   }
 
   if (status >= 500) {

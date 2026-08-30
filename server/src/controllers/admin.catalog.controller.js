@@ -81,6 +81,8 @@ export const schemas = {
     ids: z.array(z.string().min(1)).min(1, 'Select at least one product').max(200),
     action: z.enum(['activate', 'deactivate', 'feature', 'unfeature', 'delete', 'discount', 'clearDiscount', 'setStock']),
     value: z.coerce.number().optional(),
+    // Delete products that appear in orders outright instead of archiving them.
+    force: z.boolean().default(false),
   }),
 
   category: z.object({
@@ -261,18 +263,38 @@ export const updateProduct = asyncHandler(async (req, res) => {
 });
 
 export const deleteProduct = asyncHandler(async (req, res) => {
+  const force = req.query.force === 'true' || req.body?.force === true;
+
   const product = await prisma.product.findUnique({ where: { id: req.params.id }, include: { _count: { select: { orderItems: true } } } });
   if (!product) throw ApiError.notFound('Product not found');
 
-  // Products that appear in orders are archived, never deleted, so historical
-  // invoices keep resolving.
-  if (product._count.orderItems > 0) {
+  // A product in someone's order history is archived by default — that keeps the
+  // order linked to a live product page. `force` removes it outright, which is
+  // safe because OrderItem stores its own name, SKU, price and image, and the
+  // foreign key is SetNull. Past invoices still render; they just stop linking.
+  if (product._count.orderItems > 0 && !force) {
     const archived = await prisma.product.update({ where: { id: product.id }, data: { isActive: false, isFeatured: false } });
-    return res.json({ ok: true, data: { archived: true, product: archived, message: 'Product has orders — it was archived instead of deleted' } });
+    return res.json({
+      ok: true,
+      data: {
+        archived: true,
+        product: archived,
+        orderCount: product._count.orderItems,
+        message: `Archived — it appears in ${product._count.orderItems} order(s). Delete permanently to remove it for good.`,
+      },
+    });
   }
 
   await prisma.product.delete({ where: { id: product.id } });
-  res.json({ ok: true, data: { archived: false, message: 'Product deleted' } });
+  res.json({
+    ok: true,
+    data: {
+      archived: false,
+      message: product._count.orderItems > 0
+        ? `Deleted permanently. ${product._count.orderItems} past order(s) keep their record of it.`
+        : 'Product deleted',
+    },
+  });
 });
 
 /** PATCH /api/admin/products/:id/stock — quick inline stock edit. */
@@ -370,8 +392,10 @@ export const bulkUpdate = asyncHandler(async (req, res) => {
     }
 
     case 'delete': {
-      const sold = products.filter((p) => p._count.orderItems > 0).map((p) => p.id);
-      const unsold = products.filter((p) => p._count.orderItems === 0).map((p) => p.id);
+      const sold = req.body.force ? [] : products.filter((p) => p._count.orderItems > 0).map((p) => p.id);
+      const unsold = req.body.force
+        ? products.map((p) => p.id)
+        : products.filter((p) => p._count.orderItems === 0).map((p) => p.id);
 
       if (sold.length) {
         const archived = await prisma.product.updateMany({

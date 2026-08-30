@@ -108,14 +108,26 @@ export default function ProductForm() {
   };
 
   const upload = async (files) => {
-    if (!files?.length) return;
+    const picked = [...(files ?? [])];
+    if (!picked.length) return;
+
+    const room = 8 - form.images.length;
+    if (room <= 0) {
+      if (fileRef.current) fileRef.current.value = '';
+      return toast.error('A product can have at most 8 images. Remove one first.');
+    }
+    if (picked.length > room) toast(`Only ${room} more image(s) fit — the rest were skipped.`, { icon: 'ℹ️' });
+
     setUploading(true);
     try {
       const body = new FormData();
-      [...files].slice(0, 8).forEach((file) => body.append('images', file));
+      picked.slice(0, room).forEach((file) => body.append('images', file));
+
       const { data } = await api.post('/admin/upload', body);
+      if (!data?.length) throw new Error('The server did not return an image. Please try a different file.');
+
       setForm((f) => ({ ...f, images: [...f.images, ...data.map((d) => ({ url: d.url, alt: '' }))].slice(0, 8) }));
-      toast.success(`${data.length} image(s) uploaded`);
+      toast.success(`${data.length} image${data.length > 1 ? 's' : ''} uploaded — save to keep the change`);
     } catch (err) {
       toast.error(err.message);
     } finally {

@@ -46,6 +46,19 @@ it a single time; it is stored only as a bcrypt hash. To choose or reset it:
 npm run seed
 ```
 
+`npm run seed` is **safe to re-run**. After the first run it leaves the catalogue
+completely alone — it will never delete a product you added, and never bring back one you deleted.
+It only ensures the admin account exists and restores any missing placeholder images.
+
+To wipe the demo catalogue and start over:
+
+```bash
+npm run seed:reset
+```
+
+That removes only the products the seed itself created (archiving any that appear in an order).
+Products you added yourself are never touched.
+
 Re-seeding with `ADMIN_PASSWORD` set rewrites the admin password **and revokes every existing
 session**, so it doubles as the account-recovery path. With it blank, an existing admin's password
 is left untouched.

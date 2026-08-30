@@ -10,10 +10,6 @@ import { cx } from './ui';
 
 const NAV = [
   { to: '/shop', label: 'Shop all' },
-  { to: '/shop?category=vitamins-supplements', label: 'Vitamins' },
-  { to: '/shop?category=ayurveda-herbs', label: 'Ayurveda' },
-  { to: '/shop?category=protein-fitness', label: 'Fitness' },
-  { to: '/shop?category=health-devices', label: 'Devices' },
   { to: '/track', label: 'Track order' },
 ];
 

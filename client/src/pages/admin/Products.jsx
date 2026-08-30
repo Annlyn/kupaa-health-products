@@ -63,6 +63,7 @@ export default function AdminProducts() {
 
   const [selected, setSelected] = useState([]);
   const [bulkDelete, setBulkDelete] = useState(false);
+  const [forceDelete, setForceDelete] = useState(false);
   const [discountOpen, setDiscountOpen] = useState(false);
   const [discountPct, setDiscountPct] = useState('10');
 
@@ -80,10 +81,10 @@ export default function AdminProducts() {
   const toggleOne = (id) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const toggleAll = () => setSelected(allSelected ? [] : visibleIds);
 
-  const remove = async () => {
+  const remove = async (force = false) => {
     setBusy(true);
     try {
-      const { data } = await api.del(`/admin/products/${deleting.id}`);
+      const { data } = await api.del(`/admin/products/${deleting.id}${force ? '?force=true' : ''}`);
       toast.success(data.message || 'Product deleted');
       setDeleting(null);
       reload();
@@ -108,7 +109,7 @@ export default function AdminProducts() {
   const runBulk = async (action, value) => {
     setBusy(true);
     try {
-      const { data } = await api.post('/admin/products/bulk', { ids: selected, action, value });
+      const { data } = await api.post('/admin/products/bulk', { ids: selected, action, value, force: forceDelete });
       const parts = [
         data.updated ? `${data.updated} updated` : null,
         data.archived ? `${data.archived} archived (they appear in orders)` : null,
@@ -117,6 +118,7 @@ export default function AdminProducts() {
       toast.success(parts.join(' · ') || 'Nothing to change');
       setSelected([]);
       setBulkDelete(false);
+      setForceDelete(false);
       setDiscountOpen(false);
       reload();
     } catch (err) {
@@ -372,34 +374,113 @@ export default function AdminProducts() {
 
       <Pagination page={meta?.page ?? 1} pages={meta?.pages ?? 1} onChange={setPage} />
 
-      <ConfirmDialog
-        open={Boolean(deleting)}
-        onClose={() => setDeleting(null)}
-        onConfirm={remove}
-        busy={busy}
-        title="Delete this product?"
-        message={`${deleting?.name} will be removed from the store. If it appears in past orders it is archived instead of deleted, so invoices keep working.`}
-        confirmLabel="Delete product"
-      />
+      {deleting && (deleting._count?.orderItems ?? 0) > 0 ? (
+        <Modal
+          open
+          onClose={() => setDeleting(null)}
+          title={`Remove “${deleting.name}”?`}
+          size="sm"
+          footer={
+            <>
+              <button className="btn-outline" onClick={() => setDeleting(null)} disabled={busy}>
+                Cancel
+              </button>
+              <button className="btn-outline" onClick={() => remove(false)} disabled={busy}>
+                Archive
+              </button>
+              <button className="btn-danger" onClick={() => remove(true)} disabled={busy}>
+                {busy && <Spinner className="h-4 w-4" />} Delete permanently
+              </button>
+            </>
+          }
+        >
+          <p className="text-sm text-ink-600">
+            This product appears in <strong>{deleting._count.orderItems} past order(s)</strong>.
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-ink-600">
+            <li>
+              <strong className="text-ink-900">Archive</strong> — hides it from the store but keeps it in your product list and
+              linked from those orders. You can re-activate it later.
+            </li>
+            <li>
+              <strong className="text-ink-900">Delete permanently</strong> — removes it from the list for good. Those orders keep
+              the name, SKU and price they were placed with, so invoices and history still read correctly; they just stop linking
+              to a product page.
+            </li>
+          </ul>
+        </Modal>
+      ) : (
+        <ConfirmDialog
+          open={Boolean(deleting)}
+          onClose={() => setDeleting(null)}
+          onConfirm={() => remove(false)}
+          busy={busy}
+          title="Delete this product?"
+          message={`${deleting?.name} will be removed from the store. This cannot be undone.`}
+          confirmLabel="Delete product"
+        />
+      )}
 
-      <ConfirmDialog
+      <Modal
         open={bulkDelete}
-        onClose={() => setBulkDelete(false)}
-        onConfirm={() => runBulk('delete')}
-        busy={busy}
-        title={`Delete ${selected.length} product(s)?`}
-        message={
-          selectedProducts.length
-            ? `${permanentCount} will be deleted permanently${
-                archiveCount ? `, and ${archiveCount} archived instead because they appear in past orders` : ''
-              }: ${selectedProducts
-                .slice(0, 6)
-                .map((p) => p.name)
-                .join(', ')}${selectedProducts.length > 6 ? `, and ${selectedProducts.length - 6} more` : ''}.`
-            : 'Products that appear in past orders are archived instead of deleted.'
+        onClose={() => {
+          setBulkDelete(false);
+          setForceDelete(false);
+        }}
+        title={`Remove ${selected.length} product(s)?`}
+        size="sm"
+        footer={
+          <>
+            <button
+              className="btn-outline"
+              onClick={() => {
+                setBulkDelete(false);
+                setForceDelete(false);
+              }}
+              disabled={busy}
+            >
+              Cancel
+            </button>
+            <button className="btn-danger" onClick={() => runBulk('delete')} disabled={busy}>
+              {busy && <Spinner className="h-4 w-4" />} {forceDelete ? 'Delete all permanently' : `Remove ${selected.length}`}
+            </button>
+          </>
         }
-        confirmLabel={`Delete ${selected.length} product(s)`}
-      />
+      >
+        <p className="text-sm text-ink-600">
+          {selectedProducts
+            .slice(0, 6)
+            .map((p) => p.name)
+            .join(', ')}
+          {selectedProducts.length > 6 ? `, and ${selectedProducts.length - 6} more` : ''}.
+        </p>
+
+        {archiveCount > 0 && (
+          <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+            {archiveCount} of these appear in past orders. By default they are archived rather than deleted.
+          </p>
+        )}
+
+        <p className="mt-3 text-sm text-ink-600">
+          {permanentCount > 0 && `${permanentCount} will be deleted permanently. `}
+          This cannot be undone.
+        </p>
+
+        {archiveCount > 0 && (
+          <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-lg border border-ink-200 px-3 py-2.5 text-sm text-ink-700 hover:bg-ink-50">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 rounded border-ink-300 text-rose-600 focus:ring-rose-500"
+              checked={forceDelete}
+              onChange={(e) => setForceDelete(e.target.checked)}
+            />
+            <span>
+              Delete all {selected.length} permanently, including the ones with orders. Past orders keep the name, SKU and price
+              they were placed with.
+            </span>
+          </label>
+        )}
+      </Modal>
 
       <Modal
         open={discountOpen}

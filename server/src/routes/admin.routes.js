@@ -9,6 +9,7 @@ import { requireAdmin } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { uploadImages } from '../middleware/upload.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { ApiError } from '../utils/apiError.js';
 import { getPickupLocations, isMock } from '../services/shiprocket.service.js';
 import { env } from '../config/env.js';
 import { getSettings } from '../services/settings.service.js';
@@ -23,7 +24,14 @@ router.post(
   '/upload',
   uploadImages.array('images', 8),
   asyncHandler(async (req, res) => {
-    const files = (req.files || []).map((f) => ({
+    // Reaching here with nothing attached means the request was malformed —
+    // answering 201 with an empty list would look like a silent success and the
+    // admin would just see "nothing happened".
+    if (!req.files?.length) {
+      throw ApiError.badRequest('No image was received. Choose a JPG, PNG, WEBP, AVIF or GIF file and try again.');
+    }
+
+    const files = req.files.map((f) => ({
       url: `/uploads/${f.filename}`,
       name: f.originalname,
       size: f.size,
