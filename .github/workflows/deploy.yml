@@ -27,8 +27,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check API origin is configured
+        # Pages is never same-origin with the API, so an unset value ships a
+        # site where every /api call 404s against github.io.
+        run: |
+          if [ -z "${{ vars.VITE_API_URL }}" ]; then
+            echo "::warning::VITE_API_URL is not set - the deployed site will have no working API."
+          fi
+
       - name: Build client
+        # Vite inlines env at build time, so the API origin must be set here.
+        # Without it the SPA calls /api on github.io and every request 404s.
+        # Set it under Settings > Secrets and variables > Actions > Variables.
         run: npm run build -w client
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_BASE: /${{ github.event.repository.name }}/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
