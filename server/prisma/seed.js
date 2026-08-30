@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import { env } from '../src/config/env.js';
 import { syncProductAggregates } from '../src/services/variant.service.js';
 import 'dotenv/config';
 
@@ -10,7 +11,7 @@ const prisma = new PrismaClient();
 
 /** Passwords that have appeared in this repo's docs and must never reach production. */
 const INSECURE_DEFAULTS = new Set(['Admin@12345', 'admin', 'password', 'changeme']);
-const uploadDir = path.resolve(process.cwd(), 'uploads');
+const uploadDir = path.resolve(process.cwd(), env.uploadDir);
 const ensureUploadDir = () => fs.mkdirSync(uploadDir, { recursive: true });
 ensureUploadDir();
 

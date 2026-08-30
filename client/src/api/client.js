@@ -7,6 +7,10 @@
  * once and replay the original request — concurrent 401s share one refresh.
  */
 
+// Resolved by the demo-bridge plugin in vite.config.js: the real adapter when
+// ../demo exists, an inert stub (DEMO === false) when it has been deleted.
+import { DEMO, demoFetch, demoMediaUrl } from 'virtual:demo';
+
 /**
  * Same-origin by default (the dev proxy, or the API serving the built SPA).
  * Set VITE_API_URL when the frontend is hosted separately — GitHub Pages, a CDN —
@@ -14,6 +18,13 @@
  */
 const API_ORIGIN = String(import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const BASE = `${API_ORIGIN}/api`;
+
+/**
+ * Every network call goes through here, so demo mode — no API at all, answers
+ * served from a bundled snapshot — needs no other change: it hands back real
+ * Response objects, leaving caching, token refresh and `raw` untouched.
+ */
+const transport = (url, init) => (DEMO ? demoFetch(url, init) : fetch(url, init));
 
 /** True when the API is on another origin, so its cookies are third-party. */
 export const isCrossOrigin = Boolean(API_ORIGIN);
@@ -26,6 +37,7 @@ export const isCrossOrigin = Boolean(API_ORIGIN);
 export const mediaUrl = (url) => {
   if (!url) return url;
   if (/^(https?:|data:|blob:)/.test(url)) return url;
+  if (DEMO) return demoMediaUrl(url);
   return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
@@ -75,7 +87,7 @@ export class ApiError extends Error {
 async function refreshSession() {
   refreshing ??= (async () => {
     try {
-      const res = await fetch(`${BASE}/auth/refresh`, { method: 'POST', credentials: 'include' });
+      const res = await transport(`${BASE}/auth/refresh`, { method: 'POST', credentials: 'include' });
       if (!res.ok) {
         localStorage.removeItem(SESSION_KEY);
         return null;
@@ -98,7 +110,7 @@ async function refreshSession() {
 async function request(path, { method = 'GET', body, headers = {}, raw = false, retry = true, signal } = {}) {
   const isForm = body instanceof FormData;
 
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await transport(`${BASE}${path}`, {
     method,
     credentials: 'include',
     signal,

@@ -1,0 +1,617 @@
+{
+  "generatedAt": "2026-08-30T14:55:24.962Z",
+  "settings": {
+    "storeName": "Kupaa Health Products",
+    "storeTagline": "Everyday wellness, honestly made",
+    "supportEmail": "support@kupaahealth.com",
+    "supportPhone": "+91 98765 43210",
+    "currency": "INR",
+    "freeShippingAbove": 999,
+    "flatShippingFee": 59,
+    "taxPercent": 0,
+    "codEnabled": true,
+    "codExtraFee": 0,
+    "maxQtyPerItem": 20,
+    "announcementEnabled": true,
+    "announcementText": "Free delivery on orders above ₹999 · Lab-tested formulas · Ships across India",
+    "heroBadge": "Trusted by 40,000+ Indian households",
+    "heroTitle": "Everyday wellness,",
+    "heroTitleAccent": "honestly made.",
+    "heroSubtitle": "Lab-tested vitamins, standardised ayurvedic extracts, clean protein and home health devices — at doses that actually do something. No proprietary blends, no filler.",
+    "heroPrimaryLabel": "Shop all products",
+    "heroPrimaryHref": "/shop",
+    "heroSecondaryLabel": "Explore Ayurveda",
+    "heroSecondaryHref": "/shop?category=ayurveda-herbs",
+    "heroStats": [
+      {
+        "value": "4.8★",
+        "label": "Average rating"
+      },
+      {
+        "value": "24 hrs",
+        "label": "Dispatch time"
+      },
+      {
+        "value": "₹999",
+        "label": "Free delivery over"
+      }
+    ],
+    "heroCards": [
+      {
+        "title": "Vitamin D3 + K2",
+        "subtitle": "Bones & immunity"
+      },
+      {
+        "title": "KSM-66 Ashwagandha",
+        "subtitle": "Stress & sleep"
+      },
+      {
+        "title": "Whey Isolate",
+        "subtitle": "27g protein / scoop"
+      },
+      {
+        "title": "Omega-3 Triple",
+        "subtitle": "Heart & brain"
+      }
+    ],
+    "trustItems": [
+      {
+        "title": "Third-party tested",
+        "copy": "Every batch assayed for potency, purity and heavy metals."
+      },
+      {
+        "title": "Clinically dosed",
+        "copy": "The amounts used in studies — not fairy-dusted labels."
+      },
+      {
+        "title": "Fast, tracked delivery",
+        "copy": "Dispatched in 24 hours with live Shiprocket tracking."
+      },
+      {
+        "title": "Easy 7-day returns",
+        "copy": "Unopened packs, no questions asked."
+      }
+    ],
+    "categoriesTitle": "Shop by goal",
+    "categoriesSubtitle": "Six focused ranges, each built around what you are actually trying to fix.",
+    "featuredTitle": "Bestsellers",
+    "featuredSubtitle": "What our customers reorder, month after month.",
+    "newestTitle": "New in store",
+    "newestSubtitle": "Freshly added to the Kupaa range.",
+    "promoEnabled": true,
+    "promoTitle": "Not sure where to start?",
+    "promoBody": "Most people benefit from three things: vitamin D, omega-3 and magnesium. Start there, stay consistent for eight weeks, then build on it.",
+    "promoBullets": [
+      {
+        "text": "Vitamin D3 + K2"
+      },
+      {
+        "text": "Omega-3 Triple Strength"
+      },
+      {
+        "text": "Magnesium Glycinate"
+      }
+    ],
+    "promoCtaLabel": "Build your daily stack",
+    "promoCtaHref": "/shop?category=vitamins-supplements",
+    "footerBlurb": "Everyday wellness, honestly made. Clinically dosed supplements and home health essentials, shipped across India.",
+    "footerPromises": [
+      {
+        "title": "Free delivery above ₹999",
+        "copy": "Dispatched within 24 hours, tracked end to end."
+      },
+      {
+        "title": "Lab-tested, every batch",
+        "copy": "Third-party assays for potency and heavy metals."
+      },
+      {
+        "title": "No fillers, no shortcuts",
+        "copy": "Clean labels with clinically studied doses."
+      }
+    ],
+    "footerNote": "These statements are not medical advice.",
+    "policyShipping": "Orders placed before 2 PM IST on a working day are dispatched the same day; everything else goes out the next working day.\nDelivery typically takes 2–5 working days in metros and 4–8 days elsewhere. Remote PIN codes may take longer.\nDelivery is free on orders above ₹999. Below that a flat ₹59 shipping fee applies.\nEvery parcel ships with an AWB tracking number, sent by email at dispatch and visible under My Orders.\nIf a courier attempts delivery three times without success, the parcel is returned to us and we refund the order minus shipping.",
+    "policyReturns": "Unopened, unused products in their original packaging can be returned within 7 days of delivery.\nFor hygiene and safety reasons we cannot accept returns of opened supplements, powders or personal care items unless the product is damaged or expired.\nIf a product arrives damaged, defective or incorrect, email us within 48 hours with photographs and your order number. We arrange a free pickup and send a replacement or a full refund.\nApproved refunds are issued to the original payment method within 5–7 working days of us receiving the return. Cash-on-delivery refunds go to a bank account you nominate.\nOrders can be cancelled free of charge any time before dispatch, from My Orders.",
+    "policyPrivacy": "We collect only what we need to fulfil your order: your name, email, phone number and delivery address.\nPayment details are never stored on our servers. Card, UPI and netbanking data goes directly to Razorpay, a PCI-DSS Level 1 certified payment processor.\nDelivery details are shared with Shiprocket and the assigned courier purely to deliver your parcel.\nPasswords are stored as bcrypt hashes and are never recoverable in plain text, by us or anyone else.\nYou can request a copy of your data, or ask us to delete your account entirely, by writing to our support address.",
+    "policyTerms": "Prices are in Indian Rupees and inclusive of applicable taxes. We may revise prices at any time; the price shown at checkout is what you pay.\nOrders are subject to stock availability. If an item goes out of stock after you order, we cancel that line and refund it in full.\nProducts sold here are food supplements and wellness devices. They are not intended to diagnose, treat, cure or prevent any disease.\nConsult a qualified physician before starting any supplement, particularly if you are pregnant, nursing, on prescription medication or managing a chronic condition.\nAll content, imagery and branding on this store is our property.",
+    "policyContact": "Email us and we reply within one working day.\nPhone lines are open Monday to Saturday, 9 AM to 7 PM IST.\nRegistered office: 4th Floor, Wellness House, Anna Salai, Chennai, Tamil Nadu 600002.\nFor order-specific questions, please quote your order number (it looks like KUP-260830-482913)."
+  },
+  "categories": [
+    {
+      "id": "cmtfmoaoq0006uzbdz6kfr7jh",
+      "name": "Protein & Fitness",
+      "slug": "protein-fitness",
+      "description": "Clean protein and recovery nutrition for everyday training.",
+      "image": "demo-media/seed-cat-protein-fitness.svg",
+      "productCount": 1
+    },
+    {
+      "id": "cmtfmoaoq0007uzbd4gdjl15m",
+      "name": "Immunity & Wellness",
+      "slug": "immunity-wellness",
+      "description": "Support your defences through every season.",
+      "image": "demo-media/seed-cat-immunity-wellness.svg",
+      "productCount": 2
+    },
+    {
+      "id": "cmtfmoaor0008uzbd6oyxke9l",
+      "name": "Personal Care",
+      "slug": "personal-care",
+      "description": "Gentle, dermatologist-approved daily care.",
+      "image": "demo-media/seed-cat-personal-care.svg",
+      "productCount": 1
+    },
+    {
+      "id": "cmtfmoaor0009uzbd7k7djt2c",
+      "name": "Health Devices",
+      "slug": "health-devices",
+      "description": "Home monitoring devices you can trust.",
+      "image": "demo-media/seed-cat-health-devices.svg",
+      "productCount": 0
+    }
+  ],
+  "products": [
+    {
+      "id": "cmtftrtrq000yuzvgdqtxwxh1",
+      "name": "Bodywash Powder",
+      "slug": "bodywash-powder",
+      "sku": "KUP006",
+      "shortDesc": null,
+      "description": null,
+      "categoryId": "cmtfmoaor0008uzbd6oyxke9l",
+      "price": 399,
+      "mrp": 500,
+      "stock": 19,
+      "lowStockAt": 5,
+      "variantLabel": "Size",
+      "weightKg": 0.5,
+      "lengthCm": 15,
+      "breadthCm": 10,
+      "heightCm": 5,
+      "hsn": null,
+      "tags": null,
+      "isActive": true,
+      "isFeatured": false,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "createdAt": "2026-08-30T13:08:17.655Z",
+      "updatedAt": "2026-08-30T13:23:37.344Z",
+      "category": {
+        "id": "cmtfmoaor0008uzbd6oyxke9l",
+        "name": "Personal Care",
+        "slug": "personal-care"
+      },
+      "images": [
+        {
+          "id": "cmtfuau5l000wuzgj6ljl9n8s",
+          "url": "demo-media/1788095256874-3d31b36a951a.jpg",
+          "alt": null,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtfuau5l000xuzgjr63el5s7",
+          "url": "demo-media/1788095256879-fba44e417035.jpg",
+          "alt": null,
+          "sortOrder": 1
+        },
+        {
+          "id": "cmtfuau5l000yuzgjintbxlmv",
+          "url": "demo-media/1788095256881-b144f401564f.jpg",
+          "alt": null,
+          "sortOrder": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "cmtftrtrq0012uzvgfpsva2do",
+          "name": "500 g",
+          "sku": "KUP006-1",
+          "price": 399,
+          "mrp": 500,
+          "stock": 10,
+          "weightKg": 0.5,
+          "isActive": true,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftrtrq0013uzvgblguhgy0",
+          "name": "1 kg",
+          "sku": "KUP006-2",
+          "price": 699,
+          "mrp": 800,
+          "stock": 9,
+          "weightKg": 1,
+          "isActive": true,
+          "sortOrder": 1
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "id": "cmtftq9mf000ruzvg0rwsn33s",
+      "name": "Health Mix",
+      "slug": "health-mix",
+      "sku": "KUP005",
+      "shortDesc": null,
+      "description": null,
+      "categoryId": "cmtfmoaoq0006uzbdz6kfr7jh",
+      "price": 299,
+      "mrp": 400,
+      "stock": 18,
+      "lowStockAt": 5,
+      "variantLabel": "Size",
+      "weightKg": 0.5,
+      "lengthCm": 15,
+      "breadthCm": 10,
+      "heightCm": 5,
+      "hsn": null,
+      "tags": null,
+      "isActive": true,
+      "isFeatured": false,
+      "ratingAvg": 5,
+      "ratingCount": 1,
+      "createdAt": "2026-08-30T13:07:04.887Z",
+      "updatedAt": "2026-08-30T13:21:06.195Z",
+      "category": {
+        "id": "cmtfmoaoq0006uzbdz6kfr7jh",
+        "name": "Protein & Fitness",
+        "slug": "protein-fitness"
+      },
+      "images": [
+        {
+          "id": "cmtftq9mf000suzvg8zsit4kb",
+          "url": "demo-media/1788095178150-a2f4dd15d72b.jpg",
+          "alt": null,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftq9mf000tuzvgqlkv4k8z",
+          "url": "demo-media/1788095178157-e488b24aee7f.jpg",
+          "alt": null,
+          "sortOrder": 1
+        },
+        {
+          "id": "cmtftq9mf000uuzvg1dwqbgm1",
+          "url": "demo-media/1788095178160-2865eea84d11.jpg",
+          "alt": null,
+          "sortOrder": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "cmtftq9mf000vuzvg1rgflxag",
+          "name": "500 g",
+          "sku": "KUP005-1",
+          "price": 299,
+          "mrp": 400,
+          "stock": 8,
+          "weightKg": 0.5,
+          "isActive": true,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftq9mf000wuzvgf1yd5zu0",
+          "name": "1 kg",
+          "sku": "KUP005-2",
+          "price": 549,
+          "mrp": 700,
+          "stock": 10,
+          "weightKg": 1,
+          "isActive": true,
+          "sortOrder": 1
+        }
+      ],
+      "reviews": [
+        {
+          "id": "cmtfu8as2000juzgjrhc82sy2",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
+          "rating": 5,
+          "title": "Great",
+          "comment": "Works well",
+          "createdAt": "2026-08-30T13:21:06.195Z",
+          "author": "Priya Raman"
+        }
+      ]
+    },
+    {
+      "id": "cmtftogds000muzvgaa6aag06",
+      "name": "Honey spicy Garlic pickle",
+      "slug": "honey-spicy-garlic-pickle",
+      "sku": "KUP004",
+      "shortDesc": null,
+      "description": null,
+      "categoryId": null,
+      "price": 340,
+      "mrp": 400,
+      "stock": 10,
+      "lowStockAt": 5,
+      "variantLabel": "Size",
+      "weightKg": 0.2,
+      "lengthCm": 15,
+      "breadthCm": 10,
+      "heightCm": 5,
+      "hsn": null,
+      "tags": null,
+      "isActive": true,
+      "isFeatured": false,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "createdAt": "2026-08-30T13:05:40.336Z",
+      "updatedAt": "2026-08-30T13:05:40.338Z",
+      "category": null,
+      "images": [
+        {
+          "id": "cmtftogds000nuzvgerjjluqn",
+          "url": "demo-media/1788095103305-f6956101535d.jpg",
+          "alt": null,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftogds000ouzvgjff8yxy3",
+          "url": "demo-media/1788095109757-e0bc41519543.jpg",
+          "alt": null,
+          "sortOrder": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "cmtftogds000puzvgb9ypfrqc",
+          "name": "200 g",
+          "sku": "KUP004-1",
+          "price": 340,
+          "mrp": 400,
+          "stock": 10,
+          "weightKg": 0.2,
+          "isActive": true,
+          "sortOrder": 0
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "id": "cmtftmrml000huzvgzxjhxieo",
+      "name": "Honey Chilly pickle",
+      "slug": "honey-chilly-pickle",
+      "sku": "KUP003",
+      "shortDesc": null,
+      "description": null,
+      "categoryId": null,
+      "price": 390,
+      "mrp": 450,
+      "stock": 10,
+      "lowStockAt": 5,
+      "variantLabel": "Size",
+      "weightKg": 0.2,
+      "lengthCm": 15,
+      "breadthCm": 10,
+      "heightCm": 5,
+      "hsn": null,
+      "tags": null,
+      "isActive": true,
+      "isFeatured": false,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "createdAt": "2026-08-30T13:04:21.597Z",
+      "updatedAt": "2026-08-30T13:04:21.600Z",
+      "category": null,
+      "images": [
+        {
+          "id": "cmtftmrml000iuzvgzpnh8kir",
+          "url": "demo-media/1788095016900-87dd6155f207.jpg",
+          "alt": null,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftmrml000juzvg40vhbpbh",
+          "url": "demo-media/1788095038150-7694999c2c9c.jpg",
+          "alt": null,
+          "sortOrder": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "cmtftmrml000kuzvgch5ini5n",
+          "name": "200 g",
+          "sku": "KUP003-1",
+          "price": 390,
+          "mrp": 450,
+          "stock": 10,
+          "weightKg": 0.2,
+          "isActive": true,
+          "sortOrder": 0
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "id": "cmtftktdu000auzvgtompo5qn",
+      "name": "Gheee",
+      "slug": "gheee",
+      "sku": "KUP002",
+      "shortDesc": null,
+      "description": null,
+      "categoryId": "cmtfmoaoq0007uzbd4gdjl15m",
+      "price": 640,
+      "mrp": 700,
+      "stock": 20,
+      "lowStockAt": 5,
+      "variantLabel": "Size",
+      "weightKg": 0.5,
+      "lengthCm": 15,
+      "breadthCm": 10,
+      "heightCm": 5,
+      "hsn": null,
+      "tags": null,
+      "isActive": true,
+      "isFeatured": false,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "createdAt": "2026-08-30T13:02:50.562Z",
+      "updatedAt": "2026-08-30T13:02:50.566Z",
+      "category": {
+        "id": "cmtfmoaoq0007uzbd4gdjl15m",
+        "name": "Immunity & Wellness",
+        "slug": "immunity-wellness"
+      },
+      "images": [
+        {
+          "id": "cmtftktdu000buzvglpn95w9r",
+          "url": "demo-media/1788094915351-1c05d4edf46e.jpg",
+          "alt": null,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftktdu000cuzvgag5bxvia",
+          "url": "demo-media/1788094915369-0d9b5f34459c.jpg",
+          "alt": null,
+          "sortOrder": 1
+        },
+        {
+          "id": "cmtftktdu000duzvg1kljrkjd",
+          "url": "demo-media/1788094915372-0d3e35842297.jpg",
+          "alt": null,
+          "sortOrder": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "cmtftktdu000euzvg9zhgi5zw",
+          "name": "500 g",
+          "sku": "KUP002-1",
+          "price": 640,
+          "mrp": 700,
+          "stock": 10,
+          "weightKg": 0.5,
+          "isActive": true,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftktdu000fuzvgp03gwhki",
+          "name": "1 kg",
+          "sku": "KUP002-2",
+          "price": 1200,
+          "mrp": 1400,
+          "stock": 10,
+          "weightKg": 1,
+          "isActive": true,
+          "sortOrder": 1
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "id": "cmtftil6z0003uzvgowr0g79f",
+      "name": "Honey",
+      "slug": "honey",
+      "sku": "KUP001",
+      "shortDesc": null,
+      "description": null,
+      "categoryId": "cmtfmoaoq0007uzbd4gdjl15m",
+      "price": 499,
+      "mrp": 599,
+      "stock": 20,
+      "lowStockAt": 5,
+      "variantLabel": "Size",
+      "weightKg": 0.5,
+      "lengthCm": 15,
+      "breadthCm": 10,
+      "heightCm": 5,
+      "hsn": null,
+      "tags": null,
+      "isActive": true,
+      "isFeatured": false,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "createdAt": "2026-08-30T13:01:06.635Z",
+      "updatedAt": "2026-08-30T13:01:06.638Z",
+      "category": {
+        "id": "cmtfmoaoq0007uzbd4gdjl15m",
+        "name": "Immunity & Wellness",
+        "slug": "immunity-wellness"
+      },
+      "images": [
+        {
+          "id": "cmtftil6z0004uzvgnemu6ado",
+          "url": "demo-media/1788094811320-918c9f0c70c6.jpg",
+          "alt": null,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftil6z0005uzvg9q93tqit",
+          "url": "demo-media/1788094811325-52c1da9bf0b7.jpg",
+          "alt": null,
+          "sortOrder": 1
+        },
+        {
+          "id": "cmtftil6z0006uzvgjrvdf3hh",
+          "url": "demo-media/1788094811328-bded01aa2e63.jpg",
+          "alt": null,
+          "sortOrder": 2
+        }
+      ],
+      "variants": [
+        {
+          "id": "cmtftil6z0007uzvgbqs5b3lt",
+          "name": "500 g",
+          "sku": "KUP001-1",
+          "price": 499,
+          "mrp": 599,
+          "stock": 10,
+          "weightKg": 0.5,
+          "isActive": true,
+          "sortOrder": 0
+        },
+        {
+          "id": "cmtftil6z0008uzvgf7irlkuz",
+          "name": "1 kg",
+          "sku": "KUP001-2",
+          "price": 899,
+          "mrp": 999,
+          "stock": 10,
+          "weightKg": 1,
+          "isActive": true,
+          "sortOrder": 1
+        }
+      ],
+      "reviews": []
+    }
+  ],
+  "coupons": [
+    {
+      "code": "WELCOME10",
+      "description": "10% off your first order",
+      "type": "PERCENT",
+      "value": 10,
+      "minOrder": 499,
+      "maxDiscount": 300,
+      "usageLimit": null,
+      "usedCount": 5,
+      "startsAt": null,
+      "expiresAt": "2027-02-26T09:49:35.662Z"
+    },
+    {
+      "code": "HEALTH500",
+      "description": "₹500 off orders above ₹2999",
+      "type": "FLAT",
+      "value": 500,
+      "minOrder": 2999,
+      "maxDiscount": null,
+      "usageLimit": null,
+      "usedCount": 0,
+      "startsAt": null,
+      "expiresAt": "2027-02-26T09:49:35.665Z"
+    },
+    {
+      "code": "FREESHIP",
+      "description": "₹59 off — shipping on us",
+      "type": "FLAT",
+      "value": 59,
+      "minOrder": 0,
+      "maxDiscount": null,
+      "usageLimit": 500,
+      "usedCount": 0,
+      "startsAt": null,
+      "expiresAt": "2027-02-26T09:49:35.665Z"
+    }
+  ]
+}

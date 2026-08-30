@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { like } from '../lib/search.js';
 
 export const reviewSchema = z.object({
   rating: z.coerce.number().int().min(1, 'Pick a rating').max(5),
@@ -85,11 +86,11 @@ export const adminList = asyncHandler(async (req, res) => {
   if (rating) where.rating = rating;
   if (q) {
     where.OR = [
-      { title: { contains: q } },
-      { comment: { contains: q } },
-      { product: { name: { contains: q } } },
-      { user: { name: { contains: q } } },
-      { user: { email: { contains: q } } },
+      { title: like(q) },
+      { comment: like(q) },
+      { product: { name: like(q) } },
+      { user: { name: like(q) } },
+      { user: { email: like(q) } },
     ];
   }
 

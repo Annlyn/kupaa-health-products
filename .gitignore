@@ -8,3 +8,5 @@ server/uploads/*
 server/prisma/*.db
 server/prisma/*.db-journal
 .DS_Store
+server/prisma/export.json
+demo/.test-bundle.mjs

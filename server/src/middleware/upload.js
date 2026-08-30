@@ -5,7 +5,7 @@ import multer from 'multer';
 import { env } from '../config/env.js';
 import { ApiError } from '../utils/apiError.js';
 
-export const uploadDir = path.resolve(process.cwd(), 'uploads');
+export const uploadDir = path.resolve(process.cwd(), env.uploadDir);
 
 /**
  * Creating the directory once at boot is not enough — it can be wiped by a

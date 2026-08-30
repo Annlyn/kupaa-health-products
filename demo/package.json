@@ -1,0 +1,6 @@
+{
+  "name": "kupaa-demo",
+  "private": true,
+  "type": "module",
+  "description": "Throwaway catalogue snapshot for the backend-free GitHub Pages build. Not an npm workspace; delete this folder to remove demo mode entirely."
+}

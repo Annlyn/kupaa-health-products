@@ -5,6 +5,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { round2 } from '../utils/money.js';
 import { ALLOWED_TRANSITIONS, cancelOrder, logEvent, orderInclude, pushToShiprocket } from '../services/order.service.js';
 import { refundPayment } from '../services/razorpay.service.js';
+import { like } from '../lib/search.js';
 import {
   assignAwb,
   cancelShipment,
@@ -47,11 +48,11 @@ export const list = asyncHandler(async (req, res) => {
   }
   if (q) {
     where.OR = [
-      { orderNumber: { contains: q } },
-      { shipName: { contains: q } },
-      { shipEmail: { contains: q } },
-      { shipPhone: { contains: q } },
-      { shipment: { awbCode: { contains: q } } },
+      { orderNumber: like(q) },
+      { shipName: like(q) },
+      { shipEmail: like(q) },
+      { shipPhone: like(q) },
+      { shipment: { awbCode: like(q) } },
     ];
   }
 

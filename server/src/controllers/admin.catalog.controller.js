@@ -8,6 +8,7 @@ import { uniqueSlug } from '../utils/slug.js';
 import { round2 } from '../utils/money.js';
 import { syncProductAggregates, variantSelect } from '../services/variant.service.js';
 import { uploadDir } from '../middleware/upload.js';
+import { like } from '../lib/search.js';
 
 const imageInput = z.object({ url: z.string().min(1), alt: z.string().max(160).optional().or(z.literal('')) });
 
@@ -103,7 +104,7 @@ export const listProducts = asyncHandler(async (req, res) => {
   const { q, category, status, sort, page, limit } = req.query;
 
   const where = {};
-  if (q) where.OR = [{ name: { contains: q } }, { sku: { contains: q } }, { tags: { contains: q } }];
+  if (q) where.OR = [{ name: like(q) }, { sku: like(q) }, { tags: like(q) }];
   if (category) where.categoryId = category;
   if (status === 'active') where.isActive = true;
   if (status === 'inactive') where.isActive = false;

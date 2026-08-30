@@ -1,6 +1,8 @@
 // Kupaa Health Products — data model
-// SQLite by default for zero-setup local dev. Switch `provider` to "postgresql"
-// and update DATABASE_URL to move to Postgres; no model changes are required.
+// SQLite by default for zero-setup local dev, Postgres in production. No model
+// changes are needed to move between them: `provider` below is rewritten from
+// DATABASE_URL by scripts/set-db-provider.js, which runs before generate/push.
+// Edit it by hand and the next db:push will just put it back.
 
 generator client {
   provider = "prisma-client-js"

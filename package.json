@@ -16,7 +16,9 @@
     "start": "npm run start -w server",
     "seed": "npm run seed -w server",
     "bootstrap": "node scripts/bootstrap.mjs",
-    "seed:reset": "npm run seed:reset -w server"
+    "seed:reset": "npm run seed:reset -w server",
+    "demo:data": "npm run demo:data -w server",
+    "demo:test": "esbuild demo/adapter.js --bundle --format=esm --platform=node --loader:.json=json --define:import.meta.env.VITE_DEMO='\"true\"' --define:import.meta.env.BASE_URL='\"/\"' --outfile=demo/.test-bundle.mjs --log-level=warning && node demo/test.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

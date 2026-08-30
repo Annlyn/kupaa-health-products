@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { summarise, variantSelect } from '../services/variant.service.js';
+import { like } from '../lib/search.js';
 
 export const listQuerySchema = z.object({
   q: z.string().trim().max(120).optional(),
@@ -61,14 +62,14 @@ export const list = asyncHandler(async (req, res) => {
     if (minPrice != null) where.price.gte = minPrice;
     if (maxPrice != null) where.price.lte = maxPrice;
   }
-  if (tag) where.tags = { contains: tag };
+  if (tag) where.tags = like(tag);
   if (q) {
     where.OR = [
-      { name: { contains: q } },
-      { shortDesc: { contains: q } },
-      { description: { contains: q } },
-      { tags: { contains: q } },
-      { sku: { contains: q } },
+      { name: like(q) },
+      { shortDesc: like(q) },
+      { description: like(q) },
+      { tags: like(q) },
+      { sku: like(q) },
     ];
   }
 
@@ -161,7 +162,7 @@ export const suggest = asyncHandler(async (req, res) => {
   if (q.length < 2) return res.json({ ok: true, data: [] });
 
   const items = await prisma.product.findMany({
-    where: { isActive: true, OR: [{ name: { contains: q } }, { tags: { contains: q } }] },
+    where: { isActive: true, OR: [{ name: like(q) }, { tags: like(q) }] },
     select: { name: true, slug: true, price: true, images: { select: { url: true }, take: 1, orderBy: { sortOrder: 'asc' } } },
     take: 6,
   });

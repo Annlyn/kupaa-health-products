@@ -65,6 +65,23 @@ export const env = {
   },
 
   maxUploadBytes: num(process.env.MAX_UPLOAD_MB, 5) * 1024 * 1024,
+
+  /**
+   * Where product images are written. Defaults to ./uploads for local dev.
+   *
+   * On a host with an ephemeral filesystem this MUST point at a mounted disk,
+   * or every image disappears on the next deploy. See the `disk` block in
+   * render.yaml, which mounts one and sets UPLOAD_DIR to it.
+   */
+  uploadDir: process.env.UPLOAD_DIR || 'uploads',
+
+  /**
+   * SQLite locally, Postgres in production. Prisma needs the provider as a
+   * literal in the schema (scripts/set-db-provider.js keeps it in step), but a
+   * few queries have to know too: `contains` is case-insensitive on SQLite and
+   * case-sensitive on Postgres unless asked otherwise. See lib/search.js.
+   */
+  isPostgres: /^postgres(ql)?:/.test(process.env.DATABASE_URL || ''),
 };
 
 /** Warn loudly rather than crash — the store still runs in catalogue-only mode. */

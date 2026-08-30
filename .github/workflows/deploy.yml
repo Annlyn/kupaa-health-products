@@ -27,21 +27,26 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check API origin is configured
-        # Pages is never same-origin with the API, so an unset value ships a
-        # site where every /api call 404s against github.io.
+      - name: Report build mode
+        # Pages is never same-origin with the API. With VITE_API_URL set the
+        # build talks to that server; without it the demo snapshot stands in,
+        # and if demo/ has been deleted too there is nothing to fall back on.
         run: |
-          if [ -z "${{ vars.VITE_API_URL }}" ]; then
-            echo "::warning::VITE_API_URL is not set - the deployed site will have no working API."
+          if [ -n "${{ vars.VITE_API_URL }}" ]; then
+            echo "::notice::Building against ${{ vars.VITE_API_URL }}"
+          elif [ -f demo/adapter.js ]; then
+            echo "::notice::VITE_API_URL is not set - building in demo mode from demo/data.json"
+          else
+            echo "::warning::VITE_API_URL is not set and demo/ is gone - the site will have no data. Set the variable under Settings > Secrets and variables > Actions > Variables."
           fi
 
       - name: Build client
-        # Vite inlines env at build time, so the API origin must be set here.
-        # Without it the SPA calls /api on github.io and every request 404s.
-        # Set it under Settings > Secrets and variables > Actions > Variables.
+        # Vite inlines env at build time, so these must be set here rather than
+        # configured on the deployed site afterwards.
         run: npm run build -w client
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_DEMO: ${{ vars.VITE_API_URL == '' }}
           VITE_BASE: /${{ github.event.repository.name }}/
 
       - name: Setup Pages

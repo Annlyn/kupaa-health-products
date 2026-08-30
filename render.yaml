@@ -3,24 +3,38 @@
 #
 # On Render: New > Blueprint > pick this repository.
 #
-# BEFORE DEPLOYING, change one line in server/prisma/schema.prisma:
-#     datasource db { provider = "postgresql" }   // was "sqlite"
-# Prisma needs the provider as a literal, so it cannot be set from an env var.
-# SQLite also would not survive a redeploy on Render's ephemeral disk.
+# The Prisma provider no longer needs editing by hand — scripts/set-db-provider.js
+# reads DATABASE_URL during the build and sets it to postgresql there, sqlite
+# locally, so the same commit runs in both places.
 services:
   - type: web
     name: kupaa-api
     runtime: node
-    plan: free
+    # `starter`, not `free`, because of the disk below: Render does not offer
+    # persistent disks on free instances, and free instances also spin down.
+    plan: starter
     rootDir: server
-    buildCommand: npm install && npx prisma generate && npx prisma db push
+    buildCommand: npm install && node scripts/set-db-provider.js && npx prisma generate && npx prisma db push
     startCommand: npm start
     healthCheckPath: /api/health
+
+    # Product images are written to the filesystem (src/middleware/upload.js).
+    # Without a disk they live on the container's ephemeral storage and every
+    # deploy silently deletes the whole catalogue's imagery.
+    disk:
+      name: uploads
+      mountPath: /var/data
+      sizeGB: 1
+
     envVars:
       - key: NODE_ENV
         value: production
 
-      # Your GitHub Pages URL, e.g. https://yourname.github.io
+      # Must sit on the mounted disk above, not the default ./uploads.
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+
+      # Your GitHub Pages URL, e.g. https://annlyn.github.io
       # Comma-separate to allow more than one origin.
       - key: CLIENT_URL
         sync: false
@@ -29,6 +43,11 @@ services:
       - key: SERVER_URL
         sync: false
 
+      # Render's free Postgres is DELETED 30 days after creation. To use a
+      # provider without that limit (Neon and Supabase both have free tiers),
+      # delete the `databases:` block at the bottom of this file and replace
+      # this entry with `sync: false`, then paste their connection string into
+      # the Render dashboard. No code changes either way.
       - key: DATABASE_URL
         fromDatabase:
           name: kupaa-db
@@ -39,7 +58,9 @@ services:
       - key: JWT_REFRESH_SECRET
         generateValue: true
 
-      # Leave blank: `npm run seed` generates one and prints it once in the log.
+      # Only used when seeding a fresh database from scratch. Importing an
+      # existing one with `npm run db:migrate-to` brings your admin across
+      # instead, password included.
       - key: ADMIN_PASSWORD
         sync: false
 

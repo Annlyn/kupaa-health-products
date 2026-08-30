@@ -7,12 +7,16 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:setup": "prisma generate && prisma db push && node prisma/seed.js",
+    "db:generate": "npm run db:provider && prisma generate",
+    "db:push": "npm run db:provider && prisma db push",
+    "db:setup": "npm run db:provider && prisma generate && prisma db push && node prisma/seed.js",
     "seed": "node prisma/seed.js",
     "studio": "prisma studio",
-    "seed:reset": "node prisma/seed.js --reset"
+    "seed:reset": "node prisma/seed.js --reset",
+    "db:provider": "node scripts/set-db-provider.js",
+    "db:export": "node scripts/export-db.js",
+    "db:import": "npm run db:provider && prisma generate && node scripts/import-db.js",
+    "demo:data": "node ../demo/export.js"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

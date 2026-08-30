@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CartDrawer from '../components/CartDrawer';
+import { DEMO, DEMO_NOTICE } from 'virtual:demo';
 
 export default function ShopLayout() {
   const { pathname } = useLocation();
@@ -22,6 +23,7 @@ export default function ShopLayout() {
       >
         Skip to content
       </a>
+      {DEMO && <p className="bg-ink-900 px-4 py-2 text-center text-xs font-medium text-white">{DEMO_NOTICE}</p>}
       <Header />
       <main id="main" className="flex-1">
         <Outlet />

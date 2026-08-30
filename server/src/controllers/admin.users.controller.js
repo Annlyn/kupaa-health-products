@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { round2 } from '../utils/money.js';
+import { like } from '../lib/search.js';
 
 export const schemas = {
   list: z.object({
@@ -33,7 +34,7 @@ export const listUsers = asyncHandler(async (req, res) => {
 
   const where = {};
   if (role !== 'all') where.role = role;
-  if (q) where.OR = [{ name: { contains: q } }, { email: { contains: q } }, { phone: { contains: q } }];
+  if (q) where.OR = [{ name: like(q) }, { email: like(q) }, { phone: like(q) }];
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
