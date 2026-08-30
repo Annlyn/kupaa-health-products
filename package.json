@@ -19,7 +19,8 @@
     "seed:reset": "npm run seed:reset -w server"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "webpack-cli": "^7.2.3"
   },
   "engines": {
     "node": ">=20"
