@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { api } from '../../api/client';
+import { api, mediaUrl } from '../../api/client';
 import { CopyIcon, ImageIcon, PlusIcon, TrashIcon } from '../../components/Icons';
 import { Field, PageLoader, Spinner, cx } from '../../components/ui';
 import { money, percentOff } from '../../lib/format';
@@ -312,7 +312,7 @@ export default function ProductForm() {
             <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
               {form.images.map((img, i) => (
                 <div key={`${img.url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-ink-100 bg-ink-50">
-                  <img src={img.url} alt="" className="h-full w-full object-cover" />
+                  <img src={mediaUrl(img.url)} alt="" className="h-full w-full object-cover" />
                   {i === 0 && <span className="absolute left-1.5 top-1.5 badge bg-brand-700 text-[10px] text-white">Main</span>}
                   <button
                     type="button"

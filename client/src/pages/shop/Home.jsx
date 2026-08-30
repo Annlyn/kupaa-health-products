@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { CheckCircle, ChevronRight, LeafIcon, PackageIcon, ShieldIcon, TruckIcon } from '../../components/Icons';
 import { SkeletonCard } from '../../components/ui';
+import { mediaUrl } from '../../api/client';
 import { useStore } from '../../context/StoreContext';
 import { useFetchOnVisible, useTitle } from '../../lib/hooks';
 
@@ -138,7 +139,7 @@ export default function Home() {
             >
               <div className="aspect-[16/9] overflow-hidden bg-ink-50">
                 {cat.image && (
-                  <img src={cat.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <img src={mediaUrl(cat.image)} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 )}
               </div>
               <div className="p-5">

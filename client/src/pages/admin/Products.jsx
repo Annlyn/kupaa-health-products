@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { api, qs } from '../../api/client';
+import { api, mediaUrl, qs } from '../../api/client';
 import { CopyIcon, EditIcon, PackageIcon, PlusIcon, SearchIcon, TrashIcon } from '../../components/Icons';
 import { Badge, ConfirmDialog, EmptyState, Modal, Pagination, Spinner, cx } from '../../components/ui';
 import { money, percentOff } from '../../lib/format';
@@ -280,7 +280,7 @@ export default function AdminProducts() {
                       <div className="flex items-center gap-3">
                         <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-ink-100">
                           {product.images?.[0] ? (
-                            <img src={product.images[0].url} alt="" className="h-full w-full object-cover" />
+                            <img src={mediaUrl(product.images[0].url)} alt="" className="h-full w-full object-cover" />
                           ) : (
                             <span className="grid h-full w-full place-items-center text-ink-400">
                               <PackageIcon width={17} height={17} />

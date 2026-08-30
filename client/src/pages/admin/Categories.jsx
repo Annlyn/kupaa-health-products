@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { api } from '../../api/client';
+import { api, mediaUrl } from '../../api/client';
 import { PlusIcon, TagIcon } from '../../components/Icons';
 import { Badge, ConfirmDialog, EmptyState, Field, Modal, Spinner, cx } from '../../components/ui';
 import { useFetch, useTitle } from '../../lib/hooks';
@@ -95,7 +95,7 @@ export default function AdminCategories() {
             <article key={category.id} className="card overflow-hidden">
               <div className="aspect-[16/9] bg-ink-100">
                 {category.image ? (
-                  <img src={category.image} alt="" className="h-full w-full object-cover" />
+                  <img src={mediaUrl(category.image)} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <span className="grid h-full w-full place-items-center text-ink-300">
                     <TagIcon width={26} height={26} />

@@ -6,6 +6,7 @@ import AccountNav from './AccountNav';
 import { PackageIcon, TruckIcon } from '../../components/Icons';
 import { Badge, Breadcrumbs, EmptyState, Pagination, Spinner } from '../../components/ui';
 import { dateShort, money, statusClass } from '../../lib/format';
+import { mediaUrl } from '../../api/client';
 import { useFetch, useTitle } from '../../lib/hooks';
 
 const FILTERS = [
@@ -128,7 +129,7 @@ export default function Orders() {
                       {order.items.slice(0, 4).map((item) => (
                         <span key={item.id} className="h-12 w-12 overflow-hidden rounded-lg border-2 border-white bg-ink-100">
                           {item.image ? (
-                            <img src={item.image} alt="" className="h-full w-full object-cover" />
+                            <img src={mediaUrl(item.image)} alt="" className="h-full w-full object-cover" />
                           ) : (
                             <span className="grid h-full w-full place-items-center text-ink-400">
                               <PackageIcon width={18} height={18} />

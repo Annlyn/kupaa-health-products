@@ -10,7 +10,8 @@ import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    {/* BASE_URL is "/" locally and "/<repo>/" on a GitHub Pages project site. */}
+    <BrowserRouter basename={import.meta.env.BASE_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <StoreProvider>
         <AuthProvider>
           <CartProvider>

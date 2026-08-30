@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { api } from '../api/client';
+import { api, mediaUrl } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { money, percentOff, priceRange } from '../lib/format';
@@ -9,7 +9,7 @@ import { CartIcon, ChevronRight, HeartIcon } from './Icons';
 import { Rating, Spinner, cx } from './ui';
 
 export function ProductImage({ product, className = '' }) {
-  const src = product.images?.[0]?.url;
+  const src = mediaUrl(product.images?.[0]?.url);
   if (!src) {
     return (
       <div className={cx('flex items-center justify-center bg-ink-100 text-2xl font-display text-ink-400', className)}>

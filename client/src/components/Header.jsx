@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, mediaUrl } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
@@ -113,7 +113,7 @@ function SearchBox({ onDone }) {
                 className="flex items-center gap-3 px-3 py-2 hover:bg-ink-50"
               >
                 <span className="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-ink-100">
-                  {s.images?.[0] && <img src={s.images[0].url} alt="" className="h-full w-full object-cover" />}
+                  {s.images?.[0] && <img src={mediaUrl(s.images[0].url)} alt="" className="h-full w-full object-cover" />}
                 </span>
                 <span className="min-w-0 flex-1 truncate text-sm text-ink-800">{s.name}</span>
                 <span className="text-sm font-semibold text-ink-900">{money(s.price)}</span>

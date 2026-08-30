@@ -9,7 +9,13 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isProd: process.env.NODE_ENV === 'production',
   port: num(process.env.PORT, 4000),
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  clientUrl: (process.env.CLIENT_URL || 'http://localhost:5173').split(',')[0].trim(),
+  // CLIENT_URL takes a comma-separated list, so the API can serve a GitHub Pages
+  // site and a custom domain at the same time.
+  clientOrigins: (process.env.CLIENT_URL || 'http://localhost:5173')
+    .split(',')
+    .map((o) => o.trim().replace(/\/$/, ''))
+    .filter(Boolean),
   serverUrl: process.env.SERVER_URL || `http://localhost:${num(process.env.PORT, 4000)}`,
 
   jwt: {

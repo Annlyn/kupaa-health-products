@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { api } from '../../api/client';
+import { api, mediaUrl } from '../../api/client';
 import { ClockIcon, DownloadIcon, MapPinIcon, PackageIcon, RefreshIcon, TruckIcon } from '../../components/Icons';
 import { Badge, ConfirmDialog, Field, Modal, PageLoader, Spinner, cx } from '../../components/ui';
 import { ORDER_FLOW, dateTime, money, statusClass } from '../../lib/format';
@@ -210,7 +210,7 @@ export default function AdminOrderDetail() {
                         <div className="flex items-center gap-3">
                           <span className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-ink-100">
                             {item.image ? (
-                              <img src={item.image} alt="" className="h-full w-full object-cover" />
+                              <img src={mediaUrl(item.image)} alt="" className="h-full w-full object-cover" />
                             ) : (
                               <span className="grid h-full w-full place-items-center text-ink-400">
                                 <PackageIcon width={16} height={16} />

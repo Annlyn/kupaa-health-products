@@ -7,7 +7,27 @@
  * once and replay the original request — concurrent 401s share one refresh.
  */
 
-const BASE = '/api';
+/**
+ * Same-origin by default (the dev proxy, or the API serving the built SPA).
+ * Set VITE_API_URL when the frontend is hosted separately — GitHub Pages, a CDN —
+ * e.g. VITE_API_URL=https://kupaa-api.onrender.com
+ */
+const API_ORIGIN = String(import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const BASE = `${API_ORIGIN}/api`;
+
+/** True when the API is on another origin, so its cookies are third-party. */
+export const isCrossOrigin = Boolean(API_ORIGIN);
+
+/**
+ * Product images are stored as server-relative paths ("/uploads/x.png"). Hosted
+ * separately they must resolve against the API origin, or the browser looks for
+ * them on the static host and 404s.
+ */
+export const mediaUrl = (url) => {
+  if (!url) return url;
+  if (/^(https?:|data:|blob:)/.test(url)) return url;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 const TOKEN_KEY = 'kupaa_token';
 const SESSION_KEY = 'kupaa_session';

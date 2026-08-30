@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { api } from '../../api/client';
+import { api, mediaUrl } from '../../api/client';
 import ProductCard, { ProductImage } from '../../components/ProductCard';
 import {
   CartIcon,
@@ -231,7 +231,7 @@ export default function ProductDetail() {
         <div>
           <div className="aspect-square overflow-hidden rounded-2xl border border-ink-100 bg-ink-50">
             {product.images?.[activeImage] ? (
-              <img src={product.images[activeImage].url} alt={product.name} className="h-full w-full object-cover" />
+              <img src={mediaUrl(product.images[activeImage].url)} alt={product.name} className="h-full w-full object-cover" />
             ) : (
               <ProductImage product={product} />
             )}
@@ -249,7 +249,7 @@ export default function ProductDetail() {
                     i === activeImage ? 'border-brand-600' : 'border-transparent hover:border-ink-200',
                   )}
                 >
-                  <img src={img.url} alt="" className="h-full w-full object-cover" />
+                  <img src={mediaUrl(img.url)} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>

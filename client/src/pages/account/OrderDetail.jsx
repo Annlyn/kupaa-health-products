@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { CheckCircle, ClockIcon, MapPinIcon, PackageIcon, TruckIcon } from '../../components/Icons';
 import { Badge, Breadcrumbs, EmptyState, PageLoader, cx } from '../../components/ui';
 import { ORDER_FLOW, dateTime, money, statusClass } from '../../lib/format';
+import { mediaUrl } from '../../api/client';
 import { useFetch, useTitle } from '../../lib/hooks';
 
 function ProgressTrail({ status }) {
@@ -103,7 +104,7 @@ export default function OrderDetail() {
                 <li key={item.id} className="flex items-center gap-3 py-3">
                   <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-ink-50">
                     {item.image ? (
-                      <img src={item.image} alt="" className="h-full w-full object-cover" />
+                      <img src={mediaUrl(item.image)} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <span className="grid h-full w-full place-items-center text-ink-300">
                         <PackageIcon width={20} height={20} />

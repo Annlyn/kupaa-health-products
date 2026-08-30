@@ -26,10 +26,15 @@ export function createApp() {
     }),
   );
 
-  const allowedOrigins = new Set([env.clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173']);
+  const allowedOrigins = new Set([...env.clientOrigins, 'http://localhost:5173', 'http://127.0.0.1:5173']);
   app.use(
     cors({
-      origin: (origin, cb) => (!origin || allowedOrigins.has(origin) ? cb(null, true) : cb(new Error('Origin not allowed by CORS'))),
+      origin: (origin, cb) => {
+        // No Origin header: curl, server-to-server, same-origin navigation.
+        if (!origin) return cb(null, true);
+        if (allowedOrigins.has(origin.replace(/\/$/, ''))) return cb(null, true);
+        return cb(new Error(`Origin ${origin} is not allowed. Add it to CLIENT_URL (comma-separated) and restart.`));
+      },
       credentials: true,
     }),
   );
