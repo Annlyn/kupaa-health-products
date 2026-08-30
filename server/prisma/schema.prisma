@@ -1,0 +1,367 @@
+// Kupaa Health Products — data model
+// SQLite by default for zero-setup local dev. Switch `provider` to "postgresql"
+// and update DATABASE_URL to move to Postgres; no model changes are required.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- users & auth
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  role         String   @default("USER") // USER | ADMIN
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  reviews       Review[]
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String  @default("Home")
+  fullName  String
+  phone     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  country   String  @default("India")
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ------------------------------------------------------------------- catalogue
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  products    Product[]
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  sku         String  @unique
+  shortDesc   String?
+  description String?
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  // Money is stored in rupees; see src/utils/money.js for rounding rules.
+  //
+  // For a product WITH variants these three are maintained aggregates, not the
+  // source of truth: `price`/`mrp` mirror the cheapest active variant and
+  // `stock` is the sum of active variant stock. Keeping them in sync means every
+  // catalogue filter, sort and dashboard query works unchanged for both kinds of
+  // product. See services/variant.service.js#syncProductAggregates.
+  price Float // selling price
+  mrp   Float // struck-through list price
+
+  stock      Int    @default(0)
+  lowStockAt Int    @default(5)
+
+  // Label for the variant axis, e.g. "Size", "Weight", "Pack". Null = no variants.
+  variantLabel String?
+
+  // physical dimensions — required by Shiprocket for rate + AWB generation
+  weightKg   Float @default(0.3)
+  lengthCm   Float @default(15)
+  breadthCm  Float @default(10)
+  heightCm   Float @default(5)
+
+  hsn  String?
+  tags String? // comma separated
+
+  isActive   Boolean @default(true)
+  isFeatured Boolean @default(false)
+
+  ratingAvg   Float @default(0)
+  ratingCount Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images        ProductImage[]
+  variants      ProductVariant[]
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+}
+
+/// One purchasable option of a product — "500 g", "1 kg", "Pack of 3".
+/// Each carries its own price, stock, SKU and shipping weight, because those
+/// genuinely differ per size. Products without variants simply have none.
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  name String // shown to the customer: "500 g"
+  sku  String @unique
+
+  price Float
+  mrp   Float
+  stock Int   @default(0)
+
+  weightKg Float @default(0.3)
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([productId])
+}
+
+// ------------------------------------------------------------------ cart etc.
+
+model CartItem {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Null for products that have no variants. A unique index cannot dedupe on a
+  // nullable column (SQL treats NULLs as distinct), so the controller looks the
+  // row up before writing instead of relying on an upsert.
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  quantity Int @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, productId])
+}
+
+model WishlistItem {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  type        String    @default("PERCENT") // PERCENT | FLAT
+  value       Float
+  minOrder    Float     @default(0)
+  maxDiscount Float?
+  usageLimit  Int?
+  usedCount   Int       @default(0)
+  startsAt    DateTime?
+  expiresAt   DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------- orders
+
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String @unique
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // PENDING | CONFIRMED | PACKED | SHIPPED | DELIVERED | CANCELLED | RETURNED
+  status String @default("PENDING")
+
+  subtotal    Float
+  discount    Float  @default(0)
+  shippingFee Float  @default(0)
+  tax         Float  @default(0)
+  total       Float
+  couponCode  String?
+
+  paymentMethod String @default("RAZORPAY") // RAZORPAY | COD
+  // PENDING | PAID | FAILED | REFUNDED
+  paymentStatus String @default("PENDING")
+
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  refundId          String?
+
+  // shipping address snapshot — orders must not change when an address is edited
+  shipName    String
+  shipPhone   String
+  shipEmail   String
+  shipLine1   String
+  shipLine2   String?
+  shipCity    String
+  shipState   String
+  shipPincode String
+  shipCountry String @default("India")
+
+  notes       String?
+  placedAt    DateTime  @default(now())
+  cancelledAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  items    OrderItem[]
+  shipment Shipment?
+  events   OrderEvent[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  // snapshot of the product at purchase time
+  name        String
+  variantName String? // "500 g" — kept so old invoices survive a rename
+  sku         String
+  image       String?
+  price       Float
+  quantity    Int
+  weightKg    Float   @default(0.3)
+
+  @@index([orderId])
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  message   String?
+  source    String   @default("SYSTEM") // SYSTEM | ADMIN | SHIPROCKET | RAZORPAY
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model Shipment {
+  id      String @id @default(cuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  shiprocketOrderId    String?
+  shiprocketShipmentId String?
+  awbCode              String?
+  courierName          String?
+  courierCompanyId     Int?
+  labelUrl             String?
+  manifestUrl          String?
+  invoiceUrl           String?
+  pickupScheduledAt    DateTime?
+  status               String    @default("CREATED")
+  trackingUrl          String?
+  etd                  String?
+  freightCharge        Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  title     String?
+  comment   String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([productId, userId])
+  @@index([productId])
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model WebhookLog {
+  id        String   @id @default(cuid())
+  source    String // RAZORPAY | SHIPROCKET
+  event     String?
+  payload   String
+  ok        Boolean  @default(true)
+  error     String?
+  createdAt DateTime @default(now())
+}
