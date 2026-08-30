@@ -29,7 +29,7 @@ function staticHostFallback() {
 
 export default defineConfig({
   // "/" for same-origin hosting; "/<repo>/" for a GitHub Pages project site.
-  base: process.env.VITE_BASE || '/',
+  base: process.env.VITE_BASE || '/kupaa-health-products/',
   plugins: [react(), staticHostFallback()],
   server: {
     port: 5173,
