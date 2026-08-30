@@ -8,8 +8,17 @@
  */
 import { demoFetch } from './.test-bundle.mjs';
 
-// The adapter resolves request URLs against the page origin.
+// The adapter resolves request URLs against the page origin, and keeps the
+// session and the signed-in cart in localStorage.
 globalThis.window ??= { location: { origin: 'https://example.test' } };
+if (!globalThis.localStorage) {
+  const store = new Map();
+  globalThis.localStorage = {
+    getItem: (k) => (store.has(k) ? store.get(k) : null),
+    setItem: (k, v) => store.set(k, String(v)),
+    removeItem: (k) => store.delete(k),
+  };
+}
 
 let failures = 0;
 const check = async (label, fn) => {
@@ -22,14 +31,16 @@ const check = async (label, fn) => {
   }
 };
 
-const get = async (p) => {
-  const res = await demoFetch(`/api${p}`);
+const call = async (method, p, { body, token } = {}) => {
+  const res = await demoFetch(`/api${p}`, {
+    method,
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
+  });
   return { status: res.status, body: await res.json() };
 };
-const post = async (p, body) => {
-  const res = await demoFetch(`/api${p}`, { method: 'POST', body: JSON.stringify(body) });
-  return { status: res.status, body: await res.json() };
-};
+const get = (p, token) => call('GET', p, { token });
+const post = (p, body, token) => call('POST', p, { body, token });
 const eq = (a, b, m) => {
   if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`${m}: ${JSON.stringify(a)} != ${JSON.stringify(b)}`);
 };
@@ -135,12 +146,6 @@ await check('an empty cart quotes to zero', async () => {
   eq(body.data.totals.subtotal, 0, 'subtotal');
 });
 
-await check('auth answers 401 and explains why', async () => {
-  const { status, body } = await post('/auth/login', { email: 'a@b.c', password: 'x' });
-  eq(status, 401, 'status');
-  ok(/demo/i.test(body.error.message), 'message should mention the demo');
-});
-
 await check('writes answer 503', async () => {
   eq((await post('/orders', {})).status, 503, 'status');
 });
@@ -151,6 +156,99 @@ await check('every product image points into demo-media', async () => {
       ok(img.url.startsWith('demo-media/'), `${product.name}: unexpected image path ${img.url}`);
     }
   }
+});
+
+// ------------------------------------------------------------ signed-in demo
+const { body: snapshotAccounts } = await get('/store'); // ensures the snapshot is loaded
+void snapshotAccounts;
+
+const signIn = async (email, password) => {
+  const { body } = await post('/auth/login', { email, password });
+  if (!body.ok) throw new Error(`could not sign in as ${email}: ${body.error.message}`);
+  return body.data.accessToken;
+};
+
+let shopperToken = null;
+let adminToken = null;
+
+await check('demo sign-in works for both accounts', async () => {
+  shopperToken = await signIn('shopper@demo.test', 'demo-shopper');
+  adminToken = await signIn('admin@demo.test', 'demo-admin');
+  ok(shopperToken.startsWith('demo.'), 'unexpected token shape');
+});
+
+await check('a wrong password is rejected', async () => {
+  const { status, body } = await post('/auth/login', { email: 'shopper@demo.test', password: 'nope' });
+  eq(status, 401, 'status');
+  ok(body.error.message, 'no message');
+});
+
+await check('signed-out requests to private endpoints are 401', async () => {
+  eq((await get('/auth/me')).status, 401, '/auth/me');
+  eq((await get('/orders')).status, 401, '/orders');
+});
+
+await check('a customer cannot reach admin endpoints', async () => {
+  eq((await get('/admin/stats', shopperToken)).status, 403, 'status');
+});
+
+await check('GET /auth/me carries the profile counters', async () => {
+  const { body } = await get('/auth/me', shopperToken);
+  eq(body.data.user.role, 'USER', 'role');
+  ok(typeof body.data.stats.orders === 'number', 'stats.orders missing');
+});
+
+await check('a customer sees only their own orders', async () => {
+  const { body } = await get('/orders?limit=50', shopperToken);
+  const me = (await get('/auth/me', shopperToken)).body.data.user.id;
+  ok(body.data.length > 0, 'no orders in the snapshot');
+  ok(body.data.every((o) => o.userId === me), 'another account\'s order leaked in');
+});
+
+await check('an order belonging to someone else 404s', async () => {
+  const me = (await get('/auth/me', shopperToken)).body.data.user.id;
+  const all = (await get('/admin/orders?limit=50', adminToken)).body.data;
+  const other = all.find((o) => o.userId !== me);
+  if (!other) return; // the snapshot only has the one customer
+  eq((await get(`/orders/${other.id}`, shopperToken)).status, 404, 'status');
+});
+
+await check('the admin dashboard adds up', async () => {
+  const { body } = await get('/admin/stats', adminToken);
+  const d = body.data;
+  eq(d.productCount, catalogue.length, 'productCount');
+  ok(d.salesSeries.length === 14, 'expected a 14-day series');
+  ok(d.revenueTotal >= 0, 'revenueTotal');
+  ok(typeof d.statusCounts === 'object' && !Array.isArray(d.statusCounts), 'statusCounts should be an object');
+});
+
+await check('the signed-in cart adds, updates and clears', async () => {
+  const variantId = sample.variants?.[0]?.id ?? null;
+  await call('DELETE', '/cart', { token: shopperToken });
+
+  const added = await post('/cart', { productId: sample.id, variantId, quantity: 2 }, shopperToken);
+  eq(added.body.data.items.length, 1, 'after add');
+  eq(added.body.data.totals.itemCount, 2, 'quantity after add');
+
+  const id = added.body.data.items[0].id;
+  const bumped = await call('PATCH', `/cart/${id}`, { body: { quantity: 3 }, token: shopperToken });
+  eq(bumped.body.data.totals.itemCount, 3, 'quantity after patch');
+
+  const removed = await call('DELETE', `/cart/${id}`, { token: shopperToken });
+  eq(removed.body.data.items.length, 0, 'after delete');
+});
+
+await check('the guest cart merges in at sign-in', async () => {
+  const variantId = sample.variants?.[0]?.id ?? null;
+  await call('DELETE', '/cart', { token: shopperToken });
+  const merged = await post('/cart/merge', { items: [{ productId: sample.id, variantId, quantity: 1 }] }, shopperToken);
+  eq(merged.body.data.items.length, 1, 'merged line count');
+  await call('DELETE', '/cart', { token: shopperToken });
+});
+
+await check('signed in, writes are still refused', async () => {
+  eq((await post('/orders', {}, shopperToken)).status, 503, 'placing an order');
+  eq((await post('/admin/products', {}, adminToken)).status, 503, 'creating a product');
 });
 
 console.log(failures ? `\n${failures} failing` : `\nall passing (${catalogue.length} products in the snapshot)`);

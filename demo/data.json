@@ -1,5 +1,19 @@
 {
-  "generatedAt": "2026-08-30T14:55:24.962Z",
+  "generatedAt": "2026-08-30T15:14:51.516Z",
+  "accounts": [
+    {
+      "email": "admin@demo.test",
+      "password": "demo-admin",
+      "label": "Admin",
+      "userId": "cmtfmoaj20000uzbd2o1x5qmv"
+    },
+    {
+      "email": "shopper@demo.test",
+      "password": "demo-shopper",
+      "label": "Customer",
+      "userId": "cmtfmoaon0001uzbd91vvagn0"
+    }
+  ],
   "settings": {
     "storeName": "Kupaa Health Products",
     "storeTagline": "Everyday wellness, honestly made",
@@ -116,12 +130,635 @@
     "policyTerms": "Prices are in Indian Rupees and inclusive of applicable taxes. We may revise prices at any time; the price shown at checkout is what you pay.\nOrders are subject to stock availability. If an item goes out of stock after you order, we cancel that line and refund it in full.\nProducts sold here are food supplements and wellness devices. They are not intended to diagnose, treat, cure or prevent any disease.\nConsult a qualified physician before starting any supplement, particularly if you are pregnant, nursing, on prescription medication or managing a chronic condition.\nAll content, imagery and branding on this store is our property.",
     "policyContact": "Email us and we reply within one working day.\nPhone lines are open Monday to Saturday, 9 AM to 7 PM IST.\nRegistered office: 4th Floor, Wellness House, Anna Salai, Chennai, Tamil Nadu 600002.\nFor order-specific questions, please quote your order number (it looks like KUP-260830-482913)."
   },
+  "settingsMeta": {
+    "fields": [
+      {
+        "key": "storeName",
+        "group": "identity",
+        "type": "string",
+        "label": "Store name",
+        "hint": null,
+        "min": null,
+        "max": 80,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "storeTagline",
+        "group": "identity",
+        "type": "string",
+        "label": "Tagline",
+        "hint": null,
+        "min": null,
+        "max": 120,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "supportEmail",
+        "group": "identity",
+        "type": "string",
+        "label": "Support email",
+        "hint": null,
+        "min": null,
+        "max": 120,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "supportPhone",
+        "group": "identity",
+        "type": "string",
+        "label": "Support phone",
+        "hint": null,
+        "min": null,
+        "max": 40,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "currency",
+        "group": "identity",
+        "type": "string",
+        "label": "Currency code",
+        "hint": null,
+        "min": null,
+        "max": 8,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "freeShippingAbove",
+        "group": "commerce",
+        "type": "number",
+        "label": "Free delivery above (₹)",
+        "hint": "Set to 0 to charge shipping on every order",
+        "min": 0,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "flatShippingFee",
+        "group": "commerce",
+        "type": "number",
+        "label": "Flat delivery fee (₹)",
+        "hint": null,
+        "min": 0,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "taxPercent",
+        "group": "commerce",
+        "type": "number",
+        "label": "Tax percent",
+        "hint": null,
+        "min": 0,
+        "max": 100,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "codEnabled",
+        "group": "commerce",
+        "type": "boolean",
+        "label": "Offer cash on delivery",
+        "hint": null,
+        "min": null,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "codExtraFee",
+        "group": "commerce",
+        "type": "number",
+        "label": "COD handling fee (₹)",
+        "hint": null,
+        "min": 0,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "maxQtyPerItem",
+        "group": "commerce",
+        "type": "number",
+        "label": "Max quantity per item",
+        "hint": "Upper limit a single cart line may reach",
+        "min": 1,
+        "max": 50,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "announcementEnabled",
+        "group": "announcement",
+        "type": "boolean",
+        "label": "Show the announcement bar",
+        "hint": null,
+        "min": null,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "announcementText",
+        "group": "announcement",
+        "type": "string",
+        "label": "Announcement text",
+        "hint": null,
+        "min": null,
+        "max": 200,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroBadge",
+        "group": "home",
+        "type": "string",
+        "label": "Hero badge",
+        "hint": null,
+        "min": null,
+        "max": 80,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroTitle",
+        "group": "home",
+        "type": "string",
+        "label": "Hero headline",
+        "hint": null,
+        "min": null,
+        "max": 80,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroTitleAccent",
+        "group": "home",
+        "type": "string",
+        "label": "Hero headline (accent line)",
+        "hint": null,
+        "min": null,
+        "max": 80,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroSubtitle",
+        "group": "home",
+        "type": "text",
+        "label": "Hero paragraph",
+        "hint": null,
+        "min": null,
+        "max": 400,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroPrimaryLabel",
+        "group": "home",
+        "type": "string",
+        "label": "Primary button label",
+        "hint": null,
+        "min": null,
+        "max": 40,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroPrimaryHref",
+        "group": "home",
+        "type": "string",
+        "label": "Primary button link",
+        "hint": null,
+        "min": null,
+        "max": 200,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroSecondaryLabel",
+        "group": "home",
+        "type": "string",
+        "label": "Secondary button label",
+        "hint": null,
+        "min": null,
+        "max": 40,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroSecondaryHref",
+        "group": "home",
+        "type": "string",
+        "label": "Secondary button link",
+        "hint": null,
+        "min": null,
+        "max": 200,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "heroStats",
+        "group": "home",
+        "type": "list",
+        "label": "Hero stats",
+        "hint": null,
+        "min": null,
+        "max": 4,
+        "fields": [
+          {
+            "key": "value",
+            "label": "Value",
+            "max": 24
+          },
+          {
+            "key": "label",
+            "label": "Caption",
+            "max": 40
+          }
+        ],
+        "isCustomised": false
+      },
+      {
+        "key": "heroCards",
+        "group": "home",
+        "type": "list",
+        "label": "Hero highlight cards",
+        "hint": null,
+        "min": null,
+        "max": 4,
+        "fields": [
+          {
+            "key": "title",
+            "label": "Title",
+            "max": 40
+          },
+          {
+            "key": "subtitle",
+            "label": "Subtitle",
+            "max": 60
+          }
+        ],
+        "isCustomised": false
+      },
+      {
+        "key": "trustItems",
+        "group": "home",
+        "type": "list",
+        "label": "Trust strip",
+        "hint": null,
+        "min": null,
+        "max": 4,
+        "fields": [
+          {
+            "key": "title",
+            "label": "Title",
+            "max": 50
+          },
+          {
+            "key": "copy",
+            "label": "Description",
+            "max": 120
+          }
+        ],
+        "isCustomised": false
+      },
+      {
+        "key": "categoriesTitle",
+        "group": "home",
+        "type": "string",
+        "label": "Category section title",
+        "hint": null,
+        "min": null,
+        "max": 60,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "categoriesSubtitle",
+        "group": "home",
+        "type": "string",
+        "label": "Category section subtitle",
+        "hint": null,
+        "min": null,
+        "max": 160,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "featuredTitle",
+        "group": "home",
+        "type": "string",
+        "label": "Bestsellers title",
+        "hint": null,
+        "min": null,
+        "max": 60,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "featuredSubtitle",
+        "group": "home",
+        "type": "string",
+        "label": "Bestsellers subtitle",
+        "hint": null,
+        "min": null,
+        "max": 160,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "newestTitle",
+        "group": "home",
+        "type": "string",
+        "label": "New arrivals title",
+        "hint": null,
+        "min": null,
+        "max": 60,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "newestSubtitle",
+        "group": "home",
+        "type": "string",
+        "label": "New arrivals subtitle",
+        "hint": null,
+        "min": null,
+        "max": 160,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "promoEnabled",
+        "group": "home",
+        "type": "boolean",
+        "label": "Show the closing promo panel",
+        "hint": null,
+        "min": null,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "promoTitle",
+        "group": "home",
+        "type": "string",
+        "label": "Promo title",
+        "hint": null,
+        "min": null,
+        "max": 80,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "promoBody",
+        "group": "home",
+        "type": "text",
+        "label": "Promo paragraph",
+        "hint": null,
+        "min": null,
+        "max": 400,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "promoBullets",
+        "group": "home",
+        "type": "list",
+        "label": "Promo bullets",
+        "hint": null,
+        "min": null,
+        "max": 5,
+        "fields": [
+          {
+            "key": "text",
+            "label": "Bullet",
+            "max": 60
+          }
+        ],
+        "isCustomised": false
+      },
+      {
+        "key": "promoCtaLabel",
+        "group": "home",
+        "type": "string",
+        "label": "Promo button label",
+        "hint": null,
+        "min": null,
+        "max": 40,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "promoCtaHref",
+        "group": "home",
+        "type": "string",
+        "label": "Promo button link",
+        "hint": null,
+        "min": null,
+        "max": 200,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "footerBlurb",
+        "group": "footer",
+        "type": "text",
+        "label": "Footer blurb",
+        "hint": null,
+        "min": null,
+        "max": 400,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "footerPromises",
+        "group": "footer",
+        "type": "list",
+        "label": "Footer promise strip",
+        "hint": null,
+        "min": null,
+        "max": 3,
+        "fields": [
+          {
+            "key": "title",
+            "label": "Title",
+            "max": 50
+          },
+          {
+            "key": "copy",
+            "label": "Description",
+            "max": 120
+          }
+        ],
+        "isCustomised": false
+      },
+      {
+        "key": "footerNote",
+        "group": "footer",
+        "type": "string",
+        "label": "Footer fine print",
+        "hint": null,
+        "min": null,
+        "max": 200,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "policyShipping",
+        "group": "policies",
+        "type": "text",
+        "label": "Shipping & delivery",
+        "hint": "One paragraph per line. Blank lines are ignored.",
+        "min": null,
+        "max": 6000,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "policyReturns",
+        "group": "policies",
+        "type": "text",
+        "label": "Returns & refunds",
+        "hint": null,
+        "min": null,
+        "max": 6000,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "policyPrivacy",
+        "group": "policies",
+        "type": "text",
+        "label": "Privacy policy",
+        "hint": null,
+        "min": null,
+        "max": 6000,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "policyTerms",
+        "group": "policies",
+        "type": "text",
+        "label": "Terms of service",
+        "hint": null,
+        "min": null,
+        "max": 6000,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "policyContact",
+        "group": "policies",
+        "type": "text",
+        "label": "Contact us",
+        "hint": null,
+        "min": null,
+        "max": 6000,
+        "fields": null,
+        "isCustomised": false
+      }
+    ],
+    "groups": [
+      {
+        "key": "identity",
+        "label": "Store identity",
+        "keys": [
+          "storeName",
+          "storeTagline",
+          "supportEmail",
+          "supportPhone",
+          "currency"
+        ]
+      },
+      {
+        "key": "commerce",
+        "label": "Pricing & delivery rules",
+        "keys": [
+          "freeShippingAbove",
+          "flatShippingFee",
+          "taxPercent",
+          "codEnabled",
+          "codExtraFee",
+          "maxQtyPerItem"
+        ]
+      },
+      {
+        "key": "announcement",
+        "label": "Announcement bar",
+        "keys": [
+          "announcementEnabled",
+          "announcementText"
+        ]
+      },
+      {
+        "key": "home",
+        "label": "Home page",
+        "keys": [
+          "heroBadge",
+          "heroTitle",
+          "heroTitleAccent",
+          "heroSubtitle",
+          "heroPrimaryLabel",
+          "heroPrimaryHref",
+          "heroSecondaryLabel",
+          "heroSecondaryHref",
+          "heroStats",
+          "heroCards",
+          "trustItems",
+          "categoriesTitle",
+          "categoriesSubtitle",
+          "featuredTitle",
+          "featuredSubtitle",
+          "newestTitle",
+          "newestSubtitle",
+          "promoEnabled",
+          "promoTitle",
+          "promoBody",
+          "promoBullets",
+          "promoCtaLabel",
+          "promoCtaHref"
+        ]
+      },
+      {
+        "key": "footer",
+        "label": "Footer & contact",
+        "keys": [
+          "footerBlurb",
+          "footerPromises",
+          "footerNote"
+        ]
+      },
+      {
+        "key": "policies",
+        "label": "Policy pages",
+        "keys": [
+          "policyShipping",
+          "policyReturns",
+          "policyPrivacy",
+          "policyTerms",
+          "policyContact"
+        ]
+      }
+    ]
+  },
   "categories": [
     {
       "id": "cmtfmoaoq0006uzbdz6kfr7jh",
       "name": "Protein & Fitness",
       "slug": "protein-fitness",
       "description": "Clean protein and recovery nutrition for everyday training.",
+      "isActive": true,
+      "sortOrder": 3,
+      "createdAt": "2026-08-30T09:49:35.642Z",
       "image": "demo-media/seed-cat-protein-fitness.svg",
       "productCount": 1
     },
@@ -130,6 +767,9 @@
       "name": "Immunity & Wellness",
       "slug": "immunity-wellness",
       "description": "Support your defences through every season.",
+      "isActive": true,
+      "sortOrder": 4,
+      "createdAt": "2026-08-30T09:49:35.643Z",
       "image": "demo-media/seed-cat-immunity-wellness.svg",
       "productCount": 2
     },
@@ -138,6 +778,9 @@
       "name": "Personal Care",
       "slug": "personal-care",
       "description": "Gentle, dermatologist-approved daily care.",
+      "isActive": true,
+      "sortOrder": 5,
+      "createdAt": "2026-08-30T09:49:35.643Z",
       "image": "demo-media/seed-cat-personal-care.svg",
       "productCount": 1
     },
@@ -146,6 +789,9 @@
       "name": "Health Devices",
       "slug": "health-devices",
       "description": "Home monitoring devices you can trust.",
+      "isActive": true,
+      "sortOrder": 6,
+      "createdAt": "2026-08-30T09:49:35.644Z",
       "image": "demo-media/seed-cat-health-devices.svg",
       "productCount": 0
     }
@@ -179,23 +825,31 @@
       "category": {
         "id": "cmtfmoaor0008uzbd6oyxke9l",
         "name": "Personal Care",
-        "slug": "personal-care"
+        "slug": "personal-care",
+        "description": "Gentle, dermatologist-approved daily care.",
+        "image": "/uploads/seed-cat-personal-care.svg",
+        "isActive": true,
+        "sortOrder": 5,
+        "createdAt": "2026-08-30T09:49:35.643Z"
       },
       "images": [
         {
           "id": "cmtfuau5l000wuzgj6ljl9n8s",
+          "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "url": "demo-media/1788095256874-3d31b36a951a.jpg",
           "alt": null,
           "sortOrder": 0
         },
         {
           "id": "cmtfuau5l000xuzgjr63el5s7",
+          "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "url": "demo-media/1788095256879-fba44e417035.jpg",
           "alt": null,
           "sortOrder": 1
         },
         {
           "id": "cmtfuau5l000yuzgjintbxlmv",
+          "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "url": "demo-media/1788095256881-b144f401564f.jpg",
           "alt": null,
           "sortOrder": 2
@@ -204,6 +858,7 @@
       "variants": [
         {
           "id": "cmtftrtrq0012uzvgfpsva2do",
+          "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "name": "500 g",
           "sku": "KUP006-1",
           "price": 399,
@@ -211,10 +866,13 @@
           "stock": 10,
           "weightKg": 0.5,
           "isActive": true,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "createdAt": "2026-08-30T13:08:17.655Z",
+          "updatedAt": "2026-08-30T13:23:04.616Z"
         },
         {
           "id": "cmtftrtrq0013uzvgblguhgy0",
+          "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "name": "1 kg",
           "sku": "KUP006-2",
           "price": 699,
@@ -222,7 +880,9 @@
           "stock": 9,
           "weightKg": 1,
           "isActive": true,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "createdAt": "2026-08-30T13:08:17.655Z",
+          "updatedAt": "2026-08-30T13:23:37.343Z"
         }
       ],
       "reviews": []
@@ -255,23 +915,31 @@
       "category": {
         "id": "cmtfmoaoq0006uzbdz6kfr7jh",
         "name": "Protein & Fitness",
-        "slug": "protein-fitness"
+        "slug": "protein-fitness",
+        "description": "Clean protein and recovery nutrition for everyday training.",
+        "image": "/uploads/seed-cat-protein-fitness.svg",
+        "isActive": true,
+        "sortOrder": 3,
+        "createdAt": "2026-08-30T09:49:35.642Z"
       },
       "images": [
         {
           "id": "cmtftq9mf000suzvg8zsit4kb",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "url": "demo-media/1788095178150-a2f4dd15d72b.jpg",
           "alt": null,
           "sortOrder": 0
         },
         {
           "id": "cmtftq9mf000tuzvgqlkv4k8z",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "url": "demo-media/1788095178157-e488b24aee7f.jpg",
           "alt": null,
           "sortOrder": 1
         },
         {
           "id": "cmtftq9mf000uuzvg1dwqbgm1",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "url": "demo-media/1788095178160-2865eea84d11.jpg",
           "alt": null,
           "sortOrder": 2
@@ -280,6 +948,7 @@
       "variants": [
         {
           "id": "cmtftq9mf000vuzvg1rgflxag",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "name": "500 g",
           "sku": "KUP005-1",
           "price": 299,
@@ -287,10 +956,13 @@
           "stock": 8,
           "weightKg": 0.5,
           "isActive": true,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "createdAt": "2026-08-30T13:07:04.887Z",
+          "updatedAt": "2026-08-30T13:21:06.183Z"
         },
         {
           "id": "cmtftq9mf000wuzvgf1yd5zu0",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "name": "1 kg",
           "sku": "KUP005-2",
           "price": 549,
@@ -298,17 +970,25 @@
           "stock": 10,
           "weightKg": 1,
           "isActive": true,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "createdAt": "2026-08-30T13:07:04.887Z",
+          "updatedAt": "2026-08-30T13:07:04.887Z"
         }
       ],
       "reviews": [
         {
           "id": "cmtfu8as2000juzgjrhc82sy2",
           "productId": "cmtftq9mf000ruzvg0rwsn33s",
+          "userId": "cmtfmoaon0001uzbd91vvagn0",
           "rating": 5,
           "title": "Great",
           "comment": "Works well",
           "createdAt": "2026-08-30T13:21:06.195Z",
+          "user": {
+            "id": "cmtfmoaon0001uzbd91vvagn0",
+            "name": "Priya Raman",
+            "email": "shopper@demo.test"
+          },
           "author": "Priya Raman"
         }
       ]
@@ -342,12 +1022,14 @@
       "images": [
         {
           "id": "cmtftogds000nuzvgerjjluqn",
+          "productId": "cmtftogds000muzvgaa6aag06",
           "url": "demo-media/1788095103305-f6956101535d.jpg",
           "alt": null,
           "sortOrder": 0
         },
         {
           "id": "cmtftogds000ouzvgjff8yxy3",
+          "productId": "cmtftogds000muzvgaa6aag06",
           "url": "demo-media/1788095109757-e0bc41519543.jpg",
           "alt": null,
           "sortOrder": 1
@@ -356,6 +1038,7 @@
       "variants": [
         {
           "id": "cmtftogds000puzvgb9ypfrqc",
+          "productId": "cmtftogds000muzvgaa6aag06",
           "name": "200 g",
           "sku": "KUP004-1",
           "price": 340,
@@ -363,7 +1046,9 @@
           "stock": 10,
           "weightKg": 0.2,
           "isActive": true,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "createdAt": "2026-08-30T13:05:40.336Z",
+          "updatedAt": "2026-08-30T13:05:40.336Z"
         }
       ],
       "reviews": []
@@ -397,12 +1082,14 @@
       "images": [
         {
           "id": "cmtftmrml000iuzvgzpnh8kir",
+          "productId": "cmtftmrml000huzvgzxjhxieo",
           "url": "demo-media/1788095016900-87dd6155f207.jpg",
           "alt": null,
           "sortOrder": 0
         },
         {
           "id": "cmtftmrml000juzvg40vhbpbh",
+          "productId": "cmtftmrml000huzvgzxjhxieo",
           "url": "demo-media/1788095038150-7694999c2c9c.jpg",
           "alt": null,
           "sortOrder": 1
@@ -411,6 +1098,7 @@
       "variants": [
         {
           "id": "cmtftmrml000kuzvgch5ini5n",
+          "productId": "cmtftmrml000huzvgzxjhxieo",
           "name": "200 g",
           "sku": "KUP003-1",
           "price": 390,
@@ -418,7 +1106,9 @@
           "stock": 10,
           "weightKg": 0.2,
           "isActive": true,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "createdAt": "2026-08-30T13:04:21.597Z",
+          "updatedAt": "2026-08-30T13:04:21.597Z"
         }
       ],
       "reviews": []
@@ -451,23 +1141,31 @@
       "category": {
         "id": "cmtfmoaoq0007uzbd4gdjl15m",
         "name": "Immunity & Wellness",
-        "slug": "immunity-wellness"
+        "slug": "immunity-wellness",
+        "description": "Support your defences through every season.",
+        "image": "/uploads/seed-cat-immunity-wellness.svg",
+        "isActive": true,
+        "sortOrder": 4,
+        "createdAt": "2026-08-30T09:49:35.643Z"
       },
       "images": [
         {
           "id": "cmtftktdu000buzvglpn95w9r",
+          "productId": "cmtftktdu000auzvgtompo5qn",
           "url": "demo-media/1788094915351-1c05d4edf46e.jpg",
           "alt": null,
           "sortOrder": 0
         },
         {
           "id": "cmtftktdu000cuzvgag5bxvia",
+          "productId": "cmtftktdu000auzvgtompo5qn",
           "url": "demo-media/1788094915369-0d9b5f34459c.jpg",
           "alt": null,
           "sortOrder": 1
         },
         {
           "id": "cmtftktdu000duzvg1kljrkjd",
+          "productId": "cmtftktdu000auzvgtompo5qn",
           "url": "demo-media/1788094915372-0d3e35842297.jpg",
           "alt": null,
           "sortOrder": 2
@@ -476,6 +1174,7 @@
       "variants": [
         {
           "id": "cmtftktdu000euzvg9zhgi5zw",
+          "productId": "cmtftktdu000auzvgtompo5qn",
           "name": "500 g",
           "sku": "KUP002-1",
           "price": 640,
@@ -483,10 +1182,13 @@
           "stock": 10,
           "weightKg": 0.5,
           "isActive": true,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "createdAt": "2026-08-30T13:02:50.562Z",
+          "updatedAt": "2026-08-30T13:02:50.562Z"
         },
         {
           "id": "cmtftktdu000fuzvgp03gwhki",
+          "productId": "cmtftktdu000auzvgtompo5qn",
           "name": "1 kg",
           "sku": "KUP002-2",
           "price": 1200,
@@ -494,7 +1196,9 @@
           "stock": 10,
           "weightKg": 1,
           "isActive": true,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "createdAt": "2026-08-30T13:02:50.562Z",
+          "updatedAt": "2026-08-30T13:02:50.562Z"
         }
       ],
       "reviews": []
@@ -527,23 +1231,31 @@
       "category": {
         "id": "cmtfmoaoq0007uzbd4gdjl15m",
         "name": "Immunity & Wellness",
-        "slug": "immunity-wellness"
+        "slug": "immunity-wellness",
+        "description": "Support your defences through every season.",
+        "image": "/uploads/seed-cat-immunity-wellness.svg",
+        "isActive": true,
+        "sortOrder": 4,
+        "createdAt": "2026-08-30T09:49:35.643Z"
       },
       "images": [
         {
           "id": "cmtftil6z0004uzvgnemu6ado",
+          "productId": "cmtftil6z0003uzvgowr0g79f",
           "url": "demo-media/1788094811320-918c9f0c70c6.jpg",
           "alt": null,
           "sortOrder": 0
         },
         {
           "id": "cmtftil6z0005uzvg9q93tqit",
+          "productId": "cmtftil6z0003uzvgowr0g79f",
           "url": "demo-media/1788094811325-52c1da9bf0b7.jpg",
           "alt": null,
           "sortOrder": 1
         },
         {
           "id": "cmtftil6z0006uzvgjrvdf3hh",
+          "productId": "cmtftil6z0003uzvgowr0g79f",
           "url": "demo-media/1788094811328-bded01aa2e63.jpg",
           "alt": null,
           "sortOrder": 2
@@ -552,6 +1264,7 @@
       "variants": [
         {
           "id": "cmtftil6z0007uzvgbqs5b3lt",
+          "productId": "cmtftil6z0003uzvgowr0g79f",
           "name": "500 g",
           "sku": "KUP001-1",
           "price": 499,
@@ -559,10 +1272,13 @@
           "stock": 10,
           "weightKg": 0.5,
           "isActive": true,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "createdAt": "2026-08-30T13:01:06.635Z",
+          "updatedAt": "2026-08-30T13:01:06.635Z"
         },
         {
           "id": "cmtftil6z0008uzvgf7irlkuz",
+          "productId": "cmtftil6z0003uzvgowr0g79f",
           "name": "1 kg",
           "sku": "KUP001-2",
           "price": 899,
@@ -570,7 +1286,9 @@
           "stock": 10,
           "weightKg": 1,
           "isActive": true,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "createdAt": "2026-08-30T13:01:06.635Z",
+          "updatedAt": "2026-08-30T13:01:06.635Z"
         }
       ],
       "reviews": []
@@ -578,30 +1296,7 @@
   ],
   "coupons": [
     {
-      "code": "WELCOME10",
-      "description": "10% off your first order",
-      "type": "PERCENT",
-      "value": 10,
-      "minOrder": 499,
-      "maxDiscount": 300,
-      "usageLimit": null,
-      "usedCount": 5,
-      "startsAt": null,
-      "expiresAt": "2027-02-26T09:49:35.662Z"
-    },
-    {
-      "code": "HEALTH500",
-      "description": "₹500 off orders above ₹2999",
-      "type": "FLAT",
-      "value": 500,
-      "minOrder": 2999,
-      "maxDiscount": null,
-      "usageLimit": null,
-      "usedCount": 0,
-      "startsAt": null,
-      "expiresAt": "2027-02-26T09:49:35.665Z"
-    },
-    {
+      "id": "cmtfmoapd0024uzbda4hy021b",
       "code": "FREESHIP",
       "description": "₹59 off — shipping on us",
       "type": "FLAT",
@@ -611,7 +1306,1387 @@
       "usageLimit": 500,
       "usedCount": 0,
       "startsAt": null,
-      "expiresAt": "2027-02-26T09:49:35.665Z"
+      "expiresAt": "2027-02-26T09:49:35.665Z",
+      "isActive": true,
+      "createdAt": "2026-08-30T09:49:35.666Z"
+    },
+    {
+      "id": "cmtfmoapc0022uzbdudzlsru3",
+      "code": "WELCOME10",
+      "description": "10% off your first order",
+      "type": "PERCENT",
+      "value": 10,
+      "minOrder": 499,
+      "maxDiscount": 300,
+      "usageLimit": null,
+      "usedCount": 5,
+      "startsAt": null,
+      "expiresAt": "2027-02-26T09:49:35.662Z",
+      "isActive": true,
+      "createdAt": "2026-08-30T09:49:35.665Z"
+    },
+    {
+      "id": "cmtfmoapd0023uzbdyodggo8w",
+      "code": "HEALTH500",
+      "description": "₹500 off orders above ₹2999",
+      "type": "FLAT",
+      "value": 500,
+      "minOrder": 2999,
+      "maxDiscount": null,
+      "usageLimit": null,
+      "usedCount": 0,
+      "startsAt": null,
+      "expiresAt": "2027-02-26T09:49:35.665Z",
+      "isActive": true,
+      "createdAt": "2026-08-30T09:49:35.665Z"
     }
-  ]
+  ],
+  "users": [
+    {
+      "id": "cmtfmoaj20000uzbd2o1x5qmv",
+      "name": "Kupaa Admin",
+      "email": "admin@demo.test",
+      "phone": "9876543210",
+      "role": "ADMIN",
+      "isActive": true,
+      "createdAt": "2026-08-30T09:49:35.439Z"
+    },
+    {
+      "id": "cmtfmoaon0001uzbd91vvagn0",
+      "name": "Priya Raman",
+      "email": "shopper@demo.test",
+      "phone": "9812345678",
+      "role": "USER",
+      "isActive": true,
+      "createdAt": "2026-08-30T09:49:35.639Z"
+    }
+  ],
+  "addresses": [
+    {
+      "id": "cmtfxf9ju0003uzs5t6oznzou",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "label": "Home",
+      "fullName": "Priya Raman",
+      "phone": "9812345678",
+      "line1": "12/4 Anna Nagar West, 3rd Street",
+      "line2": "Near Blue Star Park",
+      "city": "Chennai",
+      "state": "Tamil Nadu",
+      "pincode": "600040",
+      "country": "India",
+      "isDefault": true,
+      "createdAt": "2026-08-30T14:50:30.042Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "cmtfubjep0014uzgjtiwthyru",
+      "orderNumber": "KUP-260830-571708",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CONFIRMED",
+      "subtotal": 699,
+      "discount": 0,
+      "shippingFee": 59,
+      "tax": 0,
+      "total": 758,
+      "couponCode": null,
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T13:23:37.345Z",
+      "cancelledAt": null,
+      "updatedAt": "2026-08-30T13:23:37.351Z",
+      "items": [
+        {
+          "id": "cmtfubjep0016uzgjpg6xvz64",
+          "orderId": "cmtfubjep0014uzgjtiwthyru",
+          "productId": "cmtftrtrq000yuzvgdqtxwxh1",
+          "variantId": "cmtftrtrq0013uzvgblguhgy0",
+          "name": "Bodywash Powder",
+          "variantName": "1 kg",
+          "sku": "KUP006-2",
+          "image": "/uploads/1788095256874-3d31b36a951a.png",
+          "price": 699,
+          "quantity": 1,
+          "weightKg": 1
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfubjez001euzgjcapm6x5t",
+          "orderId": "cmtfubjep0014uzgjtiwthyru",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700060163",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T13:23:37.356Z"
+        },
+        {
+          "id": "cmtfubjew001auzgjiq8zbfaa",
+          "orderId": "cmtfubjep0014uzgjtiwthyru",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T13:23:37.352Z"
+        },
+        {
+          "id": "cmtfubjes0018uzgj3avrawqz",
+          "orderId": "cmtfubjep0014uzgjtiwthyru",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T13:23:37.349Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfubjex001cuzgj8q0whgv8",
+        "orderId": "cmtfubjep0014uzgjtiwthyru",
+        "shiprocketOrderId": "700060163",
+        "shiprocketShipmentId": "800060163",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T13:23:37.354Z",
+        "updatedAt": "2026-08-30T13:23:37.354Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfu8ars0007uzgjxg5vsz1y",
+      "orderNumber": "KUP-260830-654599",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "DELIVERED",
+      "subtotal": 598,
+      "discount": 59.8,
+      "shippingFee": 59,
+      "tax": 0,
+      "total": 597.2,
+      "couponCode": "WELCOME10",
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T13:21:06.184Z",
+      "cancelledAt": null,
+      "updatedAt": "2026-08-30T13:21:06.419Z",
+      "items": [
+        {
+          "id": "cmtfu8ars0009uzgjwmybdvna",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "productId": "cmtftq9mf000ruzvg0rwsn33s",
+          "variantId": "cmtftq9mf000vuzvg1rgflxag",
+          "name": "Health Mix",
+          "variantName": "500 g",
+          "sku": "KUP005-1",
+          "image": "/uploads/1788095178150-a2f4dd15d72b.png",
+          "price": 299,
+          "quantity": 2,
+          "weightKg": 0.5
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfu8ayb000tuzgjlk98qkr2",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "DELIVERED",
+          "message": "Marked delivered by admin",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T13:21:06.420Z"
+        },
+        {
+          "id": "cmtfu8ay3000ruzgjxccye2sc",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "SHIPPED",
+          "message": "Handed to Delhivery Surface",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T13:21:06.411Z"
+        },
+        {
+          "id": "cmtfu8ay1000puzgjbjroryg0",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "CONFIRMED",
+          "message": "Pickup requested from courier",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T13:21:06.410Z"
+        },
+        {
+          "id": "cmtfu8ay0000nuzgjxbenmu6f",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "CONFIRMED",
+          "message": "AWB MOCK00090054 assigned (Delhivery Surface)",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T13:21:06.409Z"
+        },
+        {
+          "id": "cmtfu8arw000huzgj8ty3ktvm",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700090054",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T13:21:06.189Z"
+        },
+        {
+          "id": "cmtfu8arv000duzgjygyhzxeh",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T13:21:06.187Z"
+        },
+        {
+          "id": "cmtfu8art000buzgj5g6e9qen",
+          "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T13:21:06.186Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfu8arw000fuzgj44x7x18b",
+        "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
+        "shiprocketOrderId": "700090054",
+        "shiprocketShipmentId": "800090054",
+        "awbCode": "MOCK00090054",
+        "courierName": "Delhivery Surface",
+        "courierCompanyId": 51,
+        "labelUrl": "https://example.invalid/mock-label-800090054.pdf",
+        "manifestUrl": "https://example.invalid/mock-manifest-800090054.pdf",
+        "invoiceUrl": "https://example.invalid/mock-invoice-700090054.pdf",
+        "pickupScheduledAt": "2026-08-30T13:21:06.409Z",
+        "status": "PICKUP_SCHEDULED",
+        "trackingUrl": "https://shiprocket.co/tracking/MOCK00090054",
+        "etd": null,
+        "freightCharge": 59,
+        "createdAt": "2026-08-30T13:21:06.188Z",
+        "updatedAt": "2026-08-30T13:21:06.416Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfspmzc0018uzp408jy6aew",
+      "orderNumber": "KUP-260830-509116",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CANCELLED",
+      "subtotal": 6897,
+      "discount": 0,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 6897,
+      "couponCode": null,
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T12:38:35.928Z",
+      "cancelledAt": "2026-08-30T12:38:35.940Z",
+      "updatedAt": "2026-08-30T12:38:35.940Z",
+      "items": [
+        {
+          "id": "cmtfspmzc001auzp48pkhpkbf",
+          "orderId": "cmtfspmzc0018uzp408jy6aew",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "1 kg",
+          "sku": "KUP-WPI-1000",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 2699,
+          "quantity": 2,
+          "weightKg": 1.15
+        },
+        {
+          "id": "cmtfspmzc001buzp4b7kt1gqe",
+          "orderId": "cmtfspmzc0018uzp408jy6aew",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "500 g",
+          "sku": "KUP-WPI-500",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 1499,
+          "quantity": 1,
+          "weightKg": 0.62
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfspmzo001luzp4c7yl3hw9",
+          "orderId": "cmtfspmzc0018uzp408jy6aew",
+          "status": "CANCELLED",
+          "message": "variant test",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T12:38:35.941Z"
+        },
+        {
+          "id": "cmtfspmzg001juzp4yxnsp7cj",
+          "orderId": "cmtfspmzc0018uzp408jy6aew",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700092281",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T12:38:35.933Z"
+        },
+        {
+          "id": "cmtfspmzf001fuzp4sg6lkpos",
+          "orderId": "cmtfspmzc0018uzp408jy6aew",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T12:38:35.932Z"
+        },
+        {
+          "id": "cmtfspmze001duzp430oytey3",
+          "orderId": "cmtfspmzc0018uzp408jy6aew",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T12:38:35.930Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfspmzg001huzp42m3ptrrp",
+        "orderId": "cmtfspmzc0018uzp408jy6aew",
+        "shiprocketOrderId": "700092281",
+        "shiprocketShipmentId": "800092281",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T12:38:35.932Z",
+        "updatedAt": "2026-08-30T12:38:35.932Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfspmkg000auzp41xxy7rx2",
+      "orderNumber": "KUP-260830-784910",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "DELIVERED",
+      "subtotal": 4598,
+      "discount": 300,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 4298,
+      "couponCode": "WELCOME10",
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T12:38:35.393Z",
+      "cancelledAt": null,
+      "updatedAt": "2026-08-30T12:38:35.627Z",
+      "items": [
+        {
+          "id": "cmtfspmkg000cuzp4rcwjc8vo",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "productId": null,
+          "variantId": null,
+          "name": "Digital BP Monitor — Upper Arm",
+          "variantName": null,
+          "sku": "KUP-BPM-001",
+          "image": "/uploads/seed-digital-bp-monitor-upper-arm.svg",
+          "price": 2299,
+          "quantity": 2,
+          "weightKg": 0.62
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfspmqz000wuzp43eme3gv5",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "DELIVERED",
+          "message": "Marked delivered by admin",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T12:38:35.628Z"
+        },
+        {
+          "id": "cmtfspmqr000uuzp4itmsf3u6",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "SHIPPED",
+          "message": "Handed to Delhivery Surface",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T12:38:35.619Z"
+        },
+        {
+          "id": "cmtfspmqq000suzp4ejtk9bz4",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "CONFIRMED",
+          "message": "Pickup requested from courier",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T12:38:35.618Z"
+        },
+        {
+          "id": "cmtfspmqp000quzp4tmp8929p",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "CONFIRMED",
+          "message": "AWB MOCK00086439 assigned (Delhivery Surface)",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T12:38:35.617Z"
+        },
+        {
+          "id": "cmtfspmkk000kuzp46vkzjpvh",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700086439",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T12:38:35.397Z"
+        },
+        {
+          "id": "cmtfspmkj000guzp469gaqpft",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T12:38:35.396Z"
+        },
+        {
+          "id": "cmtfspmki000euzp407kjgy0c",
+          "orderId": "cmtfspmkg000auzp41xxy7rx2",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T12:38:35.394Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfspmkk000iuzp4ggjbrwa5",
+        "orderId": "cmtfspmkg000auzp41xxy7rx2",
+        "shiprocketOrderId": "700086439",
+        "shiprocketShipmentId": "800086439",
+        "awbCode": "MOCK00086439",
+        "courierName": "Delhivery Surface",
+        "courierCompanyId": 51,
+        "labelUrl": "https://example.invalid/mock-label-800086439.pdf",
+        "manifestUrl": "https://example.invalid/mock-manifest-800086439.pdf",
+        "invoiceUrl": "https://example.invalid/mock-invoice-700086439.pdf",
+        "pickupScheduledAt": "2026-08-30T12:38:35.617Z",
+        "status": "PICKUP_SCHEDULED",
+        "trackingUrl": "https://shiprocket.co/tracking/MOCK00086439",
+        "etd": null,
+        "freightCharge": 59,
+        "createdAt": "2026-08-30T12:38:35.396Z",
+        "updatedAt": "2026-08-30T12:38:35.624Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfr7z47003uuztgbnbtpl66",
+      "orderNumber": "KUP-260830-625723",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "DELIVERED",
+      "subtotal": 2498,
+      "discount": 249.8,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 2248.2,
+      "couponCode": "WELCOME10",
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T11:56:52.232Z",
+      "cancelledAt": null,
+      "updatedAt": "2026-08-30T11:56:52.464Z",
+      "items": [
+        {
+          "id": "cmtfr7z47003wuztgmvkbx0t8",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "productId": null,
+          "variantId": null,
+          "name": "Plant Protein Blend — Vanilla",
+          "variantName": "500 g",
+          "sku": "KUP-PLP-500",
+          "image": "/uploads/seed-plant-protein-blend-vanilla.svg",
+          "price": 1249,
+          "quantity": 2,
+          "weightKg": 0.58
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfr7zao004guztgbbvrugtf",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "DELIVERED",
+          "message": "Marked delivered by admin",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T11:56:52.464Z"
+        },
+        {
+          "id": "cmtfr7zaf004euztgdd24yr9b",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "SHIPPED",
+          "message": "Handed to Delhivery Surface",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:56:52.456Z"
+        },
+        {
+          "id": "cmtfr7zae004cuztgtlkj78ej",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "CONFIRMED",
+          "message": "Pickup requested from courier",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:56:52.454Z"
+        },
+        {
+          "id": "cmtfr7zad004auztgone6gstf",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "CONFIRMED",
+          "message": "AWB MOCK00029155 assigned (Delhivery Surface)",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:56:52.453Z"
+        },
+        {
+          "id": "cmtfr7z4b0044uztgct98cfl2",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700029155",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:56:52.236Z"
+        },
+        {
+          "id": "cmtfr7z4a0040uztg9oi2jy7a",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:56:52.235Z"
+        },
+        {
+          "id": "cmtfr7z49003yuztggq5c6mt0",
+          "orderId": "cmtfr7z47003uuztgbnbtpl66",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:56:52.233Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfr7z4b0042uztgx3z8kfaq",
+        "orderId": "cmtfr7z47003uuztgbnbtpl66",
+        "shiprocketOrderId": "700029155",
+        "shiprocketShipmentId": "800029155",
+        "awbCode": "MOCK00029155",
+        "courierName": "Delhivery Surface",
+        "courierCompanyId": 51,
+        "labelUrl": "https://example.invalid/mock-label-800029155.pdf",
+        "manifestUrl": "https://example.invalid/mock-manifest-800029155.pdf",
+        "invoiceUrl": "https://example.invalid/mock-invoice-700029155.pdf",
+        "pickupScheduledAt": "2026-08-30T11:56:52.453Z",
+        "status": "PICKUP_SCHEDULED",
+        "trackingUrl": "https://shiprocket.co/tracking/MOCK00029155",
+        "etd": null,
+        "freightCharge": 59,
+        "createdAt": "2026-08-30T11:56:52.235Z",
+        "updatedAt": "2026-08-30T11:56:52.461Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfr7qtd003cuztgvtwj3ytg",
+      "orderNumber": "KUP-260830-857181",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CANCELLED",
+      "subtotal": 2498,
+      "discount": 249.8,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 2248.2,
+      "couponCode": "WELCOME10",
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T11:56:41.473Z",
+      "cancelledAt": "2026-08-30T13:16:13.735Z",
+      "updatedAt": "2026-08-30T13:16:13.736Z",
+      "items": [
+        {
+          "id": "cmtfr7qtd003euztgl199npnr",
+          "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
+          "productId": null,
+          "variantId": null,
+          "name": "Plant Protein Blend — Vanilla",
+          "variantName": "500 g",
+          "sku": "KUP-PLP-500",
+          "image": "/uploads/seed-plant-protein-blend-vanilla.svg",
+          "price": 1249,
+          "quantity": 2,
+          "weightKg": 0.58
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfu214a0019uzvgh6obwnm8",
+          "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
+          "status": "CANCELLED",
+          "message": "Cancelled by customer",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T13:16:13.739Z"
+        },
+        {
+          "id": "cmtfr7qth003muztgnziarnpy",
+          "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700045689",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:56:41.477Z"
+        },
+        {
+          "id": "cmtfr7qtg003iuztgwbqxrv4y",
+          "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:56:41.476Z"
+        },
+        {
+          "id": "cmtfr7qte003guztg3hyp2f9l",
+          "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:56:41.475Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfr7qtg003kuztgsg10emqp",
+        "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
+        "shiprocketOrderId": "700045689",
+        "shiprocketShipmentId": "800045689",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T11:56:41.477Z",
+        "updatedAt": "2026-08-30T11:56:41.477Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfr7h2o002juztgpohxthiq",
+      "orderNumber": "KUP-260830-122176",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CANCELLED",
+      "subtotal": 6897,
+      "discount": 0,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 6897,
+      "couponCode": null,
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T11:56:28.849Z",
+      "cancelledAt": "2026-08-30T11:56:28.860Z",
+      "updatedAt": "2026-08-30T11:56:28.860Z",
+      "items": [
+        {
+          "id": "cmtfr7h2o002luztgmhg2hvk0",
+          "orderId": "cmtfr7h2o002juztgpohxthiq",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "1 kg",
+          "sku": "KUP-WPI-1000",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 2699,
+          "quantity": 2,
+          "weightKg": 1.15
+        },
+        {
+          "id": "cmtfr7h2o002muztgiv2o1785",
+          "orderId": "cmtfr7h2o002juztgpohxthiq",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "500 g",
+          "sku": "KUP-WPI-500",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 1499,
+          "quantity": 1,
+          "weightKg": 0.62
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfr7h30002wuztgcgnpiyi2",
+          "orderId": "cmtfr7h2o002juztgpohxthiq",
+          "status": "CANCELLED",
+          "message": "variant test",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T11:56:28.861Z"
+        },
+        {
+          "id": "cmtfr7h2s002uuztgohab8tue",
+          "orderId": "cmtfr7h2o002juztgpohxthiq",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700071323",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:56:28.853Z"
+        },
+        {
+          "id": "cmtfr7h2r002quztg8ghdu4r6",
+          "orderId": "cmtfr7h2o002juztgpohxthiq",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:56:28.852Z"
+        },
+        {
+          "id": "cmtfr7h2q002ouztg6kg2g8g4",
+          "orderId": "cmtfr7h2o002juztgpohxthiq",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:56:28.850Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfr7h2s002suztg2rovqa7x",
+        "orderId": "cmtfr7h2o002juztgpohxthiq",
+        "shiprocketOrderId": "700071323",
+        "shiprocketShipmentId": "800071323",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T11:56:28.852Z",
+        "updatedAt": "2026-08-30T11:56:28.852Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfr07gc0012uztgo18c5rag",
+      "orderNumber": "KUP-260830-918861",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CANCELLED",
+      "subtotal": 6897,
+      "discount": 0,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 6897,
+      "couponCode": null,
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T11:50:49.788Z",
+      "cancelledAt": "2026-08-30T11:50:49.798Z",
+      "updatedAt": "2026-08-30T11:50:49.799Z",
+      "items": [
+        {
+          "id": "cmtfr07gc0014uztgm511yrd4",
+          "orderId": "cmtfr07gc0012uztgo18c5rag",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "1 kg",
+          "sku": "KUP-WPI-1000",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 2699,
+          "quantity": 2,
+          "weightKg": 1.15
+        },
+        {
+          "id": "cmtfr07gc0015uztgeiu59xx2",
+          "orderId": "cmtfr07gc0012uztgo18c5rag",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "500 g",
+          "sku": "KUP-WPI-500",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 1499,
+          "quantity": 1,
+          "weightKg": 0.62
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfr07gn001fuztgltore4jn",
+          "orderId": "cmtfr07gc0012uztgo18c5rag",
+          "status": "CANCELLED",
+          "message": "variant test",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T11:50:49.799Z"
+        },
+        {
+          "id": "cmtfr07gf0019uztg0ce5qj2p",
+          "orderId": "cmtfr07gc0012uztgo18c5rag",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:50:49.792Z"
+        },
+        {
+          "id": "cmtfr07gg001duztgo1k2oaxc",
+          "orderId": "cmtfr07gc0012uztgo18c5rag",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700073916",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:50:49.792Z"
+        },
+        {
+          "id": "cmtfr07ge0017uztgozfj9f2p",
+          "orderId": "cmtfr07gc0012uztgo18c5rag",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:50:49.790Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfr07gg001buztgbrpx95ni",
+        "orderId": "cmtfr07gc0012uztgo18c5rag",
+        "shiprocketOrderId": "700073916",
+        "shiprocketShipmentId": "800073916",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T11:50:49.792Z",
+        "updatedAt": "2026-08-30T11:50:49.792Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfqzsk70007uztgcnfa0wk7",
+      "orderNumber": "KUP-260830-022464",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CANCELLED",
+      "subtotal": 55479,
+      "discount": 0,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 55479,
+      "couponCode": null,
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T11:50:30.487Z",
+      "cancelledAt": "2026-08-30T11:50:30.498Z",
+      "updatedAt": "2026-08-30T11:50:30.499Z",
+      "items": [
+        {
+          "id": "cmtfqzsk70009uztgjtxdtd3t",
+          "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "1 kg",
+          "sku": "KUP-WPI-1000",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 2699,
+          "quantity": 20,
+          "weightKg": 1.15
+        },
+        {
+          "id": "cmtfqzsk7000auztgwpl1kugr",
+          "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+          "productId": null,
+          "variantId": null,
+          "name": "Whey Protein Isolate — Chocolate",
+          "variantName": "500 g",
+          "sku": "KUP-WPI-500",
+          "image": "/uploads/seed-whey-protein-isolate-chocolate.svg",
+          "price": 1499,
+          "quantity": 1,
+          "weightKg": 0.62
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfqzskj000kuztgbnbmfk2b",
+          "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+          "status": "CANCELLED",
+          "message": "variant test",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T11:50:30.499Z"
+        },
+        {
+          "id": "cmtfqzskb000iuztglmfafku0",
+          "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700097910",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T11:50:30.491Z"
+        },
+        {
+          "id": "cmtfqzska000euztglsxjqhct",
+          "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:50:30.490Z"
+        },
+        {
+          "id": "cmtfqzsk8000cuztg7tv5rwru",
+          "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T11:50:30.489Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfqzska000guztgzg8kox1x",
+        "orderId": "cmtfqzsk70007uztgcnfa0wk7",
+        "shiprocketOrderId": "700097910",
+        "shiprocketShipmentId": "800097910",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T11:50:30.491Z",
+        "updatedAt": "2026-08-30T11:50:30.491Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfot3ck0005uzhuxnsmduci",
+      "orderNumber": "KUP-260830-435182",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "CANCELLED",
+      "subtotal": 2148,
+      "discount": 0,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 2148,
+      "couponCode": null,
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T10:49:18.644Z",
+      "cancelledAt": "2026-08-30T13:16:17.103Z",
+      "updatedAt": "2026-08-30T13:16:17.104Z",
+      "items": [
+        {
+          "id": "cmtfot3ck0007uzhu1b2mwppw",
+          "orderId": "cmtfot3ck0005uzhuxnsmduci",
+          "productId": null,
+          "variantId": null,
+          "name": "Ceramide Barrier Repair Moisturiser 100g",
+          "variantName": null,
+          "sku": "KUP-CRM-100",
+          "image": "/uploads/seed-ceramide-barrier-repair-moisturiser-100g.svg",
+          "price": 849,
+          "quantity": 1,
+          "weightKg": 0.16
+        },
+        {
+          "id": "cmtfot3ck0008uzhu9rgl6i3w",
+          "orderId": "cmtfot3ck0005uzhuxnsmduci",
+          "productId": null,
+          "variantId": null,
+          "name": "Fingertip Pulse Oximeter",
+          "variantName": null,
+          "sku": "KUP-OXI-001",
+          "image": "/uploads/seed-fingertip-pulse-oximeter.svg",
+          "price": 1299,
+          "quantity": 1,
+          "weightKg": 0.09
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfu23pw001buzvgug5sxui9",
+          "orderId": "cmtfot3ck0005uzhuxnsmduci",
+          "status": "CANCELLED",
+          "message": "Cancelled by customer",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T13:16:17.108Z"
+        },
+        {
+          "id": "cmtfot3cz000guzhuxfnn2bfr",
+          "orderId": "cmtfot3ck0005uzhuxnsmduci",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700070080",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T10:49:18.660Z"
+        },
+        {
+          "id": "cmtfot3cx000cuzhu4oie2wg5",
+          "orderId": "cmtfot3ck0005uzhuxnsmduci",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T10:49:18.657Z"
+        },
+        {
+          "id": "cmtfot3ct000auzhukfbh3h7s",
+          "orderId": "cmtfot3ck0005uzhuxnsmduci",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T10:49:18.654Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfot3cy000euzhulu9buxu6",
+        "orderId": "cmtfot3ck0005uzhuxnsmduci",
+        "shiprocketOrderId": "700070080",
+        "shiprocketShipmentId": "800070080",
+        "awbCode": null,
+        "courierName": null,
+        "courierCompanyId": null,
+        "labelUrl": null,
+        "manifestUrl": null,
+        "invoiceUrl": null,
+        "pickupScheduledAt": null,
+        "status": "CREATED",
+        "trackingUrl": null,
+        "etd": null,
+        "freightCharge": null,
+        "createdAt": "2026-08-30T10:49:18.659Z",
+        "updatedAt": "2026-08-30T10:49:18.659Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    },
+    {
+      "id": "cmtfo45ey0005uzbuvv2i68sw",
+      "orderNumber": "KUP-260830-308396",
+      "userId": "cmtfmoaon0001uzbd91vvagn0",
+      "status": "DELIVERED",
+      "subtotal": 2598,
+      "discount": 259.8,
+      "shippingFee": 0,
+      "tax": 0,
+      "total": 2338.2,
+      "couponCode": "WELCOME10",
+      "paymentMethod": "COD",
+      "paymentStatus": "PENDING",
+      "shipName": "Priya Raman",
+      "shipPhone": "9812345678",
+      "shipEmail": "customer@example.com",
+      "shipLine1": "12/4 Anna Nagar West, 3rd Street",
+      "shipLine2": "Near Blue Star Park",
+      "shipCity": "Chennai",
+      "shipState": "Tamil Nadu",
+      "shipPincode": "600040",
+      "shipCountry": "India",
+      "notes": null,
+      "placedAt": "2026-08-30T10:29:54.922Z",
+      "cancelledAt": null,
+      "updatedAt": "2026-08-30T10:29:55.160Z",
+      "items": [
+        {
+          "id": "cmtfo45ey0007uzbuadva29za",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "productId": null,
+          "variantId": null,
+          "name": "Fingertip Pulse Oximeter",
+          "variantName": null,
+          "sku": "KUP-OXI-001",
+          "image": "/uploads/seed-fingertip-pulse-oximeter.svg",
+          "price": 1299,
+          "quantity": 2,
+          "weightKg": 0.09
+        }
+      ],
+      "events": [
+        {
+          "id": "cmtfo45lk000ruzbuuz4z3ghc",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "DELIVERED",
+          "message": "Marked delivered by admin",
+          "source": "ADMIN",
+          "createdAt": "2026-08-30T10:29:55.160Z"
+        },
+        {
+          "id": "cmtfo45lc000puzbuk1lzr1t2",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "SHIPPED",
+          "message": "Handed to Delhivery Surface",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T10:29:55.152Z"
+        },
+        {
+          "id": "cmtfo45la000nuzbui2ycl5rf",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "CONFIRMED",
+          "message": "Pickup requested from courier",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T10:29:55.151Z"
+        },
+        {
+          "id": "cmtfo45l9000luzbucwcgfu81",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "CONFIRMED",
+          "message": "AWB MOCK00078777 assigned (Delhivery Surface)",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T10:29:55.150Z"
+        },
+        {
+          "id": "cmtfo45f3000fuzbu3ebz1ije",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "CONFIRMED",
+          "message": "Shipment created in Shiprocket (mock mode) — ref 700078777",
+          "source": "SHIPROCKET",
+          "createdAt": "2026-08-30T10:29:54.927Z"
+        },
+        {
+          "id": "cmtfo45f2000buzbuhu6zgd0w",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "CONFIRMED",
+          "message": "COD order confirmed",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T10:29:54.926Z"
+        },
+        {
+          "id": "cmtfo45f00009uzbu2ziw5cd5",
+          "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+          "status": "PENDING",
+          "message": "Order placed (Cash on delivery)",
+          "source": "SYSTEM",
+          "createdAt": "2026-08-30T10:29:54.924Z"
+        }
+      ],
+      "shipment": {
+        "id": "cmtfo45f2000duzbuv6885f0l",
+        "orderId": "cmtfo45ey0005uzbuvv2i68sw",
+        "shiprocketOrderId": "700078777",
+        "shiprocketShipmentId": "800078777",
+        "awbCode": "MOCK00078777",
+        "courierName": "Delhivery Surface",
+        "courierCompanyId": 51,
+        "labelUrl": "https://example.invalid/mock-label-800078777.pdf",
+        "manifestUrl": "https://example.invalid/mock-manifest-800078777.pdf",
+        "invoiceUrl": "https://example.invalid/mock-invoice-700078777.pdf",
+        "pickupScheduledAt": "2026-08-30T10:29:55.150Z",
+        "status": "PICKUP_SCHEDULED",
+        "trackingUrl": "https://shiprocket.co/tracking/MOCK00078777",
+        "etd": null,
+        "freightCharge": 59,
+        "createdAt": "2026-08-30T10:29:54.927Z",
+        "updatedAt": "2026-08-30T10:29:55.157Z"
+      },
+      "razorpayOrderId": null,
+      "razorpayPaymentId": null,
+      "razorpaySignature": null,
+      "refundId": null,
+      "user": {
+        "id": "cmtfmoaon0001uzbd91vvagn0",
+        "name": "Priya Raman",
+        "email": "shopper@demo.test",
+        "phone": "9812345678"
+      }
+    }
+  ],
+  "wishlist": []
 }

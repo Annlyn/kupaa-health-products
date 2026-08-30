@@ -16,6 +16,25 @@ npm run setup   # install, create .env files, create and seed the SQLite databas
 npm run dev     # API on :4000, client on :5173 (proxied, so a single origin)
 ```
 
+### Accounts
+
+The seed creates two, so both sides of the app can be opened straight away:
+
+| | Email | Password | |
+|---|---|---|---|
+| Admin | `admin@kupaahealth.com` | the `ADMIN_PASSWORD` value in `server/.env` | `/admin` |
+| Customer | `customer@example.com` | `Customer@123` | shop, cart, orders |
+
+The admin password deliberately lives only in `server/.env` (gitignored) — the
+seed generates a strong one on a fresh install and prints it once. To change or
+recover it, set `ADMIN_PASSWORD` and re-run `npm run seed -w server`; that
+rewrites the hash and revokes every existing session. `ADMIN_EMAIL` sets the
+address. The customer account is demo data and its password is in the seed.
+
+These are the real accounts. The demo build has its own pair
+(`admin@demo.test` / `demo-admin` and `shopper@demo.test` / `demo-shopper`),
+which work only there — see [demo/README.md](demo/README.md).
+
 SQLite is the local default and Postgres is used in production. The Prisma
 `provider` is rewritten from `DATABASE_URL` by `scripts/set-db-provider.js`,
 which runs before every `generate`/`push`, so the same commit works in both

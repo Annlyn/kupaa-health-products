@@ -79,6 +79,7 @@ function demoBridge() {
         "export const DEMO_NOTICE = '';",
         "export const demoFetch = () => { throw new Error('demo mode is not bundled'); };",
         'export const demoMediaUrl = (url) => url;',
+        'export const demoAccounts = async () => [];',
       ].join('\n');
     },
 

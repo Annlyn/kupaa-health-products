@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { LeafIcon, ShieldIcon } from '../components/Icons';
 import { Field, PageLoader, Spinner, cx } from '../components/ui';
 import { useTitle } from '../lib/hooks';
+import { DEMO, demoAccounts } from 'virtual:demo';
 
 export default function Login() {
   useTitle('Sign in');
@@ -15,6 +16,13 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
+
+  // Only ever non-empty in a demo build; the snapshot loads asynchronously.
+  const [accounts, setAccounts] = useState([]);
+  useEffect(() => {
+    if (!DEMO) return;
+    demoAccounts().then(setAccounts).catch(() => setAccounts([]));
+  }, []);
 
   if (booting) return <PageLoader />;
   if (isAuthenticated) return <Navigate to={location.state?.from || '/'} replace />;
@@ -84,10 +92,28 @@ export default function Login() {
         </p>
 
         {/*
-          Credentials are never printed in the UI — not even for the demo data,
-          and never in a production build. See the README for the seeded logins.
+          Credentials are never printed in the UI — not even for the seeded data,
+          and never against a real API. The one exception is a demo build, where
+          the accounts exist only in the bundled snapshot, unlock nothing, and
+          are already readable in the JavaScript. See demo/README.md.
         */}
-        {import.meta.env.DEV && (
+        {DEMO && accounts.length > 0 && (
+          <div className="mt-7 rounded-xl border border-dashed border-ink-200 bg-ink-50/60 p-4 text-xs text-ink-600">
+            <p className="font-semibold text-ink-700">Demo logins</p>
+            <p className="mt-1">This build has no server. Nothing you do here is saved.</p>
+            <ul className="mt-2.5 space-y-1">
+              {accounts.map((account) => (
+                <li key={account.email} className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="w-16 shrink-0 text-ink-500">{account.label}</span>
+                  <code className="font-medium text-ink-800">{account.email}</code>
+                  <code className="text-ink-500">{account.password}</code>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {!DEMO && import.meta.env.DEV && (
           <p className="mt-7 rounded-xl border border-dashed border-ink-200 bg-ink-50/60 p-4 text-xs text-ink-500">
             Development build. The seeded demo logins are listed in the project README under{' '}
             <span className="font-medium text-ink-700">Quick start</span>.

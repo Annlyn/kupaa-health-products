@@ -12,15 +12,33 @@ export.js    regenerates the two above from a real database
 test.mjs     checks the adapter still behaves like the API
 ```
 
+## Signing in
+
+| | Email | Password |
+|---|---|---|
+| Admin | `admin@demo.test` | `demo-admin` |
+| Customer | `shopper@demo.test` | `demo-shopper` |
+
+The sign-in page lists these too, because in a static build they are not
+secrets — anyone can read them out of the JavaScript. They are safe for exactly
+that reason: they exist only in `data.json`, the real API has never heard of
+them, and every write is refused. The live admin address is not used and no
+password hash is exported.
+
+Change them by editing the `accounts` block in `export.js` and regenerating.
+
 ## What works, and what does not
 
-Browsing, search, filters, sorting, product pages, the cart and coupon pricing
-all work — the guest cart already lives in `localStorage`, and pricing is
-recomputed here using the same rules as `server/src/services/pricing.service.js`.
+**Works.** Browsing, search, filters, sorting, product pages, the cart and
+coupon pricing. Signed in: order history, order detail, addresses, wishlist, and
+the whole admin area — dashboard, products, orders, customers, coupons, reviews
+and settings. Pricing and the dashboard totals are recomputed here from the same
+rules the server uses, not copied from a canned response.
 
-Sign-in, checkout and admin do not, and cannot: they write data, and in demo
-mode there is nowhere to write it. Those requests answer 401/503 with a message
-saying so, and a banner at the top of every page says the same.
+**Does not.** Anything that writes: checkout, editing a product, changing an
+order's status, saving settings. Those answer 503 and the UI shows the message.
+The cart is the one exception — it writes to `localStorage`, so it behaves
+normally and is emptied by clearing site data rather than by an API call.
 
 ## Regenerating
 

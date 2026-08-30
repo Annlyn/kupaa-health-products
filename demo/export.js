@@ -15,8 +15,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '../server/src/lib/prisma.js';
-import { getSettings } from '../server/src/services/settings.service.js';
-import { variantSelect } from '../server/src/services/variant.service.js';
+import { SETTINGS_GROUPS, SETTINGS_SCHEMA, getSettings } from '../server/src/services/settings.service.js';
+
+const byId = (rows, id) => rows.find((r) => r.id === id);
 
 const demoDir = path.dirname(fileURLToPath(import.meta.url));
 const uploadDir = path.resolve(demoDir, '../server/uploads');
@@ -79,13 +80,12 @@ async function main() {
   const seen = new Set();
   const settings = await getSettings();
 
+  // Full rows, not just the storefront projection: the admin screens read the
+  // same records. The demo handlers filter and project, exactly as the two sets
+  // of controllers do.
   const categoryRows = await prisma.category.findMany({
-    where: { isActive: true },
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: {
-      id: true, name: true, slug: true, description: true, image: true,
-      _count: { select: { products: { where: { isActive: true } } } },
-    },
+    include: { _count: { select: { products: { where: { isActive: true } } } } },
   });
   const categories = categoryRows.map(({ _count, image, ...c }) => ({
     ...c,
@@ -93,40 +93,130 @@ async function main() {
     productCount: _count.products,
   }));
 
+  // Full rows again: the storefront sends a trimmed card while the admin sends
+  // everything, and the adapter derives both from these.
   const productRows = await prisma.product.findMany({
     where: { isActive: true },
     orderBy: { createdAt: 'desc' },
     include: {
-      category: { select: { id: true, name: true, slug: true } },
-      images: { orderBy: { sortOrder: 'asc' }, select: { id: true, url: true, alt: true, sortOrder: true } },
-      variants: { where: { isActive: true }, orderBy: { sortOrder: 'asc' }, select: variantSelect },
-      reviews: { orderBy: { createdAt: 'desc' }, include: { user: { select: { name: true } } } },
+      category: true,
+      images: { orderBy: { sortOrder: 'asc' } },
+      variants: { orderBy: { sortOrder: 'asc' } },
+      reviews: { orderBy: { createdAt: 'desc' }, include: { user: { select: { id: true, name: true, email: true } } } },
     },
   });
   const products = productRows.map((p) => ({
     ...p,
     images: p.images.map((img) => ({ ...img, url: exportMedia(img.url, seen) })).filter((img) => img.url),
-    reviews: p.reviews.map(({ user, userId, ...r }) => ({ ...r, author: user.name })),
+    reviews: p.reviews.map((r) => ({ ...r, author: r.user.name })),
   }));
 
-  // Coupons are checked in the browser in demo mode, so only ship live ones.
-  const coupons = await prisma.coupon.findMany({
-    where: { isActive: true },
-    select: {
-      code: true, description: true, type: true, value: true,
-      minOrder: true, maxDiscount: true, usageLimit: true, usedCount: true,
-      startsAt: true, expiresAt: true,
+  // ------------------------------------------------------------------ people
+  // Password hashes are deliberately NOT exported. This file is served from a
+  // public URL; a bcrypt hash there is an offline cracking target, and the admin
+  // one would match the live API. Demo sign-in uses the fixed credentials below,
+  // which exist nowhere but this snapshot.
+  const userRows = await prisma.user.findMany({
+    select: { id: true, name: true, email: true, phone: true, role: true, isActive: true, createdAt: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const admin = userRows.find((u) => u.role === 'ADMIN');
+  const shopper = userRows.find((u) => u.role === 'USER');
+
+  const accounts = [
+    admin && { email: 'admin@demo.test', password: 'demo-admin', label: 'Admin', userId: admin.id },
+    shopper && { email: 'shopper@demo.test', password: 'demo-shopper', label: 'Customer', userId: shopper.id },
+  ].filter(Boolean);
+
+  // Rewrite the exported identities to the demo addresses, so the real admin
+  // email is not advertised on a public page and nobody mistakes these for the
+  // live logins.
+  const users = userRows.map((u) => {
+    const account = accounts.find((a) => a.userId === u.id);
+    return account ? { ...u, email: account.email } : u;
+  });
+
+  // Reviews carry the reviewer's address; remap it like the user rows above.
+  for (const product of products) {
+    for (const review of product.reviews) {
+      const mapped = byId(users, review.user.id);
+      if (mapped) review.user = { ...review.user, email: mapped.email };
+    }
+  }
+
+  const addresses = await prisma.address.findMany({ orderBy: { createdAt: 'asc' } });
+
+  const orderRows = await prisma.order.findMany({
+    orderBy: { placedAt: 'desc' },
+    include: {
+      items: true,
+      events: { orderBy: { createdAt: 'desc' } },
+      shipment: true,
+      user: { select: { id: true, name: true, email: true, phone: true } },
     },
   });
 
-  fs.writeFileSync(
-    dataFile,
-    `${JSON.stringify({ generatedAt: new Date().toISOString(), settings, categories, products, coupons }, null, 2)}\n`,
-  );
+  // Gateway identifiers earn nothing in a demo, and the signature is an HMAC.
+  // Drop them so a future export against live data cannot publish them.
+  const orders = orderRows.map(({ razorpayOrderId, razorpayPaymentId, razorpaySignature, refundId, ...o }) => ({
+    ...o,
+    razorpayOrderId: null,
+    razorpayPaymentId: null,
+    razorpaySignature: null,
+    refundId: null,
+  }));
+
+  const wishlist = await prisma.wishlistItem.findMany({ select: { id: true, userId: true, productId: true, createdAt: true } });
+
+  const coupons = await prisma.coupon.findMany({ orderBy: { createdAt: 'desc' } });
+
+  // The admin settings form renders from this metadata, so it has to travel too.
+  const overridden = new Set((await prisma.setting.findMany({ select: { key: true } })).map((r) => r.key));
+  const settingsMeta = {
+    fields: Object.entries(SETTINGS_SCHEMA).map(([key, spec]) => ({
+      key,
+      group: spec.group,
+      type: spec.type,
+      label: spec.label,
+      hint: spec.hint ?? null,
+      min: spec.min ?? null,
+      max: spec.max ?? null,
+      fields: spec.fields ?? null,
+      isCustomised: overridden.has(key),
+    })),
+    groups: SETTINGS_GROUPS,
+  };
+
+  // Order rows carry a shipping name, email, phone and address. That is fine
+  // here because every order belongs to the seeded demo customer, but it would
+  // not be if real ones existed — check before regenerating on live data.
+  const realCustomers = orders.filter((o) => !accounts.some((a) => a.userId === o.userId)).length;
+  if (realCustomers) {
+    console.warn(`  ! ${realCustomers} order(s) belong to accounts other than the demo ones —`);
+    console.warn('    this snapshot is published, so review it for personal data before committing.');
+  }
+
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    accounts,
+    settings,
+    settingsMeta,
+    categories,
+    products,
+    coupons,
+    users,
+    addresses,
+    orders: orders.map(({ user, ...o }) => ({ ...o, user: user && { ...user, email: byId(users, user.id)?.email } })),
+    wishlist,
+  };
+  fs.writeFileSync(dataFile, `${JSON.stringify(payload, null, 2)}\n`);
 
   const bytes = fs.readdirSync(mediaDir).reduce((n, f) => n + fs.statSync(path.join(mediaDir, f)).size, 0);
   console.log(`Wrote demo/data.json`);
   console.log(`  ${products.length} products, ${categories.length} categories, ${coupons.length} coupons`);
+  console.log(`  ${orders.length} orders, ${users.length} users, ${addresses.length} addresses`);
+  for (const a of accounts) console.log(`  sign in as ${a.label.padEnd(8)} ${a.email} / ${a.password}`);
   console.log(`  ${seen.size} media files -> demo/media (${(bytes / 1e6).toFixed(1)} MB)`);
   if (!products.some((p) => p.isFeatured)) {
     console.warn('  ! no featured products — the home page Bestsellers row will be empty');
