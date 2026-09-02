@@ -15,15 +15,14 @@ const NAV = [
 
 export function Logo({ className = '' }) {
   const { storeName } = useStore();
-  // "Kupaa Health Products" -> bold "Kupaa" over a small-caps "Health Products".
   const [first, ...rest] = String(storeName || 'Kupaa').split(' ');
 
   return (
-    <Link to="/" className={cx('flex items-center gap-2.5', className)} aria-label={`${storeName} home`}>
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-700 text-white">
-        <LeafIcon width={20} height={20} />
+    <Link to="/" className={cx('flex -ml-2 items-center gap-2.5 sm:-ml-1', className)} aria-label={`${storeName} home`}>
+      <span className="grid h-20 w-20 shrink-0 place-items-center">
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Kupaa Health Products" className="h-24 w-24 object-contain" />
       </span>
-      <span className="leading-none">
+      <span className="flex flex-col justify-center leading-none">
         <span className="block font-display text-lg font-bold text-ink-950">{first}</span>
         {rest.length > 0 && (
           <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-700">{rest.join(' ')}</span>
@@ -147,7 +146,7 @@ export default function Header() {
       )}
 
       <div className="container-page">
-        <div className="flex h-16 items-center gap-4">
+        <div className="flex h-20 items-center gap-4">
           <button className="btn-ghost -ml-2 lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <MenuIcon />
           </button>
