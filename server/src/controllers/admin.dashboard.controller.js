@@ -2,7 +2,7 @@ import { prisma } from '../lib/prisma.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { round2 } from '../utils/money.js';
 import { razorpayEnabled } from '../services/razorpay.service.js';
-import { shiprocketEnabled } from '../services/shiprocket.service.js';
+import { amazonShippingEnabled } from '../services/amazon.service.js';
 
 const PAID_STATUSES = ['CONFIRMED', 'PACKED', 'SHIPPED', 'DELIVERED'];
 const dayStart = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -80,7 +80,7 @@ export const stats = asyncHandler(async (_req, res) => {
       salesSeries: [...buckets.values()],
       statusCounts: Object.fromEntries(statusCounts.map((s) => [s.status, s._count.status])),
       topProducts: topRows.map((r) => ({ productId: r.productId, name: r.name, unitsSold: r._sum.quantity ?? 0 })),
-      integrations: { razorpay: razorpayEnabled(), shiprocket: shiprocketEnabled() },
+      integrations: { razorpay: razorpayEnabled(), shipping: amazonShippingEnabled() },
     },
   });
 });

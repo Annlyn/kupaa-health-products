@@ -36,7 +36,7 @@ export default function TrackOrder() {
       <div className="mx-auto mt-6 max-w-2xl">
         <h1 className="text-2xl font-bold sm:text-3xl">Track your shipment</h1>
         <p className="mt-2 text-sm text-ink-600">
-          Enter the AWB (airway bill) number from your dispatch email. Signed in?{' '}
+          Enter the Amazon Shipping tracking number from your dispatch email. Signed in?{' '}
           <Link to="/account/orders" className="font-semibold text-brand-700 hover:underline">
             Track from My Orders
           </Link>{' '}
@@ -51,7 +51,7 @@ export default function TrackOrder() {
               placeholder="e.g. 1234567890123"
               value={awb}
               onChange={(e) => setAwb(e.target.value)}
-              aria-label="AWB number"
+              aria-label="Tracking number"
             />
           </div>
           <button className="btn-primary shrink-0" disabled={busy || !awb.trim()}>
@@ -68,7 +68,7 @@ export default function TrackOrder() {
                   <TruckIcon width={20} height={20} className="text-brand-700" /> {result.status}
                 </p>
                 <p className="mt-1 text-sm text-ink-500">
-                  AWB {result.awb}
+                  Tracking {result.awb}
                   {result.courier ? ` · ${result.courier}` : ''}
                 </p>
               </div>
@@ -82,7 +82,7 @@ export default function TrackOrder() {
 
             {result.mock && (
               <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                Shiprocket credentials are not configured, so this is simulated tracking data.
+                Amazon Shipping credentials are not configured, so this is simulated tracking data.
               </p>
             )}
 
@@ -124,7 +124,7 @@ export default function TrackOrder() {
           <div className="mt-8">
             <EmptyState
               icon={PackageIcon}
-              title="No shipment found for that AWB"
+              title="No shipment found for that tracking number"
               description="Double-check the number in your dispatch email. Tracking can take a few hours to appear after pickup."
             />
           </div>

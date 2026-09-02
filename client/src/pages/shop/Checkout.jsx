@@ -424,7 +424,7 @@ export default function Checkout() {
               {items.map((line) => (
                 <li key={line.id} className="flex gap-3">
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-ink-50">
-                    <ProductImage product={line.product} />
+                    <ProductImage product={line.product} src={line.image} />
                     <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-ink-900 text-[10px] font-bold text-white">
                       {line.quantity}
                     </span>

@@ -365,7 +365,11 @@ async function main() {
     await prisma.productVariant.deleteMany({ where: { productId: product.id } });
     if (p.variants?.length) {
       for (const [idx, v] of p.variants.entries()) {
-        await prisma.productVariant.create({ data: { ...v, productId: product.id, sortOrder: idx } });
+        await prisma.productVariant.create({
+          // Alternating photos, so switching option on the product page visibly
+          // swaps the image the way it does with real per-pack photography.
+          data: { ...v, image: images[idx % images.length], productId: product.id, sortOrder: idx },
+        });
       }
       await syncProductAggregates(null, product.id);
     }

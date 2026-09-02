@@ -59,7 +59,7 @@ export default function Cart() {
               {items.map((line) => (
                 <article key={line.id} className="flex gap-4 p-4">
                   <Link to={`/product/${line.product.slug}`} className="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-ink-50">
-                    <ProductImage product={line.product} />
+                    <ProductImage product={line.product} src={line.image} />
                   </Link>
 
                   <div className="min-w-0 flex-1">

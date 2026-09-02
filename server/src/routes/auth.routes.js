@@ -8,6 +8,9 @@ import { authLimiter } from '../middleware/rateLimit.js';
 const router = Router();
 
 router.post('/register', authLimiter, validate({ body: auth.schemas.register }), auth.register);
+router.post('/login/start', authLimiter, validate({ body: auth.schemas.loginStart }), auth.loginStart);
+router.post('/login/resend', authLimiter, validate({ body: auth.schemas.loginResend }), auth.loginResend);
+router.post('/login/verify', authLimiter, validate({ body: auth.schemas.loginVerify }), auth.loginVerify);
 router.post('/login', authLimiter, validate({ body: auth.schemas.login }), auth.login);
 router.post('/refresh', auth.refresh);
 router.post('/logout', auth.logout);

@@ -11,6 +11,7 @@ router.post('/', writeLimiter, validate({ body: orders.schemas.create }), orders
 router.get('/', validate({ query: orders.schemas.listMine }), orders.listMine);
 router.get('/:id', orders.getOne);
 router.get('/:id/track', orders.track);
+router.get('/:id/invoice', orders.invoice);
 router.post('/:id/cancel', orders.cancel);
 
 export default router;

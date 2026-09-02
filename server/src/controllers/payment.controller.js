@@ -7,6 +7,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { fromPaise } from '../utils/money.js';
 import { confirmOrder, logEvent, orderInclude, restockOrder } from '../services/order.service.js';
 import { getSettings } from '../services/settings.service.js';
+import { notifyOwnerPaymentReceived, sendInvoiceToCustomer } from '../services/notify.service.js';
 import {
   createRazorpayOrder,
   razorpayEnabled,
@@ -57,6 +58,8 @@ export const verify = asyncHandler(async (req, res) => {
     throw ApiError.badRequest('We could not verify this payment. If money was deducted it will be refunded automatically.');
   }
 
+  const alreadyPaid = order.paymentStatus === 'PAID';
+
   await prisma.order.update({
     where: { id: order.id },
     data: {
@@ -68,6 +71,13 @@ export const verify = asyncHandler(async (req, res) => {
   await logEvent(order.id, order.status, `Payment received (${razorpay_payment_id})`, 'RAZORPAY');
 
   const confirmed = await confirmOrder(order.id, { source: 'RAZORPAY', message: 'Payment verified' });
+
+  // Invoice to the customer, alert to the owner. Both are fire-and-forget and
+  // both are idempotent, because the webhook reports this same payment too.
+  if (!alreadyPaid) {
+    void sendInvoiceToCustomer(order.id);
+    void notifyOwnerPaymentReceived(confirmed ?? order);
+  }
   res.json({ ok: true, data: confirmed ?? (await prisma.order.findUnique({ where: { id: order.id }, include: orderInclude })) });
 });
 
@@ -147,6 +157,8 @@ export const webhook = asyncHandler(async (req, res) => {
         });
         await logEvent(order.id, order.status, `Payment captured — ₹${fromPaise(payment.amount)}`, 'RAZORPAY');
         await confirmOrder(order.id, { source: 'RAZORPAY', message: 'Confirmed via webhook' });
+        await sendInvoiceToCustomer(order.id);
+        await notifyOwnerPaymentReceived(order);
       } else if (event === 'payment.failed' && order.paymentStatus === 'PENDING') {
         await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'FAILED' } });
         await logEvent(order.id, order.status, payment?.error_description || 'Payment failed', 'RAZORPAY');

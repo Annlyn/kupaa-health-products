@@ -87,7 +87,7 @@ export default function CartDrawer() {
                     onClick={closeDrawer}
                     className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-ink-50"
                   >
-                    <ProductImage product={line.product} />
+                    <ProductImage product={line.product} src={line.image} />
                   </Link>
 
                   <div className="min-w-0 flex-1">

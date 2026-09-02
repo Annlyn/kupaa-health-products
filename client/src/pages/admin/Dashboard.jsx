@@ -46,12 +46,12 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {(!data.integrations.razorpay || !data.integrations.shiprocket) && (
+      {(!data.integrations.razorpay || !data.integrations.shipping) && (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <AlertIcon width={18} height={18} className="shrink-0" />
           <p className="flex-1">
             {!data.integrations.razorpay && 'Razorpay is not configured — only cash on delivery is available. '}
-            {!data.integrations.shiprocket && 'Shiprocket is running in mock mode — shipments are simulated.'}
+            {!data.integrations.shipping && 'Amazon Shipping is running in mock mode — shipments are simulated.'}
           </p>
           <Link to="/admin/integrations" className="btn-outline btn-sm shrink-0">
             Configure

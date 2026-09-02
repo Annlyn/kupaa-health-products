@@ -1,7 +1,8 @@
 # Kupaa Health Products
 
 Full-stack storefront: React + Vite client, Express + Prisma API, Razorpay
-payments, Shiprocket shipping.
+payments, Amazon Shipping delivery, WhatsApp order alerts and invoices,
+OTP-verified sign-in.
 
 ```
 client/   React SPA (shop + admin)   -> GitHub Pages
@@ -55,8 +56,8 @@ on `starter` rather than `free` — Render does not offer disks on free instance
 
 Fill in the values Render marks as required: `CLIENT_URL`
 (`https://annlyn.github.io`, comma-separated for more than one origin),
-`SERVER_URL` (the service's own URL), and the Razorpay/Shiprocket keys if you
-are using them.
+`SERVER_URL` (the service's own URL), and the Razorpay/Amazon Shipping/WhatsApp
+keys if you are using them.
 
 > Render's free Postgres is **deleted 30 days after creation**. Neon and
 > Supabase both offer free Postgres with no such limit; to use one, delete the

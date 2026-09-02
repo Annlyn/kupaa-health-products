@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma.js';
 import { logger } from '../lib/logger.js';
-import { createShiprocketOrder, isMock } from './shiprocket.service.js';
+import { isMock } from './amazon.service.js';
 import { adjustStock } from './variant.service.js';
 
 export const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURNED'];
@@ -29,8 +29,8 @@ export function logEvent(orderId, status, message, source = 'SYSTEM') {
 
 /**
  * Everything that must happen once an order is paid (or placed as COD):
- * clear the cart, count the coupon, move to CONFIRMED and push to Shiprocket.
- * Shiprocket failures are logged, never fatal — the admin can retry by hand.
+ * clear the cart, count the coupon, move to CONFIRMED and open a shipment.
+ * Carrier failures are logged, never fatal — the admin can retry by hand.
  */
 export async function confirmOrder(orderId, { source = 'SYSTEM', message } = {}) {
   const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
@@ -46,39 +46,30 @@ export async function confirmOrder(orderId, { source = 'SYSTEM', message } = {})
   });
 
   await logEvent(order.id, 'CONFIRMED', message || 'Order confirmed', source);
-  await pushToShiprocket(order).catch((err) => logger.error('[order] shiprocket push failed', err.message));
+  await pushToCarrier(order).catch((err) => logger.error('[order] shipment prepare failed', err.message));
 
   return prisma.order.findUnique({ where: { id: order.id }, include: orderInclude });
 }
 
-/** Creates the Shiprocket order record for an order (safe to call twice). */
-export async function pushToShiprocket(order) {
+/**
+ * Opens the shipment record for an order (safe to call twice).
+ *
+ * Amazon Shipping has no "create order" step — nothing exists on their side
+ * until a label is bought, which happens when the admin ships the order. So
+ * this only reserves our own row, and `POST /admin/orders/:id/ship` fills in
+ * the Amazon shipment id, tracking id and label.
+ */
+export async function pushToCarrier(order) {
   const existing = await prisma.shipment.findUnique({ where: { orderId: order.id } });
-  if (existing?.shiprocketOrderId) return existing;
+  if (existing) return existing;
 
-  const full = order.items ? order : await prisma.order.findUnique({ where: { id: order.id }, include: { items: true } });
-  const created = await createShiprocketOrder(full);
-
-  const shipment = await prisma.shipment.upsert({
-    where: { orderId: full.id },
-    create: {
-      orderId: full.id,
-      shiprocketOrderId: created.shiprocketOrderId,
-      shiprocketShipmentId: created.shiprocketShipmentId,
-      status: 'CREATED',
-    },
-    update: {
-      shiprocketOrderId: created.shiprocketOrderId,
-      shiprocketShipmentId: created.shiprocketShipmentId,
-      status: 'CREATED',
-    },
-  });
+  const shipment = await prisma.shipment.create({ data: { orderId: order.id, status: 'CREATED' } });
 
   await logEvent(
-    full.id,
+    order.id,
     'CONFIRMED',
-    `Shipment created in Shiprocket${isMock() ? ' (mock mode)' : ''} — ref ${created.shiprocketOrderId}`,
-    'SHIPROCKET',
+    `Ready to ship with Amazon Shipping${isMock() ? ' (mock mode)' : ''}`,
+    'AMAZON',
   );
   return shipment;
 }
@@ -108,13 +99,19 @@ export async function cancelOrder(orderId, { reason, source = 'SYSTEM' } = {}) {
   return prisma.order.findUnique({ where: { id: order.id }, include: orderInclude });
 }
 
-/** Shiprocket status strings -> our order statuses. */
-export function mapShiprocketStatus(status = '') {
-  const s = String(status).toUpperCase();
-  if (['DELIVERED'].some((k) => s.includes(k))) return 'DELIVERED';
-  if (['RTO', 'RETURN'].some((k) => s.includes(k))) return 'RETURNED';
-  if (['CANCEL'].some((k) => s.includes(k))) return 'CANCELLED';
-  if (['OUT FOR DELIVERY', 'IN TRANSIT', 'SHIPPED', 'PICKED UP'].some((k) => s.includes(k))) return 'SHIPPED';
-  if (['PICKUP', 'MANIFEST', 'AWB', 'READY'].some((k) => s.includes(k))) return 'PACKED';
+/**
+ * Carrier status -> our order statuses. Amazon reports CamelCase event codes
+ * ("OutForDelivery", "PickupDone"); the spaces are stripped so both those and
+ * the human-readable summary strings match.
+ */
+export function mapCarrierStatus(status = '') {
+  const s = String(status).toUpperCase().replace(/[\s_-]/g, '');
+  if (s.includes('DELIVERED')) return 'DELIVERED';
+  if (['RETURN', 'RTO', 'UNDELIVERABLE', 'LOST'].some((k) => s.includes(k))) return 'RETURNED';
+  if (s.includes('CANCEL')) return 'CANCELLED';
+  if (['OUTFORDELIVERY', 'INTRANSIT', 'DEPARTED', 'ARRIVED', 'SHIPPED', 'PICKUPDONE', 'PICKEDUP'].some((k) => s.includes(k)))
+    return 'SHIPPED';
+  if (['CREATIONCONFIRMED', 'READYFORPICKUP', 'READYFORRECEIVE', 'LABEL', 'MANIFEST', 'PACKED'].some((k) => s.includes(k)))
+    return 'PACKED';
   return null;
 }

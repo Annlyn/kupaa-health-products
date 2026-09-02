@@ -73,6 +73,7 @@ function toLine(row) {
     mrp: sellable.mrp,
     sku: sellable.sku,
     weightKg: sellable.weightKg,
+    image: sellable.image,
     lineTotal: Math.round(sellable.price * row.quantity * 100) / 100,
     inStock: sellable.stock >= row.quantity,
     maxQuantity: sellable.stock,

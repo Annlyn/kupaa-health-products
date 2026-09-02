@@ -16,10 +16,12 @@ datasource db {
 // ---------------------------------------------------------------- users & auth
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  phone        String?
+  id    String @id @default(cuid())
+  name  String
+  email String @unique
+  // Unique because it is a sign-in identifier: two accounts on one number
+  // would make "log in with your phone" ambiguous.
+  phone        String? @unique
   passwordHash String
   role         String   @default("USER") // USER | ADMIN
   isActive     Boolean  @default(true)
@@ -29,9 +31,51 @@ model User {
   addresses     Address[]
   orders        Order[]
   reviews       Review[]
-  cartItems     CartItem[]
-  wishlistItems WishlistItem[]
-  refreshTokens RefreshToken[]
+  cartItems      CartItem[]
+  wishlistItems  WishlistItem[]
+  refreshTokens  RefreshToken[]
+  trustedDevices TrustedDevice[]
+}
+
+/// A one-time code sent to an email address or a phone number.
+///
+/// Sign-in verifies the identifier before the password is ever asked for, so a
+/// challenge is created from nothing but what the visitor typed — `userId` is
+/// null when no account matches, which keeps the response identical either way
+/// and stops the form from being used to test whether an account exists.
+model OtpChallenge {
+  id          String  @id @default(cuid())
+  identifier  String // email address or 10-digit phone, as resolved
+  channel     String // EMAIL | WHATSAPP
+  destination String? // masked, for "code sent to ku•••@gmail.com"
+  codeHash    String
+  purpose     String  @default("LOGIN")
+  userId      String?
+
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([identifier])
+  @@index([expiresAt])
+}
+
+/// A browser that has already passed the OTP for an account. While the cookie
+/// holding its token lives, sign-in on that browser goes straight to the
+/// password — the point of verifying once rather than every time.
+model TrustedDevice {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenHash  String   @unique
+  label      String?
+  lastUsedAt DateTime @default(now())
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
 }
 
 model RefreshToken {
@@ -107,7 +151,7 @@ model Product {
   // Label for the variant axis, e.g. "Size", "Weight", "Pack". Null = no variants.
   variantLabel String?
 
-  // physical dimensions — required by Shiprocket for rate + AWB generation
+  // physical dimensions — required by Amazon Shipping to rate and label a parcel
   weightKg   Float @default(0.3)
   lengthCm   Float @default(15)
   breadthCm  Float @default(10)
@@ -144,7 +188,12 @@ model ProductImage {
   alt       String?
   sortOrder Int     @default(0)
 
+  /// New images run in the home page carousel by default. The admin product
+  /// form can opt any individual photo in or out.
+  showInCarousel Boolean @default(true)
+
   @@index([productId])
+  @@index([showInCarousel])
 }
 
 /// One purchasable option of a product — "500 g", "1 kg", "Pack of 3".
@@ -163,6 +212,11 @@ model ProductVariant {
   stock Int   @default(0)
 
   weightKg Float @default(0.3)
+
+  /// Which product photo this option shows. Holds a ProductImage `url` rather
+  /// than its id, because saving a product rewrites the image rows (and their
+  /// ids) while the URLs stay put.
+  image String?
 
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
@@ -267,6 +321,11 @@ model Order {
   shipCountry String @default("India")
 
   notes       String?
+
+  // Set when the paid-order invoice went out on WhatsApp, so a retried webhook
+  // or a manual resend does not silently double-send.
+  invoiceSentAt DateTime?
+
   placedAt    DateTime  @default(now())
   cancelledAt DateTime?
   updatedAt   DateTime  @updatedAt
@@ -308,7 +367,7 @@ model OrderEvent {
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   status    String
   message   String?
-  source    String   @default("SYSTEM") // SYSTEM | ADMIN | SHIPROCKET | RAZORPAY
+  source    String   @default("SYSTEM") // SYSTEM | ADMIN | AMAZON | RAZORPAY | WHATSAPP
   createdAt DateTime @default(now())
 
   @@index([orderId])
@@ -319,19 +378,19 @@ model Shipment {
   orderId String @unique
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  shiprocketOrderId    String?
-  shiprocketShipmentId String?
-  awbCode              String?
-  courierName          String?
-  courierCompanyId     Int?
-  labelUrl             String?
-  manifestUrl          String?
-  invoiceUrl           String?
-  pickupScheduledAt    DateTime?
-  status               String    @default("CREATED")
-  trackingUrl          String?
-  etd                  String?
-  freightCharge        Float?
+  // Amazon Shipping identifiers. `carrierShipmentId` and `awbCode` (Amazon's
+  // trackingId) only exist once a label has been bought; before that the row is
+  // just our own record that the order is ready to ship.
+  carrierShipmentId String?
+  carrierServiceId  String? // the rate/service the admin chose, e.g. "STD"
+  carrierId         String? // Amazon carrier id, needed for tracking lookups
+  awbCode           String?
+  courierName       String?
+  labelUrl          String?
+  status            String    @default("CREATED")
+  trackingUrl       String?
+  etd               String?
+  freightCharge     Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -360,7 +419,7 @@ model Setting {
 
 model WebhookLog {
   id        String   @id @default(cuid())
-  source    String // RAZORPAY | SHIPROCKET
+  source    String // RAZORPAY | AMAZON | WHATSAPP
   event     String?
   payload   String
   ok        Boolean  @default(true)

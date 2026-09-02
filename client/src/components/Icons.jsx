@@ -49,6 +49,13 @@ export const SearchIcon = make(
   </>,
 );
 
+export const ZoomIcon = make(
+  <>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m20 20-3.6-3.6M11 8.5v5M8.5 11h5" />
+  </>,
+);
+
 export const MenuIcon = make(<path d="M3 6h18M3 12h18M3 18h18" />);
 export const CloseIcon = make(<path d="M6 6l12 12M18 6 6 18" />);
 export const ChevronRight = make(<path d="m9 5 7 7-7 7" />);

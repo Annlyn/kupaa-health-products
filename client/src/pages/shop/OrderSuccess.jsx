@@ -106,7 +106,7 @@ export default function OrderSuccess() {
             {order.shipPhone}
           </address>
           <p className="mt-3 text-xs text-ink-500">
-            You will get an AWB tracking number by email as soon as the parcel is handed to the courier — usually within 24 hours.
+            You will get an Amazon Shipping tracking number by email as soon as the parcel is picked up — usually within 24 hours.
           </p>
         </div>
 

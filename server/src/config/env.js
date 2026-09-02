@@ -22,7 +22,8 @@ export const env = {
     accessSecret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
     accessTtl: process.env.ACCESS_TOKEN_TTL || '15m',
-    refreshTtlDays: num(process.env.REFRESH_TOKEN_TTL_DAYS, 30),
+    // Long, and rotated on every refresh — a signed-in browser stays signed in.
+    refreshTtlDays: num(process.env.REFRESH_TOKEN_TTL_DAYS, 180),
   },
 
   admin: {
@@ -37,7 +38,9 @@ export const env = {
     email: process.env.STORE_EMAIL || 'support@kupaahealth.com',
     currency: process.env.CURRENCY || 'INR',
     taxPercent: num(process.env.TAX_PERCENT, 0),
-    freeShippingAbove: num(process.env.FREE_SHIPPING_ABOVE, 999),
+    // Free delivery is opt-in: an admin (or deployment) must set a positive
+    // threshold before orders qualify for it.
+    freeShippingAbove: num(process.env.FREE_SHIPPING_ABOVE, 0),
     flatShippingFee: num(process.env.FLAT_SHIPPING_FEE, 59),
     codEnabled: bool(process.env.COD_ENABLED, true),
     codExtraFee: num(process.env.COD_EXTRA_FEE, 0),
@@ -52,15 +55,94 @@ export const env = {
     },
   },
 
-  shiprocket: {
-    email: process.env.SHIPROCKET_EMAIL || '',
-    password: process.env.SHIPROCKET_PASSWORD || '',
-    pickupLocation: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary',
-    pickupPincode: process.env.SHIPROCKET_PICKUP_PINCODE || '600001',
-    webhookToken: process.env.SHIPROCKET_WEBHOOK_TOKEN || '',
-    baseUrl: 'https://apiv2.shiprocket.in/v1/external',
+  /**
+   * Amazon Shipping runs on SP-API, so the credentials are a Login with Amazon
+   * application (client id + secret) plus the refresh token issued when the
+   * seller authorises it. India sits in the SP-API "eu" region.
+   */
+  amazon: {
+    clientId: process.env.AMAZON_LWA_CLIENT_ID || '',
+    clientSecret: process.env.AMAZON_LWA_CLIENT_SECRET || '',
+    refreshToken: process.env.AMAZON_LWA_REFRESH_TOKEN || '',
+    endpoint: (process.env.AMAZON_SPAPI_ENDPOINT || 'https://sellingpartnerapi-eu.amazon.com').replace(/\/$/, ''),
+    carrierId: process.env.AMAZON_CARRIER_ID || 'AMZN_IN',
+    // Relayed SP-API notifications hit /api/shipping/webhook with this secret
+    // in the x-api-key header.
+    webhookToken: process.env.SHIPPING_WEBHOOK_TOKEN || '',
+
+    // Rate quotes need a full origin address, not just a PIN code.
+    shipFrom: {
+      name: process.env.AMAZON_SHIP_FROM_NAME || process.env.STORE_NAME || 'Kupaa Health Products',
+      line1: process.env.AMAZON_SHIP_FROM_LINE1 || '4th Floor, Wellness House, Anna Salai',
+      line2: process.env.AMAZON_SHIP_FROM_LINE2 || '',
+      city: process.env.AMAZON_SHIP_FROM_CITY || 'Chennai',
+      state: process.env.AMAZON_SHIP_FROM_STATE || 'Tamil Nadu',
+      pincode: process.env.AMAZON_SHIP_FROM_PINCODE || '600002',
+      country: process.env.AMAZON_SHIP_FROM_COUNTRY || 'IN',
+      phone: process.env.AMAZON_SHIP_FROM_PHONE || '9876543210',
+      email: process.env.AMAZON_SHIP_FROM_EMAIL || process.env.STORE_EMAIL || '',
+    },
+
     get enabled() {
-      return Boolean(process.env.SHIPROCKET_EMAIL && process.env.SHIPROCKET_PASSWORD);
+      return Boolean(
+        process.env.AMAZON_LWA_CLIENT_ID && process.env.AMAZON_LWA_CLIENT_SECRET && process.env.AMAZON_LWA_REFRESH_TOKEN,
+      );
+    },
+  },
+
+  /**
+   * WhatsApp Cloud API (Meta Graph). The access token and phone number id come
+   * from the WhatsApp app in Meta for Developers; `ownerNumber` is where new
+   * order alerts go.
+   *
+   * Meta only allows free-form text inside a 24-hour window opened by the
+   * customer, so business-initiated messages need approved templates. Name the
+   * templates here and they are used; leave one blank and that message falls
+   * back to plain text, which is enough for test numbers and local work.
+   */
+  whatsapp: {
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+    accessToken: process.env.WHATSAPP_ACCESS_TOKEN || '',
+    apiVersion: process.env.WHATSAPP_API_VERSION || 'v21.0',
+    ownerNumber: process.env.WHATSAPP_OWNER_NUMBER || '',
+    // Customers type 10-digit numbers; E.164 needs a country code in front.
+    defaultCountryCode: (process.env.WHATSAPP_DEFAULT_COUNTRY_CODE || '91').replace(/\D/g, ''),
+    templateLanguage: process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en',
+    templates: {
+      newOrder: process.env.WHATSAPP_TEMPLATE_NEW_ORDER || '',
+      paymentReceived: process.env.WHATSAPP_TEMPLATE_PAYMENT_RECEIVED || '',
+      invoice: process.env.WHATSAPP_TEMPLATE_INVOICE || '',
+    },
+    get enabled() {
+      return Boolean(process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_ACCESS_TOKEN);
+    },
+  },
+
+  /**
+   * Sign-in verification. The identifier (email or phone) is confirmed with a
+   * one-time code before the password is asked for, and the browser is then
+   * remembered so it only happens once.
+   *
+   * LOGIN_OTP_ENABLED=false is the escape hatch: it turns the step off without
+   * a code change, which matters because a store whose delivery channels are
+   * misconfigured would otherwise have no way in.
+   */
+  auth: {
+    otpEnabled: bool(process.env.LOGIN_OTP_ENABLED, true),
+    otpTtlMinutes: num(process.env.LOGIN_OTP_TTL_MINUTES, 10),
+    otpMaxAttempts: num(process.env.LOGIN_OTP_MAX_ATTEMPTS, 5),
+    trustedDeviceDays: num(process.env.TRUSTED_DEVICE_DAYS, 180),
+  },
+
+  /** SMTP for one-time codes sent to an email address. */
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: num(process.env.SMTP_PORT, 587),
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.SMTP_FROM || process.env.STORE_EMAIL || 'support@kupaahealth.com',
+    get enabled() {
+      return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
     },
   },
 
@@ -100,5 +182,13 @@ export function reportConfig(log = console) {
   }
 
   if (!env.razorpay.enabled) log.warn?.('[config] Razorpay keys missing — online payments disabled, COD only.');
-  if (!env.shiprocket.enabled) log.warn?.('[config] Shiprocket credentials missing — shipping runs in mock mode.');
+  if (!env.amazon.enabled) log.warn?.('[config] Amazon Shipping credentials missing — shipping runs in mock mode.');
+  if (!env.whatsapp.enabled) log.warn?.('[config] WhatsApp credentials missing — order alerts and invoices are logged, not sent.');
+  if (env.auth.otpEnabled && !env.whatsapp.enabled && !env.smtp.enabled) {
+    log.warn?.(
+      '[config] Sign-in OTP is on but neither WhatsApp nor SMTP is configured — codes are printed to this log only.' +
+        (env.isProd ? ' Set SMTP_* / WHATSAPP_* or LOGIN_OTP_ENABLED=false before anyone tries to sign in.' : ''),
+    );
+  }
+  else if (!env.whatsapp.ownerNumber) log.warn?.('[config] WHATSAPP_OWNER_NUMBER is not set — new order alerts have nowhere to go.');
 }

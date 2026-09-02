@@ -7,7 +7,7 @@ import { round2 } from '../utils/money.js';
  * its own price, stock, SKU and shipping weight. Products that come in a single
  * size simply have no variants.
  *
- * Everything downstream (cart, checkout, Shiprocket) works off the shape
+ * Everything downstream (cart, checkout, shipping) works off the shape
  * returned by `resolveSellable`, so those call sites never branch on whether a
  * product has variants.
  */
@@ -20,6 +20,7 @@ export const variantSelect = {
   mrp: true,
   stock: true,
   weightKg: true,
+  image: true,
   isActive: true,
   sortOrder: true,
 };
@@ -47,6 +48,7 @@ export function resolveSellable(product, variantId) {
       mrp: product.mrp,
       stock: product.stock,
       weightKg: product.weightKg,
+      image: product.images?.[0]?.url ?? null,
       label: product.name,
     };
   }
@@ -66,6 +68,9 @@ export function resolveSellable(product, variantId) {
     mrp: variant.mrp,
     stock: variant.stock,
     weightKg: variant.weightKg,
+    // The option's own photo when it has one, so a cart line and an invoice
+    // show the pack that was actually bought.
+    image: variant.image || product.images?.[0]?.url || null,
     label: `${product.name} — ${variant.name}`,
   };
 }

@@ -23,6 +23,16 @@
 }
 
 @layer components {
+  /* The image panel begins on the right on desktop. Masking the image (instead
+     of laying a translucent colour over it) makes its left edge disappear
+     smoothly into the exact carousel background colour. */
+  @media (min-width: 768px) {
+    .carousel-image {
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.15) 14%, #000 52%);
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.15) 14%, #000 52%);
+    }
+  }
+
   .container-page {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }

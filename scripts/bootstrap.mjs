@@ -30,4 +30,4 @@ const contents = fs
 
 fs.writeFileSync(envPath, contents);
 console.log('Created server/.env with freshly generated JWT secrets.');
-console.log('Add your Razorpay and Shiprocket credentials there when you are ready to go live.');
+console.log('Add your Razorpay and Amazon Shipping credentials there when you are ready to go live.');

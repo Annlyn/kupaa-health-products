@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { AlertIcon, CheckCircle, SettingsIcon, ShieldIcon, TruckIcon } from '../../components/Icons';
+import { AlertIcon, CheckCircle, MailIcon, SettingsIcon, ShieldIcon, TruckIcon } from '../../components/Icons';
 import { Badge, PageLoader, cx } from '../../components/ui';
 import { money } from '../../lib/format';
 import { useFetch, useTitle } from '../../lib/hooks';
@@ -98,32 +98,34 @@ export default function Integrations() {
       <section className="card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <TruckIcon width={20} height={20} className="text-brand-700" /> Shiprocket — shipping
+            <TruckIcon width={20} height={20} className="text-brand-700" /> Amazon Shipping — delivery
           </h2>
-          <StatusPill ok={data.shiprocket.enabled} okLabel="Live" offLabel="Mock mode" />
+          <StatusPill ok={data.shipping.enabled} okLabel="Live" offLabel="Mock mode" />
         </div>
 
         <p className="mt-3 text-sm text-ink-600">
-          Powers PIN-code serviceability, courier rate comparison, AWB assignment, pickup scheduling, labels and tracking. In mock
-          mode every call returns realistic simulated data so you can exercise the full flow before going live.
+          Powers PIN-code serviceability, the rate card, label purchase and tracking, through the SP-API Shipping v2
+          endpoints. Nothing is created on Amazon&apos;s side until a label is bought, and Amazon collects from your
+          registered pickup address on its own round — there is no pickup to schedule. In mock mode every call returns
+          realistic simulated data so you can exercise the full flow before going live.
         </p>
 
         <dl className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex justify-between border-b border-ink-50 py-1.5">
-            <dt className="text-ink-500">Pickup location</dt>
-            <dd className="font-medium">{data.shiprocket.pickupLocation}</dd>
+            <dt className="text-ink-500">SP-API endpoint</dt>
+            <dd className="truncate pl-3 font-medium">{data.shipping.endpoint}</dd>
           </div>
           <div className="flex justify-between border-b border-ink-50 py-1.5">
-            <dt className="text-ink-500">Origin PIN code</dt>
-            <dd className="font-medium">{data.shiprocket.pickupPincode}</dd>
+            <dt className="text-ink-500">Carrier ID</dt>
+            <dd className="font-medium">{data.shipping.carrierId}</dd>
+          </div>
+          <div className="flex justify-between border-b border-ink-50 py-1.5">
+            <dt className="text-ink-500">Pickup PIN code</dt>
+            <dd className="font-medium">{data.shipping.shipFrom?.postalCode}</dd>
           </div>
           <div className="flex justify-between border-b border-ink-50 py-1.5">
             <dt className="text-ink-500">Webhook token</dt>
-            <dd className="font-medium">{data.shiprocket.webhookConfigured ? 'Configured' : 'Not set'}</dd>
-          </div>
-          <div className="flex justify-between border-b border-ink-50 py-1.5">
-            <dt className="text-ink-500">Pickup addresses</dt>
-            <dd className="font-medium">{data.shiprocket.pickupLocations?.length ?? 0} on file</dd>
+            <dd className="font-medium">{data.shipping.webhookConfigured ? 'Configured' : 'Not set'}</dd>
           </div>
         </dl>
 
@@ -131,40 +133,121 @@ export default function Integrations() {
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Environment variables</h3>
             <ul className="mt-2">
-              <EnvRow name="SHIPROCKET_EMAIL" note="API user, not your login" />
-              <EnvRow name="SHIPROCKET_PASSWORD" note="Settings → API → Configure" />
-              <EnvRow name="SHIPROCKET_PICKUP_LOCATION" note="Nickname of your warehouse" />
-              <EnvRow name="SHIPROCKET_PICKUP_PINCODE" note="Origin for rate checks" />
-              <EnvRow name="SHIPROCKET_WEBHOOK_TOKEN" note="Shared secret for status pushes" />
+              <EnvRow name="AMAZON_LWA_CLIENT_ID" note="Seller Central → Develop Apps" />
+              <EnvRow name="AMAZON_LWA_CLIENT_SECRET" note="Shown once when the app is created" />
+              <EnvRow name="AMAZON_LWA_REFRESH_TOKEN" note="From authorising the app" />
+              <EnvRow name="AMAZON_SPAPI_ENDPOINT" note="India is served by the eu region" />
+              <EnvRow name="AMAZON_SHIP_FROM_*" note="Full pickup address for rate quotes" />
+              <EnvRow name="SHIPPING_WEBHOOK_TOKEN" note="Shared secret for status pushes" />
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Webhook endpoint</h3>
+            <h3 className="text-sm font-semibold text-ink-900">Status webhook</h3>
             <p className="mt-2 break-all rounded-lg bg-ink-950 px-3 py-2.5 font-mono text-xs text-brand-200">
               {origin}/api/shipping/webhook
             </p>
             <p className="mt-2 text-xs text-ink-500">
-              Add this under Settings → API → Webhooks with the same token in the <code className="font-mono">x-api-key</code> header.
-              Courier scans then update order status automatically.
+              SP-API delivers shipment notifications to EventBridge or SQS rather than calling a URL, so point your relay
+              at this endpoint and send the same token in the <code className="font-mono">x-api-key</code> header. Carrier
+              scans then update order status automatically.
             </p>
           </div>
         </div>
 
-        {data.shiprocket.pickupLocations?.length > 0 && (
+        {data.shipping.shipFrom && (
           <div className="mt-5">
-            <h3 className="text-sm font-semibold text-ink-900">Pickup addresses on file</h3>
-            <ul className="mt-2 grid gap-2 sm:grid-cols-2">
-              {data.shiprocket.pickupLocations.map((loc, i) => (
-                <li key={loc.pickup_location ?? i} className="rounded-lg border border-ink-100 p-3 text-xs text-ink-600">
-                  <span className="font-semibold text-ink-900">{loc.pickup_location}</span>
-                  <br />
-                  {loc.city} {loc.pin_code}
+            <h3 className="text-sm font-semibold text-ink-900">Pickup address used for quotes</h3>
+            <address className="mt-2 rounded-lg border border-ink-100 p-3 text-xs not-italic leading-relaxed text-ink-600">
+              <span className="font-semibold text-ink-900">{data.shipping.shipFrom.name}</span>
+              <br />
+              {data.shipping.shipFrom.addressLine1}
+              {data.shipping.shipFrom.addressLine2 ? `, ${data.shipping.shipFrom.addressLine2}` : ''}
+              <br />
+              {data.shipping.shipFrom.city}, {data.shipping.shipFrom.stateOrRegion} {data.shipping.shipFrom.postalCode}
+              <br />
+              {data.shipping.shipFrom.countryCode} · {data.shipping.shipFrom.phoneNumber}
+            </address>
+          </div>
+        )}
+      </section>
+
+      <section className="card p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <MailIcon width={20} height={20} className="text-brand-700" /> WhatsApp — order alerts &amp; invoices
+          </h2>
+          <StatusPill ok={data.whatsapp.enabled} okLabel="Live" offLabel="Mock mode" />
+        </div>
+
+        <p className="mt-3 text-sm text-ink-600">
+          Sends you a message the moment an order is placed, and the invoice PDF to the customer once an online payment
+          clears. Turn either off under{' '}
+          <Link to="/admin/settings" className="font-semibold text-brand-700 hover:underline">
+            Store settings → WhatsApp notifications
+          </Link>
+          . In mock mode nothing leaves the server — every message is written to the log and to the order timeline, so the
+          flow is still testable.
+        </p>
+
+        <dl className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
+          <div className="flex justify-between border-b border-ink-50 py-1.5">
+            <dt className="text-ink-500">Phone number ID</dt>
+            <dd className="font-medium">{data.whatsapp.phoneNumberId || 'Not set'}</dd>
+          </div>
+          <div className="flex justify-between border-b border-ink-50 py-1.5">
+            <dt className="text-ink-500">Your number (alerts)</dt>
+            <dd className="font-medium">{data.whatsapp.ownerNumber || 'Not set'}</dd>
+          </div>
+          <div className="flex justify-between border-b border-ink-50 py-1.5">
+            <dt className="text-ink-500">Graph API version</dt>
+            <dd className="font-medium">{data.whatsapp.apiVersion}</dd>
+          </div>
+          <div className="flex justify-between border-b border-ink-50 py-1.5">
+            <dt className="text-ink-500">Template language</dt>
+            <dd className="font-medium">{data.whatsapp.templateLanguage}</dd>
+          </div>
+        </dl>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-semibold text-ink-900">Environment variables</h3>
+            <ul className="mt-2">
+              <EnvRow name="WHATSAPP_PHONE_NUMBER_ID" note="Meta for Developers → WhatsApp → API setup" />
+              <EnvRow name="WHATSAPP_ACCESS_TOKEN" note="Permanent system-user token" />
+              <EnvRow name="WHATSAPP_OWNER_NUMBER" note="Where new order alerts go" />
+              <EnvRow name="WHATSAPP_TEMPLATE_NEW_ORDER" note="Approved template for order alerts" />
+              <EnvRow name="WHATSAPP_TEMPLATE_PAYMENT_RECEIVED" note="Approved template for payment alerts" />
+              <EnvRow name="WHATSAPP_TEMPLATE_INVOICE" note="Approved template with a document header" />
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-ink-900">Message templates</h3>
+            <ul className="mt-2">
+              {[
+                ['New order', data.whatsapp.templates?.newOrder, 'order no · total · payment · customer · city · items'],
+                ['Payment received', data.whatsapp.templates?.paymentReceived, 'order no · total · customer'],
+                ['Invoice', data.whatsapp.templates?.invoice, 'customer · order no · total, document header'],
+              ].map(([label, name, params]) => (
+                <li key={label} className="border-b border-ink-50 py-2 last:border-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <span className="text-sm font-medium text-ink-900">{label}</span>
+                    <code className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-xs text-ink-800">
+                      {name || 'plain text'}
+                    </code>
+                  </div>
+                  <p className="mt-0.5 text-xs text-ink-500">Placeholders in order: {params}</p>
                 </li>
               ))}
             </ul>
+            <p className="mt-2 text-xs text-ink-500">
+              Meta only allows free-form text inside the 24 hours after a customer messages you, so live sending needs
+              approved templates. Name one above and it is used; leave it blank and that message falls back to plain
+              text, which is enough for test numbers.
+            </p>
           </div>
-        )}
+        </div>
       </section>
 
       <section className="card p-5">

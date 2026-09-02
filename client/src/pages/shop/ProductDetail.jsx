@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api, mediaUrl } from '../../api/client';
 import ProductCard, { ProductImage } from '../../components/ProductCard';
+import Lightbox from '../../components/Lightbox';
 import {
   CartIcon,
   CheckCircle,
@@ -13,6 +14,7 @@ import {
   PlusIcon,
   ShieldIcon,
   TruckIcon,
+  ZoomIcon,
 } from '../../components/Icons';
 import { Breadcrumbs, EmptyState, PageLoader, Rating, Spinner, cx } from '../../components/ui';
 import { useAuth } from '../../context/AuthContext';
@@ -73,7 +75,9 @@ function PincodeCheck({ weightKg }) {
               </p>
             )}
             <p className="text-xs text-ink-500">
-              Free delivery on orders above {money(result.freeShippingAbove)}, otherwise {money(result.flatShippingFee)}.
+              {result.freeShippingAbove > 0
+                ? `Free delivery on orders above ${money(result.freeShippingAbove)}, otherwise ${money(result.flatShippingFee)}.`
+                : `Delivery fee: ${money(result.flatShippingFee)}.`}
             </p>
           </div>
         ) : (
@@ -149,10 +153,26 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
   const [adding, setAdding] = useState(false);
   const [tab, setTab] = useState('description');
 
   useTitle(product?.name);
+
+  /**
+   * The gallery is the product's own photos plus any option photo that is not
+   * already among them, so an option shot only ever used by one size still has
+   * a thumbnail to switch back to.
+   */
+  const gallery = useMemo(() => {
+    const images = [...(product?.images ?? [])];
+    for (const variant of product?.variants ?? []) {
+      if (variant.image && !images.some((img) => img.url === variant.image)) {
+        images.push({ id: `variant-${variant.id}`, url: variant.image, alt: `${product.name} — ${variant.name}` });
+      }
+    }
+    return images;
+  }, [product]);
 
   // Default to the first in-stock option so the page is immediately actionable.
   useEffect(() => {
@@ -162,6 +182,14 @@ export default function ProductDetail() {
       return (product.variants.find((v) => v.stock > 0) ?? product.variants[0]).id;
     });
   }, [product]);
+
+  // Choosing an option jumps the gallery to that option's photo.
+  useEffect(() => {
+    const image = product?.variants?.find((v) => v.id === variantId)?.image;
+    if (!image) return;
+    const index = gallery.findIndex((img) => img.url === image);
+    if (index >= 0) setActiveImage(index);
+  }, [variantId, gallery, product]);
 
   if (loading) return <PageLoader label="Loading product" />;
   if (error || !product) {
@@ -229,21 +257,36 @@ export default function ProductDetail() {
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
         <div>
-          <div className="aspect-square overflow-hidden rounded-2xl border border-ink-100 bg-ink-50">
-            {product.images?.[activeImage] ? (
-              <img src={mediaUrl(product.images[activeImage].url)} alt={product.name} className="h-full w-full object-cover" />
+          <div className="group relative aspect-square overflow-hidden rounded-2xl border border-ink-100 bg-ink-50">
+            {gallery[activeImage] ? (
+              <button
+                type="button"
+                onClick={() => setZoomed(true)}
+                className="block h-full w-full cursor-zoom-in"
+                aria-label="View full size image"
+              >
+                <img
+                  src={mediaUrl(gallery[activeImage].url)}
+                  alt={gallery[activeImage].alt || product.name}
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-ink-700 shadow-sm transition group-hover:bg-white">
+                  <ZoomIcon width={14} height={14} /> Full size
+                </span>
+              </button>
             ) : (
               <ProductImage product={product} />
             )}
           </div>
 
-          {product.images?.length > 1 && (
-            <div className="mt-3 flex gap-3">
-              {product.images.map((img, i) => (
+          {gallery.length > 1 && (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {gallery.map((img, i) => (
                 <button
                   key={img.id ?? i}
                   onClick={() => setActiveImage(i)}
                   aria-label={`View image ${i + 1}`}
+                  aria-current={i === activeImage}
                   className={cx(
                     'h-20 w-20 overflow-hidden rounded-lg border-2 bg-ink-50 transition',
                     i === activeImage ? 'border-brand-600' : 'border-transparent hover:border-ink-200',
@@ -253,6 +296,16 @@ export default function ProductDetail() {
                 </button>
               ))}
             </div>
+          )}
+
+          {zoomed && (
+            <Lightbox
+              images={gallery}
+              index={activeImage}
+              onIndexChange={setActiveImage}
+              onClose={() => setZoomed(false)}
+              title={selected ? `${product.name} — ${selected.name}` : product.name}
+            />
           )}
         </div>
 

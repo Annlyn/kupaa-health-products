@@ -1,16 +1,51 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import Carousel from '../../components/Carousel';
 import ProductCard from '../../components/ProductCard';
 import { CheckCircle, ChevronRight, LeafIcon, PackageIcon, ShieldIcon, TruckIcon } from '../../components/Icons';
 import { SkeletonCard } from '../../components/ui';
 import { mediaUrl } from '../../api/client';
 import { useStore } from '../../context/StoreContext';
-import { useFetchOnVisible, useTitle } from '../../lib/hooks';
+import { money } from '../../lib/format';
+import { useFetch, useFetchOnVisible, useTitle } from '../../lib/hooks';
 
 // The trust strip and footer promises are admin-editable text; the icons cycle
 // through this set so the layout stays balanced whatever is entered.
 const TRUST_ICONS = [ShieldIcon, LeafIcon, TruckIcon, PackageIcon];
 
-function Hero({ settings }) {
+/** "From ₹499" for a product with options, the plain price otherwise. */
+const priceLabel = (product) =>
+  product.hasVariants ? `From ${money(product.priceFrom ?? product.price)}` : money(product.price);
+
+/**
+ * Slides for the hero carousel.
+ *
+ * Each new product image is included by default. The product form can opt an
+ * individual image in or out with "Show carousel", while every slide keeps its
+ * product's own name and description.
+ */
+function useHeroSlides(settings) {
+  const { data: curated } = useFetch('/products/carousel');
+
+  return useMemo(() => {
+    const slide = (image, product) => ({
+      image,
+      alt: product.name,
+      eyebrow: settings.heroBadge || undefined,
+      title: product.name,
+      // A product with no copy of its own borrows the store's hero line rather
+      // than leaving the faded band with a bare name in it.
+      body: product.shortDesc || product.description || settings.heroSubtitle,
+      meta: priceLabel(product),
+      href: `/product/${product.slug}`,
+    });
+
+    return (curated ?? []).map((row) => ({ ...slide(row.url, row.product), alt: row.alt || row.product.name }));
+  }, [curated, settings.heroBadge, settings.heroSubtitle]);
+}
+
+/** What the hero falls back to when the catalogue has no imagery at all. */
+function TextHero({ settings }) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800">
       <div
@@ -20,68 +55,28 @@ function Hero({ settings }) {
             'radial-gradient(circle at 18% 20%, rgba(95,233,206,.5), transparent 45%), radial-gradient(circle at 82% 70%, rgba(20,184,157,.45), transparent 50%)',
         }}
       />
-      <div className="container-page relative grid gap-10 py-16 md:grid-cols-2 md:items-center md:py-24">
-        <div className="animate-fade-up">
+      <div className="container-page relative py-20 md:py-28">
+        <div className="max-w-xl animate-fade-up">
           {settings.heroBadge && <span className="badge bg-white/10 text-brand-100 ring-1 ring-white/20">{settings.heroBadge}</span>}
-
           <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] text-white sm:text-5xl lg:text-6xl">
             {settings.heroTitle}
             {settings.heroTitleAccent && <span className="block text-brand-300">{settings.heroTitleAccent}</span>}
           </h1>
-
-          {settings.heroSubtitle && <p className="mt-5 max-w-lg text-base leading-relaxed text-brand-100/90">{settings.heroSubtitle}</p>}
-
-          {/* <div className="mt-8 flex flex-wrap gap-3">
-            {settings.heroPrimaryLabel && (
-              <Link to={settings.heroPrimaryHref || '/shop'} className="btn bg-white px-6 py-3 text-brand-900 hover:bg-brand-50">
-                {settings.heroPrimaryLabel} <ChevronRight width={17} height={17} />
-              </Link>
-            )}
-            {settings.heroSecondaryLabel && (
-              <Link
-                to={settings.heroSecondaryHref || '/shop'}
-                className="btn border border-white/30 px-6 py-3 text-white hover:bg-white/10"
-              >
-                {settings.heroSecondaryLabel}
-              </Link>
-            )}
-          </div> */}
-
-          {settings.heroStats?.length > 0 && (
-            <dl className="mt-10 grid max-w-md gap-6 border-t border-white/15 pt-6" style={{ gridTemplateColumns: `repeat(${settings.heroStats.length}, minmax(0, 1fr))` }}>
-              {settings.heroStats.map((stat) => (
-                <div key={stat.label || stat.value}>
-                  <dt className="text-xl font-bold text-white">{stat.value}</dt>
-                  <dd className="mt-0.5 text-xs text-brand-200">{stat.label}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
+          {settings.heroSubtitle && <p className="mt-5 text-base leading-relaxed text-brand-100/90">{settings.heroSubtitle}</p>}
+          <Link to="/shop" className="btn mt-8 bg-white px-6 py-3 text-brand-900 hover:bg-brand-50">
+            {settings.heroPrimaryLabel || 'Shop all products'} <ChevronRight width={17} height={17} />
+          </Link>
         </div>
-
-        {settings.heroCards?.length > 0 && (
-          <div className="relative hidden md:block">
-            <div className="absolute -inset-6 rounded-[2rem] bg-white/5 backdrop-blur-sm" />
-            <div className="relative grid grid-cols-2 gap-4">
-              {settings.heroCards.map((card, i) => (
-                <div
-                  key={card.title || i}
-                  className="rounded-2xl bg-white/95 p-5 shadow-lift"
-                  style={{ transform: `translateY(${i % 2 ? '1.5rem' : '0'})` }}
-                >
-                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-brand-800">
-                    <LeafIcon width={18} height={18} />
-                  </span>
-                  <p className="mt-3 text-sm font-semibold text-ink-950">{card.title}</p>
-                  <p className="mt-0.5 text-xs text-ink-500">{card.subtitle}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
+}
+
+function Hero({ settings }) {
+  const slides = useHeroSlides(settings);
+  if (!slides.length) return <TextHero settings={settings} />;
+
+  return <Carousel slides={slides} />;
 }
 
 export default function Home() {

@@ -1,21 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { LeafIcon, ShieldIcon } from '../components/Icons';
+import { CheckCircle, LeafIcon, ShieldIcon } from '../components/Icons';
 import { Field, PageLoader, Spinner, cx } from '../components/ui';
 import { useTitle } from '../lib/hooks';
 import { DEMO, demoAccounts } from 'virtual:demo';
 
+const RESEND_SECONDS = 30;
+
 export default function Login() {
   useTitle('Sign in');
-  const { login, isAuthenticated, booting } = useAuth();
+  const { loginStart, loginResend, loginVerify, login, isAuthenticated, booting } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  // IDENTIFIER → OTP → PASSWORD. The server decides whether OTP is needed, so
+  // a browser that has verified before goes straight from the first step to
+  // the last.
+  const [step, setStep] = useState('IDENTIFIER');
+  const [form, setForm] = useState({ identifier: '', code: '', password: '' });
+  const [challenge, setChallenge] = useState(null);
+  const [verificationToken, setVerificationToken] = useState(null);
+  const [trusted, setTrusted] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
+  const codeRef = useRef(null);
+
+  // "Send another code" stays disabled briefly, so a stuck message does not
+  // turn into a burst of them.
+  useEffect(() => {
+    if (cooldown <= 0) return undefined;
+    const timer = setTimeout(() => setCooldown((n) => n - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
+  useEffect(() => {
+    if (step === 'OTP') codeRef.current?.focus();
+  }, [step]);
 
   // Only ever non-empty in a demo build; the snapshot loads asynchronously.
   const [accounts, setAccounts] = useState([]);
@@ -27,20 +50,74 @@ export default function Login() {
   if (booting) return <PageLoader />;
   if (isAuthenticated) return <Navigate to={location.state?.from || '/'} replace />;
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const applyStep = (data) => {
+    if (data.step === 'PASSWORD') {
+      setTrusted(data.verification === 'trusted-device');
+      setStep('PASSWORD');
+      return;
+    }
+    setChallenge(data);
+    setCooldown(RESEND_SECONDS);
+    setStep('OTP');
+  };
+
+  const guard = async (run) => {
     setErrors({});
     setBusy(true);
     try {
-      const user = await login({ email: form.email.trim(), password: form.password });
-      toast.success(`Welcome back, ${user.name.split(' ')[0]}`);
-      navigate(location.state?.from || (user.role === 'ADMIN' ? '/admin' : '/'), { replace: true });
+      await run();
     } catch (err) {
       setErrors(err.fieldErrors ?? {});
       toast.error(err.message);
     } finally {
       setBusy(false);
     }
+  };
+
+  const submitIdentifier = (e) => {
+    e.preventDefault();
+    return guard(async () => applyStep(await loginStart(form.identifier.trim())));
+  };
+
+  const submitCode = (e) => {
+    e.preventDefault();
+    return guard(async () => {
+      const data = await loginVerify({ challengeId: challenge.challengeId, code: form.code.trim() });
+      setVerificationToken(data.verificationToken);
+      setStep('PASSWORD');
+      toast.success('Verified — one more step');
+    });
+  };
+
+  const resend = () =>
+    guard(async () => {
+      const data = await loginResend(challenge.challengeId);
+      setChallenge(data);
+      setCooldown(RESEND_SECONDS);
+      setForm((f) => ({ ...f, code: '' }));
+      toast.success('New code sent');
+    });
+
+  const submitPassword = (e) => {
+    e.preventDefault();
+    return guard(async () => {
+      const user = await login({
+        identifier: form.identifier.trim(),
+        password: form.password,
+        verificationToken: verificationToken ?? undefined,
+      });
+      toast.success(`Welcome back, ${user.name.split(' ')[0]}`);
+      navigate(location.state?.from || (user.role === 'ADMIN' ? '/admin' : '/'), { replace: true });
+    });
+  };
+
+  const restart = () => {
+    setStep('IDENTIFIER');
+    setChallenge(null);
+    setVerificationToken(null);
+    setTrusted(false);
+    setForm({ identifier: form.identifier, code: '', password: '' });
+    setErrors({});
   };
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -52,37 +129,122 @@ export default function Login() {
           <LeafIcon width={22} height={22} />
         </span>
         <h1 className="mt-5 text-2xl font-bold sm:text-3xl">Welcome back</h1>
-        <p className="mt-1.5 text-sm text-ink-500">Sign in to see your orders, wishlist and saved addresses.</p>
+        <p className="mt-1.5 text-sm text-ink-500">
+          {step === 'IDENTIFIER' && 'Sign in to see your orders, wishlist and saved addresses.'}
+          {step === 'OTP' && `Enter the code we sent to ${challenge?.destination || 'you'}.`}
+          {step === 'PASSWORD' &&
+            (trusted ? 'This device is already verified — just your password.' : 'Verified. Now your password.')}
+        </p>
 
-        <form onSubmit={submit} className="mt-7 space-y-4" noValidate>
-          <Field label="Email address" error={errors.email} required>
-            <input
-              type="email"
-              autoComplete="email"
-              className={cx('input', errors.email && 'input-error')}
-              value={form.email}
-              onChange={set('email')}
-              placeholder="you@example.com"
+        {step === 'IDENTIFIER' && (
+          <form onSubmit={submitIdentifier} className="mt-7 space-y-4" noValidate>
+            <Field
+              label="Email or mobile number"
+              error={errors.identifier || errors.email}
+              hint="We send a one-time code to confirm it is you"
               required
-            />
-          </Field>
+            >
+              <input
+                type="text"
+                autoComplete="username"
+                autoFocus
+                className={cx('input', (errors.identifier || errors.email) && 'input-error')}
+                value={form.identifier}
+                onChange={set('identifier')}
+                placeholder="you@example.com or 9876543210"
+                required
+              />
+            </Field>
 
-          <Field label="Password" error={errors.password} required>
-            <input
-              type="password"
-              autoComplete="current-password"
-              className={cx('input', errors.password && 'input-error')}
-              value={form.password}
-              onChange={set('password')}
-              placeholder="••••••••"
+            <button className="btn-primary w-full py-3" disabled={busy}>
+              {busy && <Spinner className="h-4 w-4" />} Continue
+            </button>
+          </form>
+        )}
+
+        {step === 'OTP' && (
+          <form onSubmit={submitCode} className="mt-7 space-y-4" noValidate>
+            <Field
+              label="Verification code"
+              error={errors.code}
+              hint={challenge?.channel === 'EMAIL' ? 'Sent by email' : 'Sent on WhatsApp'}
               required
-            />
-          </Field>
+            >
+              <input
+                ref={codeRef}
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                className={cx('input text-center text-2xl tracking-[0.5em]', errors.code && 'input-error')}
+                value={form.code}
+                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.replace(/\D/g, '') }))}
+                placeholder="······"
+                required
+              />
+            </Field>
 
-          <button className="btn-primary w-full py-3" disabled={busy}>
-            {busy && <Spinner className="h-4 w-4" />} Sign in
-          </button>
-        </form>
+            <button className="btn-primary w-full py-3" disabled={busy || form.code.length < 4}>
+              {busy && <Spinner className="h-4 w-4" />} Verify
+            </button>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+              <button type="button" onClick={restart} className="font-medium text-ink-500 hover:text-ink-800">
+                ← Use a different one
+              </button>
+              <button
+                type="button"
+                onClick={resend}
+                disabled={busy || cooldown > 0}
+                className="font-semibold text-brand-700 hover:underline disabled:text-ink-400 disabled:no-underline"
+              >
+                {cooldown > 0 ? `Send another code in ${cooldown}s` : 'Send another code'}
+              </button>
+            </div>
+
+            {/* Development only, and only ever for an account that exists: the
+                API returns the code outside production so a local sign-in does
+                not need the server log open. */}
+            {import.meta.env.DEV && challenge?.devCode && (
+              <p className="rounded-lg border border-dashed border-ink-200 bg-ink-50/60 px-3 py-2 text-xs text-ink-500">
+                Development build — the code is{' '}
+                <code className="font-mono font-semibold text-ink-800">{challenge.devCode}</code>. Configure WhatsApp or
+                SMTP to have it delivered.
+              </p>
+            )}
+          </form>
+        )}
+
+        {step === 'PASSWORD' && (
+          <form onSubmit={submitPassword} className="mt-7 space-y-4" noValidate>
+            <div className="flex items-center gap-2 rounded-lg bg-brand-50 px-3.5 py-2.5 text-sm text-brand-800">
+              <CheckCircle width={16} height={16} className="shrink-0" />
+              <span className="truncate">{form.identifier}</span>
+              <button type="button" onClick={restart} className="ml-auto shrink-0 text-xs font-semibold hover:underline">
+                Change
+              </button>
+            </div>
+
+            <Field label="Password" error={errors.password} required>
+              <input
+                type="password"
+                autoComplete="current-password"
+                autoFocus
+                className={cx('input', errors.password && 'input-error')}
+                value={form.password}
+                onChange={set('password')}
+                placeholder="••••••••"
+                required
+              />
+            </Field>
+
+            <button className="btn-primary w-full py-3" disabled={busy}>
+              {busy && <Spinner className="h-4 w-4" />} Sign in
+            </button>
+
+            <p className="hint">You will stay signed in on this device, and it will not ask for a code again.</p>
+          </form>
+        )}
 
         <p className="mt-5 text-sm text-ink-600">
           New to Kupaa?{' '}
@@ -128,7 +290,7 @@ export default function Login() {
         <p className="mt-5 text-sm font-semibold text-brand-200">Meera S. — Bengaluru</p>
 
         <ul className="mt-10 space-y-3 border-t border-white/15 pt-6 text-sm text-brand-100">
-          {['Third-party tested every batch', 'Order tracking end to end', 'Free delivery above ₹999'].map((line) => (
+          {['Third-party tested every batch', 'Order tracking end to end', 'Clear pricing at checkout'].map((line) => (
             <li key={line} className="flex items-center gap-2.5">
               <ShieldIcon width={16} height={16} className="text-brand-300" /> {line}
             </li>

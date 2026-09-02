@@ -8,6 +8,7 @@ import { validate } from '../middleware/validate.js';
 export const productRouter = Router();
 
 // Static paths must be declared before the /:slug catch-all.
+productRouter.get('/carousel', products.carousel);
 productRouter.get('/facets', products.facets);
 productRouter.get('/suggest', products.suggest);
 productRouter.get('/', validate({ query: products.listQuerySchema }), products.list);

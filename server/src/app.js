@@ -12,7 +12,7 @@ import { apiLimiter } from './middleware/rateLimit.js';
 import { errorHandler, notFound } from './middleware/error.js';
 import { uploadDir } from './middleware/upload.js';
 import { webhook as razorpayWebhook } from './controllers/payment.controller.js';
-import { webhook as shiprocketWebhook } from './controllers/shipping.controller.js';
+import { webhook as shippingWebhook } from './controllers/shipping.controller.js';
 
 export function createApp() {
   const app = express();
@@ -44,7 +44,7 @@ export function createApp() {
 
   // Webhooks are mounted before the JSON parser: Razorpay signs the raw bytes.
   app.post('/api/payments/webhook', express.raw({ type: '*/*', limit: '1mb' }), razorpayWebhook);
-  app.post('/api/shipping/webhook', express.json({ limit: '1mb' }), shiprocketWebhook);
+  app.post('/api/shipping/webhook', express.json({ limit: '1mb' }), shippingWebhook);
 
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true }));

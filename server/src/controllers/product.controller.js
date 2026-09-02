@@ -156,6 +156,44 @@ export const bySlug = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * GET /api/products/carousel — the home page hero.
+ *
+ * New product images are included by default; the "Show in carousel" tick on
+ * each photo lets the shop owner curate the hero from the product form.
+ * Each slide carries its product's own words, because the description is what
+ * the hero shows over the faded edge of the image.
+ */
+export const carousel = asyncHandler(async (_req, res) => {
+  const images = await prisma.productImage.findMany({
+    where: { showInCarousel: true, product: { isActive: true } },
+    orderBy: [{ product: { createdAt: 'desc' } }, { sortOrder: 'asc' }],
+    take: 8,
+    select: {
+      id: true,
+      url: true,
+      alt: true,
+      product: {
+        select: {
+          name: true,
+          slug: true,
+          shortDesc: true,
+          description: true,
+          price: true,
+          mrp: true,
+          variantLabel: true,
+          variants: { where: { isActive: true }, select: variantSelect, orderBy: { sortOrder: 'asc' } },
+        },
+      },
+    },
+  });
+
+  res.json({
+    ok: true,
+    data: images.map(({ product, ...image }) => ({ ...image, product: withVariantSummary(product) })),
+  });
+});
+
 /** GET /api/products/suggest?q= — lightweight autocomplete */
 export const suggest = asyncHandler(async (req, res) => {
   const q = String(req.query.q || '').trim();

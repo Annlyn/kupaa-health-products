@@ -20,14 +20,16 @@
     "supportEmail": "support@kupaahealth.com",
     "supportPhone": "+91 98765 43210",
     "currency": "INR",
-    "freeShippingAbove": 999,
+    "freeShippingAbove": 0,
     "flatShippingFee": 59,
     "taxPercent": 0,
     "codEnabled": true,
     "codExtraFee": 0,
     "maxQtyPerItem": 20,
+    "whatsappNotifyOwner": true,
+    "whatsappSendInvoice": true,
     "announcementEnabled": true,
-    "announcementText": "Free delivery on orders above ₹999 · Lab-tested formulas · Ships across India",
+    "announcementText": "Lab-tested formulas · Ships across India",
     "heroBadge": "Trusted by 40,000+ Indian households",
     "heroTitle": "Everyday wellness,",
     "heroTitleAccent": "honestly made.",
@@ -79,7 +81,7 @@
       },
       {
         "title": "Fast, tracked delivery",
-        "copy": "Dispatched in 24 hours with live Shiprocket tracking."
+        "copy": "Dispatched in 24 hours with live Amazon Shipping tracking."
       },
       {
         "title": "Easy 7-day returns",
@@ -124,9 +126,9 @@
       }
     ],
     "footerNote": "These statements are not medical advice.",
-    "policyShipping": "Orders placed before 2 PM IST on a working day are dispatched the same day; everything else goes out the next working day.\nDelivery typically takes 2–5 working days in metros and 4–8 days elsewhere. Remote PIN codes may take longer.\nDelivery is free on orders above ₹999. Below that a flat ₹59 shipping fee applies.\nEvery parcel ships with an AWB tracking number, sent by email at dispatch and visible under My Orders.\nIf a courier attempts delivery three times without success, the parcel is returned to us and we refund the order minus shipping.",
+    "policyShipping": "Orders placed before 2 PM IST on a working day are dispatched the same day; everything else goes out the next working day.\nDelivery typically takes 2–5 working days in metros and 4–8 days elsewhere. Remote PIN codes may take longer.\nDelivery is free on orders above ₹999. Below that a flat ₹59 shipping fee applies.\nEvery parcel ships with an Amazon Shipping tracking number, sent by email at dispatch and visible under My Orders.\nIf a courier attempts delivery three times without success, the parcel is returned to us and we refund the order minus shipping.",
     "policyReturns": "Unopened, unused products in their original packaging can be returned within 7 days of delivery.\nFor hygiene and safety reasons we cannot accept returns of opened supplements, powders or personal care items unless the product is damaged or expired.\nIf a product arrives damaged, defective or incorrect, email us within 48 hours with photographs and your order number. We arrange a free pickup and send a replacement or a full refund.\nApproved refunds are issued to the original payment method within 5–7 working days of us receiving the return. Cash-on-delivery refunds go to a bank account you nominate.\nOrders can be cancelled free of charge any time before dispatch, from My Orders.",
-    "policyPrivacy": "We collect only what we need to fulfil your order: your name, email, phone number and delivery address.\nPayment details are never stored on our servers. Card, UPI and netbanking data goes directly to Razorpay, a PCI-DSS Level 1 certified payment processor.\nDelivery details are shared with Shiprocket and the assigned courier purely to deliver your parcel.\nPasswords are stored as bcrypt hashes and are never recoverable in plain text, by us or anyone else.\nYou can request a copy of your data, or ask us to delete your account entirely, by writing to our support address.",
+    "policyPrivacy": "We collect only what we need to fulfil your order: your name, email, phone number and delivery address.\nPayment details are never stored on our servers. Card, UPI and netbanking data goes directly to Razorpay, a PCI-DSS Level 1 certified payment processor.\nDelivery details are shared with Amazon Shipping purely so they can deliver your parcel.\nPasswords are stored as bcrypt hashes and are never recoverable in plain text, by us or anyone else.\nYou can request a copy of your data, or ask us to delete your account entirely, by writing to our support address.",
     "policyTerms": "Prices are in Indian Rupees and inclusive of applicable taxes. We may revise prices at any time; the price shown at checkout is what you pay.\nOrders are subject to stock availability. If an item goes out of stock after you order, we cancel that line and refund it in full.\nProducts sold here are food supplements and wellness devices. They are not intended to diagnose, treat, cure or prevent any disease.\nConsult a qualified physician before starting any supplement, particularly if you are pregnant, nursing, on prescription medication or managing a chronic condition.\nAll content, imagery and branding on this store is our property.",
     "policyContact": "Email us and we reply within one working day.\nPhone lines are open Monday to Saturday, 9 AM to 7 PM IST.\nRegistered office: 4th Floor, Wellness House, Anna Salai, Chennai, Tamil Nadu 600002.\nFor order-specific questions, please quote your order number (it looks like KUP-260830-482913)."
   },
@@ -250,6 +252,28 @@
         "hint": "Upper limit a single cart line may reach",
         "min": 1,
         "max": 50,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "whatsappNotifyOwner",
+        "group": "notifications",
+        "type": "boolean",
+        "label": "WhatsApp me when an order is placed",
+        "hint": "Goes to WHATSAPP_OWNER_NUMBER in server/.env, along with a follow-up when an online payment lands",
+        "min": null,
+        "max": null,
+        "fields": null,
+        "isCustomised": false
+      },
+      {
+        "key": "whatsappSendInvoice",
+        "group": "notifications",
+        "type": "boolean",
+        "label": "WhatsApp the invoice to the customer once they pay online",
+        "hint": "Cash-on-delivery orders are invoiced on delivery, so nothing is sent for them",
+        "min": null,
+        "max": null,
         "fields": null,
         "isCustomised": false
       },
@@ -692,6 +716,14 @@
         ]
       },
       {
+        "key": "notifications",
+        "label": "WhatsApp notifications",
+        "keys": [
+          "whatsappNotifyOwner",
+          "whatsappSendInvoice"
+        ]
+      },
+      {
         "key": "announcement",
         "label": "Announcement bar",
         "keys": [
@@ -838,21 +870,24 @@
           "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "url": "demo-media/1788095256874-3d31b36a951a.jpg",
           "alt": null,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "showInCarousel": true
         },
         {
           "id": "cmtfuau5l000xuzgjr63el5s7",
           "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "url": "demo-media/1788095256879-fba44e417035.jpg",
           "alt": null,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "showInCarousel": false
         },
         {
           "id": "cmtfuau5l000yuzgjintbxlmv",
           "productId": "cmtftrtrq000yuzvgdqtxwxh1",
           "url": "demo-media/1788095256881-b144f401564f.jpg",
           "alt": null,
-          "sortOrder": 2
+          "sortOrder": 2,
+          "showInCarousel": false
         }
       ],
       "variants": [
@@ -868,7 +903,8 @@
           "isActive": true,
           "sortOrder": 0,
           "createdAt": "2026-08-30T13:08:17.655Z",
-          "updatedAt": "2026-08-30T13:23:04.616Z"
+          "updatedAt": "2026-08-30T13:23:04.616Z",
+          "image": "demo-media/1788095256874-3d31b36a951a.jpg"
         },
         {
           "id": "cmtftrtrq0013uzvgblguhgy0",
@@ -882,7 +918,8 @@
           "isActive": true,
           "sortOrder": 1,
           "createdAt": "2026-08-30T13:08:17.655Z",
-          "updatedAt": "2026-08-30T13:23:37.343Z"
+          "updatedAt": "2026-08-30T13:23:37.343Z",
+          "image": "demo-media/1788095256879-fba44e417035.jpg"
         }
       ],
       "reviews": []
@@ -928,21 +965,24 @@
           "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "url": "demo-media/1788095178150-a2f4dd15d72b.jpg",
           "alt": null,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "showInCarousel": true
         },
         {
           "id": "cmtftq9mf000tuzvgqlkv4k8z",
           "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "url": "demo-media/1788095178157-e488b24aee7f.jpg",
           "alt": null,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "showInCarousel": false
         },
         {
           "id": "cmtftq9mf000uuzvg1dwqbgm1",
           "productId": "cmtftq9mf000ruzvg0rwsn33s",
           "url": "demo-media/1788095178160-2865eea84d11.jpg",
           "alt": null,
-          "sortOrder": 2
+          "sortOrder": 2,
+          "showInCarousel": false
         }
       ],
       "variants": [
@@ -958,7 +998,8 @@
           "isActive": true,
           "sortOrder": 0,
           "createdAt": "2026-08-30T13:07:04.887Z",
-          "updatedAt": "2026-08-30T13:21:06.183Z"
+          "updatedAt": "2026-08-30T13:21:06.183Z",
+          "image": "demo-media/1788095178150-a2f4dd15d72b.jpg"
         },
         {
           "id": "cmtftq9mf000wuzvgf1yd5zu0",
@@ -972,7 +1013,8 @@
           "isActive": true,
           "sortOrder": 1,
           "createdAt": "2026-08-30T13:07:04.887Z",
-          "updatedAt": "2026-08-30T13:07:04.887Z"
+          "updatedAt": "2026-08-30T13:07:04.887Z",
+          "image": "demo-media/1788095178157-e488b24aee7f.jpg"
         }
       ],
       "reviews": [
@@ -1025,14 +1067,16 @@
           "productId": "cmtftogds000muzvgaa6aag06",
           "url": "demo-media/1788095103305-f6956101535d.jpg",
           "alt": null,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "showInCarousel": true
         },
         {
           "id": "cmtftogds000ouzvgjff8yxy3",
           "productId": "cmtftogds000muzvgaa6aag06",
           "url": "demo-media/1788095109757-e0bc41519543.jpg",
           "alt": null,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "showInCarousel": false
         }
       ],
       "variants": [
@@ -1048,7 +1092,8 @@
           "isActive": true,
           "sortOrder": 0,
           "createdAt": "2026-08-30T13:05:40.336Z",
-          "updatedAt": "2026-08-30T13:05:40.336Z"
+          "updatedAt": "2026-08-30T13:05:40.336Z",
+          "image": "demo-media/1788095103305-f6956101535d.jpg"
         }
       ],
       "reviews": []
@@ -1085,14 +1130,16 @@
           "productId": "cmtftmrml000huzvgzxjhxieo",
           "url": "demo-media/1788095016900-87dd6155f207.jpg",
           "alt": null,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "showInCarousel": false
         },
         {
           "id": "cmtftmrml000juzvg40vhbpbh",
           "productId": "cmtftmrml000huzvgzxjhxieo",
           "url": "demo-media/1788095038150-7694999c2c9c.jpg",
           "alt": null,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "showInCarousel": false
         }
       ],
       "variants": [
@@ -1108,7 +1155,8 @@
           "isActive": true,
           "sortOrder": 0,
           "createdAt": "2026-08-30T13:04:21.597Z",
-          "updatedAt": "2026-08-30T13:04:21.597Z"
+          "updatedAt": "2026-08-30T13:04:21.597Z",
+          "image": "demo-media/1788095016900-87dd6155f207.jpg"
         }
       ],
       "reviews": []
@@ -1154,21 +1202,24 @@
           "productId": "cmtftktdu000auzvgtompo5qn",
           "url": "demo-media/1788094915351-1c05d4edf46e.jpg",
           "alt": null,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "showInCarousel": false
         },
         {
           "id": "cmtftktdu000cuzvgag5bxvia",
           "productId": "cmtftktdu000auzvgtompo5qn",
           "url": "demo-media/1788094915369-0d9b5f34459c.jpg",
           "alt": null,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "showInCarousel": false
         },
         {
           "id": "cmtftktdu000duzvg1kljrkjd",
           "productId": "cmtftktdu000auzvgtompo5qn",
           "url": "demo-media/1788094915372-0d3e35842297.jpg",
           "alt": null,
-          "sortOrder": 2
+          "sortOrder": 2,
+          "showInCarousel": false
         }
       ],
       "variants": [
@@ -1184,7 +1235,8 @@
           "isActive": true,
           "sortOrder": 0,
           "createdAt": "2026-08-30T13:02:50.562Z",
-          "updatedAt": "2026-08-30T13:02:50.562Z"
+          "updatedAt": "2026-08-30T13:02:50.562Z",
+          "image": "demo-media/1788094915351-1c05d4edf46e.jpg"
         },
         {
           "id": "cmtftktdu000fuzvgp03gwhki",
@@ -1198,7 +1250,8 @@
           "isActive": true,
           "sortOrder": 1,
           "createdAt": "2026-08-30T13:02:50.562Z",
-          "updatedAt": "2026-08-30T13:02:50.562Z"
+          "updatedAt": "2026-08-30T13:02:50.562Z",
+          "image": "demo-media/1788094915369-0d9b5f34459c.jpg"
         }
       ],
       "reviews": []
@@ -1244,21 +1297,24 @@
           "productId": "cmtftil6z0003uzvgowr0g79f",
           "url": "demo-media/1788094811320-918c9f0c70c6.jpg",
           "alt": null,
-          "sortOrder": 0
+          "sortOrder": 0,
+          "showInCarousel": false
         },
         {
           "id": "cmtftil6z0005uzvg9q93tqit",
           "productId": "cmtftil6z0003uzvgowr0g79f",
           "url": "demo-media/1788094811325-52c1da9bf0b7.jpg",
           "alt": null,
-          "sortOrder": 1
+          "sortOrder": 1,
+          "showInCarousel": false
         },
         {
           "id": "cmtftil6z0006uzvgjrvdf3hh",
           "productId": "cmtftil6z0003uzvgowr0g79f",
           "url": "demo-media/1788094811328-bded01aa2e63.jpg",
           "alt": null,
-          "sortOrder": 2
+          "sortOrder": 2,
+          "showInCarousel": false
         }
       ],
       "variants": [
@@ -1274,7 +1330,8 @@
           "isActive": true,
           "sortOrder": 0,
           "createdAt": "2026-08-30T13:01:06.635Z",
-          "updatedAt": "2026-08-30T13:01:06.635Z"
+          "updatedAt": "2026-08-30T13:01:06.635Z",
+          "image": "demo-media/1788094811320-918c9f0c70c6.jpg"
         },
         {
           "id": "cmtftil6z0008uzvgf7irlkuz",
@@ -1288,7 +1345,8 @@
           "isActive": true,
           "sortOrder": 1,
           "createdAt": "2026-08-30T13:01:06.635Z",
-          "updatedAt": "2026-08-30T13:01:06.635Z"
+          "updatedAt": "2026-08-30T13:01:06.635Z",
+          "image": "demo-media/1788094811325-52c1da9bf0b7.jpg"
         }
       ],
       "reviews": []
@@ -1425,8 +1483,8 @@
           "id": "cmtfubjez001euzgjcapm6x5t",
           "orderId": "cmtfubjep0014uzgjtiwthyru",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700060163",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T13:23:37.356Z"
         },
         {
@@ -1449,15 +1507,12 @@
       "shipment": {
         "id": "cmtfubjex001cuzgj8q0whgv8",
         "orderId": "cmtfubjep0014uzgjtiwthyru",
-        "shiprocketOrderId": "700060163",
-        "shiprocketShipmentId": "800060163",
+        "carrierShipmentId": "AMZS800060163",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -1530,32 +1585,32 @@
           "id": "cmtfu8ay3000ruzgjxccye2sc",
           "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
           "status": "SHIPPED",
-          "message": "Handed to Delhivery Surface",
-          "source": "SHIPROCKET",
+          "message": "Handed to Amazon Shipping · Standard",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T13:21:06.411Z"
         },
         {
           "id": "cmtfu8ay1000puzgjbjroryg0",
           "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
           "status": "CONFIRMED",
-          "message": "Pickup requested from courier",
-          "source": "SHIPROCKET",
+          "message": "Amazon Shipping pickup confirmed",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T13:21:06.410Z"
         },
         {
           "id": "cmtfu8ay0000nuzgjxbenmu6f",
           "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
           "status": "CONFIRMED",
-          "message": "AWB MOCK00090054 assigned (Delhivery Surface)",
-          "source": "SHIPROCKET",
+          "message": "Label bought — tracking MOCK00090054 (Amazon Shipping · Standard)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T13:21:06.409Z"
         },
         {
           "id": "cmtfu8arw000huzgj8ty3ktvm",
           "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700090054",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T13:21:06.189Z"
         },
         {
@@ -1578,17 +1633,14 @@
       "shipment": {
         "id": "cmtfu8arw000fuzgj44x7x18b",
         "orderId": "cmtfu8ars0007uzgjxg5vsz1y",
-        "shiprocketOrderId": "700090054",
-        "shiprocketShipmentId": "800090054",
+        "carrierShipmentId": "AMZS800090054",
+        "carrierServiceId": "STD",
+        "carrierId": "AMZN_IN",
         "awbCode": "MOCK00090054",
-        "courierName": "Delhivery Surface",
-        "courierCompanyId": 51,
+        "courierName": "Amazon Shipping · Standard",
         "labelUrl": "https://example.invalid/mock-label-800090054.pdf",
-        "manifestUrl": "https://example.invalid/mock-manifest-800090054.pdf",
-        "invoiceUrl": "https://example.invalid/mock-invoice-700090054.pdf",
-        "pickupScheduledAt": "2026-08-30T13:21:06.409Z",
-        "status": "PICKUP_SCHEDULED",
-        "trackingUrl": "https://shiprocket.co/tracking/MOCK00090054",
+        "status": "LABEL_PURCHASED",
+        "trackingUrl": "https://track.amazon.in/tracking/MOCK00090054",
         "etd": null,
         "freightCharge": 59,
         "createdAt": "2026-08-30T13:21:06.188Z",
@@ -1672,8 +1724,8 @@
           "id": "cmtfspmzg001juzp4yxnsp7cj",
           "orderId": "cmtfspmzc0018uzp408jy6aew",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700092281",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T12:38:35.933Z"
         },
         {
@@ -1696,15 +1748,12 @@
       "shipment": {
         "id": "cmtfspmzg001huzp42m3ptrrp",
         "orderId": "cmtfspmzc0018uzp408jy6aew",
-        "shiprocketOrderId": "700092281",
-        "shiprocketShipmentId": "800092281",
+        "carrierShipmentId": "AMZS800092281",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -1777,32 +1826,32 @@
           "id": "cmtfspmqr000uuzp4itmsf3u6",
           "orderId": "cmtfspmkg000auzp41xxy7rx2",
           "status": "SHIPPED",
-          "message": "Handed to Delhivery Surface",
-          "source": "SHIPROCKET",
+          "message": "Handed to Amazon Shipping · Standard",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T12:38:35.619Z"
         },
         {
           "id": "cmtfspmqq000suzp4ejtk9bz4",
           "orderId": "cmtfspmkg000auzp41xxy7rx2",
           "status": "CONFIRMED",
-          "message": "Pickup requested from courier",
-          "source": "SHIPROCKET",
+          "message": "Amazon Shipping pickup confirmed",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T12:38:35.618Z"
         },
         {
           "id": "cmtfspmqp000quzp4tmp8929p",
           "orderId": "cmtfspmkg000auzp41xxy7rx2",
           "status": "CONFIRMED",
-          "message": "AWB MOCK00086439 assigned (Delhivery Surface)",
-          "source": "SHIPROCKET",
+          "message": "Label bought — tracking MOCK00086439 (Amazon Shipping · Standard)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T12:38:35.617Z"
         },
         {
           "id": "cmtfspmkk000kuzp46vkzjpvh",
           "orderId": "cmtfspmkg000auzp41xxy7rx2",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700086439",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T12:38:35.397Z"
         },
         {
@@ -1825,17 +1874,14 @@
       "shipment": {
         "id": "cmtfspmkk000iuzp4ggjbrwa5",
         "orderId": "cmtfspmkg000auzp41xxy7rx2",
-        "shiprocketOrderId": "700086439",
-        "shiprocketShipmentId": "800086439",
+        "carrierShipmentId": "AMZS800086439",
+        "carrierServiceId": "STD",
+        "carrierId": "AMZN_IN",
         "awbCode": "MOCK00086439",
-        "courierName": "Delhivery Surface",
-        "courierCompanyId": 51,
+        "courierName": "Amazon Shipping · Standard",
         "labelUrl": "https://example.invalid/mock-label-800086439.pdf",
-        "manifestUrl": "https://example.invalid/mock-manifest-800086439.pdf",
-        "invoiceUrl": "https://example.invalid/mock-invoice-700086439.pdf",
-        "pickupScheduledAt": "2026-08-30T12:38:35.617Z",
-        "status": "PICKUP_SCHEDULED",
-        "trackingUrl": "https://shiprocket.co/tracking/MOCK00086439",
+        "status": "LABEL_PURCHASED",
+        "trackingUrl": "https://track.amazon.in/tracking/MOCK00086439",
         "etd": null,
         "freightCharge": 59,
         "createdAt": "2026-08-30T12:38:35.396Z",
@@ -1906,32 +1952,32 @@
           "id": "cmtfr7zaf004euztgdd24yr9b",
           "orderId": "cmtfr7z47003uuztgbnbtpl66",
           "status": "SHIPPED",
-          "message": "Handed to Delhivery Surface",
-          "source": "SHIPROCKET",
+          "message": "Handed to Amazon Shipping · Standard",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:56:52.456Z"
         },
         {
           "id": "cmtfr7zae004cuztgtlkj78ej",
           "orderId": "cmtfr7z47003uuztgbnbtpl66",
           "status": "CONFIRMED",
-          "message": "Pickup requested from courier",
-          "source": "SHIPROCKET",
+          "message": "Amazon Shipping pickup confirmed",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:56:52.454Z"
         },
         {
           "id": "cmtfr7zad004auztgone6gstf",
           "orderId": "cmtfr7z47003uuztgbnbtpl66",
           "status": "CONFIRMED",
-          "message": "AWB MOCK00029155 assigned (Delhivery Surface)",
-          "source": "SHIPROCKET",
+          "message": "Label bought — tracking MOCK00029155 (Amazon Shipping · Standard)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:56:52.453Z"
         },
         {
           "id": "cmtfr7z4b0044uztgct98cfl2",
           "orderId": "cmtfr7z47003uuztgbnbtpl66",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700029155",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:56:52.236Z"
         },
         {
@@ -1954,17 +2000,14 @@
       "shipment": {
         "id": "cmtfr7z4b0042uztgx3z8kfaq",
         "orderId": "cmtfr7z47003uuztgbnbtpl66",
-        "shiprocketOrderId": "700029155",
-        "shiprocketShipmentId": "800029155",
+        "carrierShipmentId": "AMZS800029155",
+        "carrierServiceId": "STD",
+        "carrierId": "AMZN_IN",
         "awbCode": "MOCK00029155",
-        "courierName": "Delhivery Surface",
-        "courierCompanyId": 51,
+        "courierName": "Amazon Shipping · Standard",
         "labelUrl": "https://example.invalid/mock-label-800029155.pdf",
-        "manifestUrl": "https://example.invalid/mock-manifest-800029155.pdf",
-        "invoiceUrl": "https://example.invalid/mock-invoice-700029155.pdf",
-        "pickupScheduledAt": "2026-08-30T11:56:52.453Z",
-        "status": "PICKUP_SCHEDULED",
-        "trackingUrl": "https://shiprocket.co/tracking/MOCK00029155",
+        "status": "LABEL_PURCHASED",
+        "trackingUrl": "https://track.amazon.in/tracking/MOCK00029155",
         "etd": null,
         "freightCharge": 59,
         "createdAt": "2026-08-30T11:56:52.235Z",
@@ -2035,8 +2078,8 @@
           "id": "cmtfr7qth003muztgnziarnpy",
           "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700045689",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:56:41.477Z"
         },
         {
@@ -2059,15 +2102,12 @@
       "shipment": {
         "id": "cmtfr7qtg003kuztgsg10emqp",
         "orderId": "cmtfr7qtd003cuztgvtwj3ytg",
-        "shiprocketOrderId": "700045689",
-        "shiprocketShipmentId": "800045689",
+        "carrierShipmentId": "AMZS800045689",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -2153,8 +2193,8 @@
           "id": "cmtfr7h2s002uuztgohab8tue",
           "orderId": "cmtfr7h2o002juztgpohxthiq",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700071323",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:56:28.853Z"
         },
         {
@@ -2177,15 +2217,12 @@
       "shipment": {
         "id": "cmtfr7h2s002suztg2rovqa7x",
         "orderId": "cmtfr7h2o002juztgpohxthiq",
-        "shiprocketOrderId": "700071323",
-        "shiprocketShipmentId": "800071323",
+        "carrierShipmentId": "AMZS800071323",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -2279,8 +2316,8 @@
           "id": "cmtfr07gg001duztgo1k2oaxc",
           "orderId": "cmtfr07gc0012uztgo18c5rag",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700073916",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:50:49.792Z"
         },
         {
@@ -2295,15 +2332,12 @@
       "shipment": {
         "id": "cmtfr07gg001buztgbrpx95ni",
         "orderId": "cmtfr07gc0012uztgo18c5rag",
-        "shiprocketOrderId": "700073916",
-        "shiprocketShipmentId": "800073916",
+        "carrierShipmentId": "AMZS800073916",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -2389,8 +2423,8 @@
           "id": "cmtfqzskb000iuztglmfafku0",
           "orderId": "cmtfqzsk70007uztgcnfa0wk7",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700097910",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T11:50:30.491Z"
         },
         {
@@ -2413,15 +2447,12 @@
       "shipment": {
         "id": "cmtfqzska000guztgzg8kox1x",
         "orderId": "cmtfqzsk70007uztgcnfa0wk7",
-        "shiprocketOrderId": "700097910",
-        "shiprocketShipmentId": "800097910",
+        "carrierShipmentId": "AMZS800097910",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -2507,8 +2538,8 @@
           "id": "cmtfot3cz000guzhuxfnn2bfr",
           "orderId": "cmtfot3ck0005uzhuxnsmduci",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700070080",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T10:49:18.660Z"
         },
         {
@@ -2531,15 +2562,12 @@
       "shipment": {
         "id": "cmtfot3cy000euzhulu9buxu6",
         "orderId": "cmtfot3ck0005uzhuxnsmduci",
-        "shiprocketOrderId": "700070080",
-        "shiprocketShipmentId": "800070080",
+        "carrierShipmentId": "AMZS800070080",
+        "carrierServiceId": null,
+        "carrierId": null,
         "awbCode": null,
         "courierName": null,
-        "courierCompanyId": null,
         "labelUrl": null,
-        "manifestUrl": null,
-        "invoiceUrl": null,
-        "pickupScheduledAt": null,
         "status": "CREATED",
         "trackingUrl": null,
         "etd": null,
@@ -2612,32 +2640,32 @@
           "id": "cmtfo45lc000puzbuk1lzr1t2",
           "orderId": "cmtfo45ey0005uzbuvv2i68sw",
           "status": "SHIPPED",
-          "message": "Handed to Delhivery Surface",
-          "source": "SHIPROCKET",
+          "message": "Handed to Amazon Shipping · Standard",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T10:29:55.152Z"
         },
         {
           "id": "cmtfo45la000nuzbui2ycl5rf",
           "orderId": "cmtfo45ey0005uzbuvv2i68sw",
           "status": "CONFIRMED",
-          "message": "Pickup requested from courier",
-          "source": "SHIPROCKET",
+          "message": "Amazon Shipping pickup confirmed",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T10:29:55.151Z"
         },
         {
           "id": "cmtfo45l9000luzbucwcgfu81",
           "orderId": "cmtfo45ey0005uzbuvv2i68sw",
           "status": "CONFIRMED",
-          "message": "AWB MOCK00078777 assigned (Delhivery Surface)",
-          "source": "SHIPROCKET",
+          "message": "Label bought — tracking MOCK00078777 (Amazon Shipping · Standard)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T10:29:55.150Z"
         },
         {
           "id": "cmtfo45f3000fuzbu3ebz1ije",
           "orderId": "cmtfo45ey0005uzbuvv2i68sw",
           "status": "CONFIRMED",
-          "message": "Shipment created in Shiprocket (mock mode) — ref 700078777",
-          "source": "SHIPROCKET",
+          "message": "Ready to ship with Amazon Shipping (mock mode)",
+          "source": "AMAZON",
           "createdAt": "2026-08-30T10:29:54.927Z"
         },
         {
@@ -2660,17 +2688,14 @@
       "shipment": {
         "id": "cmtfo45f2000duzbuv6885f0l",
         "orderId": "cmtfo45ey0005uzbuvv2i68sw",
-        "shiprocketOrderId": "700078777",
-        "shiprocketShipmentId": "800078777",
+        "carrierShipmentId": "AMZS800078777",
+        "carrierServiceId": "STD",
+        "carrierId": "AMZN_IN",
         "awbCode": "MOCK00078777",
-        "courierName": "Delhivery Surface",
-        "courierCompanyId": 51,
+        "courierName": "Amazon Shipping · Standard",
         "labelUrl": "https://example.invalid/mock-label-800078777.pdf",
-        "manifestUrl": "https://example.invalid/mock-manifest-800078777.pdf",
-        "invoiceUrl": "https://example.invalid/mock-invoice-700078777.pdf",
-        "pickupScheduledAt": "2026-08-30T10:29:55.150Z",
-        "status": "PICKUP_SCHEDULED",
-        "trackingUrl": "https://shiprocket.co/tracking/MOCK00078777",
+        "status": "LABEL_PURCHASED",
+        "trackingUrl": "https://track.amazon.in/tracking/MOCK00078777",
         "etd": null,
         "freightCharge": 59,
         "createdAt": "2026-08-30T10:29:54.927Z",

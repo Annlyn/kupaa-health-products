@@ -2,7 +2,7 @@
   "name": "kupaa-health-products",
   "private": true,
   "version": "1.0.0",
-  "description": "Kupaa Health Products - full stack e-commerce (catalog, auth, admin, Razorpay, Shiprocket)",
+  "description": "Kupaa Health Products - full stack e-commerce (catalog, auth, admin, Razorpay, Amazon Shipping)",
   "workspaces": [
     "server",
     "client"

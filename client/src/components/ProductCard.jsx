@@ -5,11 +5,16 @@ import { api, mediaUrl } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { money, percentOff, priceRange } from '../lib/format';
-import { CartIcon, ChevronRight, HeartIcon } from './Icons';
+import { CartIcon, ChevronRight, HeartIcon, ZoomIcon } from './Icons';
 import { Rating, Spinner, cx } from './ui';
+import Lightbox from './Lightbox';
 
-export function ProductImage({ product, className = '' }) {
-  const src = mediaUrl(product.images?.[0]?.url);
+/**
+ * A product thumbnail. `src` overrides the product's own first image — cart and
+ * order lines pass the chosen variant's photo through it.
+ */
+export function ProductImage({ product, src: override, className = '' }) {
+  const src = mediaUrl(override || product.images?.[0]?.url);
   if (!src) {
     return (
       <div className={cx('flex items-center justify-center bg-ink-100 text-2xl font-display text-ink-400', className)}>
@@ -20,7 +25,7 @@ export function ProductImage({ product, className = '' }) {
   return (
     <img
       src={src}
-      alt={product.images?.[0]?.alt || product.name}
+      alt={(override ? null : product.images?.[0]?.alt) || product.name}
       loading="lazy"
       className={cx('h-full w-full object-cover', className)}
     />
@@ -32,6 +37,9 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
   const { isAuthenticated } = useAuth();
   const [adding, setAdding] = useState(false);
   const [saved, setSaved] = useState(Boolean(wishlisted));
+  const [zoomed, setZoomed] = useState(false);
+
+  const images = product.images ?? [];
 
   const discount = percentOff(product.mrp, product.price);
   const outOfStock = product.stock <= 0;
@@ -67,8 +75,18 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
 
   return (
     <article className="group card flex flex-col overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-lift">
-      <Link to={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-ink-50">
-        <ProductImage product={product} className="transition duration-500 group-hover:scale-105" />
+      <div className="relative aspect-square overflow-hidden bg-ink-50">
+        {/* Tapping the photo opens it full size; the title and the button below
+            are the way through to the product page. */}
+        <button
+          type="button"
+          onClick={() => images.length && setZoomed(true)}
+          disabled={!images.length}
+          aria-label={`View full size image of ${product.name}`}
+          className="block h-full w-full cursor-zoom-in"
+        >
+          <ProductImage product={product} className="transition duration-500 group-hover:scale-105" />
+        </button>
 
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {discount > 0 && <span className="badge bg-rose-600 text-white shadow-sm">{discount}% off</span>}
@@ -87,12 +105,31 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
           <HeartIcon width={17} height={17} fill={saved ? 'currentColor' : 'none'} />
         </button>
 
+        {images.length > 0 && (
+          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/90 p-1.5 text-ink-600 opacity-0 shadow-sm transition group-hover:opacity-100">
+            <ZoomIcon width={15} height={15} />
+          </span>
+        )}
+
         {outOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/70">
             <span className="badge bg-ink-900 text-white">Out of stock</span>
           </div>
         )}
-      </Link>
+      </div>
+
+      {zoomed && (
+        <Lightbox
+          images={images}
+          onClose={() => setZoomed(false)}
+          title={product.name}
+          footer={
+            <Link to={`/product/${product.slug}`} className="btn bg-white px-5 py-2.5 text-ink-900 hover:bg-brand-50">
+              View product <ChevronRight width={15} height={15} />
+            </Link>
+          }
+        />
+      )}
 
       <div className="flex flex-1 flex-col p-4">
         {product.category && <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700">{product.category.name}</p>}

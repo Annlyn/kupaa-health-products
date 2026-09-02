@@ -31,7 +31,7 @@ const BLANK = {
   variants: [],
 };
 
-const BLANK_VARIANT = { id: null, name: '', sku: '', price: '', mrp: '', stock: 0, weightKg: 0.3, isActive: true };
+const BLANK_VARIANT = { id: null, name: '', sku: '', price: '', mrp: '', stock: 0, weightKg: 0.3, image: '', isActive: true };
 
 export default function ProductForm() {
   const { id } = useParams();
@@ -50,6 +50,7 @@ export default function ProductForm() {
   const [uploading, setUploading] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [discountDraft, setDiscountDraft] = useState('');
+  const [draggedImage, setDraggedImage] = useState(null);
 
   useEffect(() => {
     if (!existing) return;
@@ -61,7 +62,7 @@ export default function ProductForm() {
       description: existing.description || '',
       hsn: existing.hsn || '',
       tags: existing.tags || '',
-      images: existing.images?.map((i) => ({ url: i.url, alt: i.alt || '' })) || [],
+      images: existing.images?.map((i) => ({ url: i.url, alt: i.alt || '', showInCarousel: Boolean(i.showInCarousel) })) || [],
       variantLabel: existing.variantLabel || '',
       variants:
         existing.variants?.map((v) => ({
@@ -72,6 +73,7 @@ export default function ProductForm() {
           mrp: v.mrp,
           stock: v.stock,
           weightKg: v.weightKg,
+          image: v.image || '',
           isActive: v.isActive,
         })) || [],
     });
@@ -126,7 +128,10 @@ export default function ProductForm() {
       const { data } = await api.post('/admin/upload', body);
       if (!data?.length) throw new Error('The server did not return an image. Please try a different file.');
 
-      setForm((f) => ({ ...f, images: [...f.images, ...data.map((d) => ({ url: d.url, alt: '' }))].slice(0, 8) }));
+      setForm((f) => ({
+        ...f,
+        images: [...f.images, ...data.map((d) => ({ url: d.url, alt: '', showInCarousel: true }))].slice(0, 8),
+      }));
       toast.success(`${data.length} image${data.length > 1 ? 's' : ''} uploaded — save to keep the change`);
     } catch (err) {
       toast.error(err.message);
@@ -137,6 +142,16 @@ export default function ProductForm() {
   };
 
   const hasVariants = form.variants.length > 0;
+
+  const moveImage = (from, to) => {
+    if (from === to || from == null || to == null || from < 0 || to < 0 || from >= form.images.length || to >= form.images.length) return;
+    setForm((f) => {
+      const images = [...f.images];
+      const [image] = images.splice(from, 1);
+      images.splice(to, 0, image);
+      return { ...f, images };
+    });
+  };
 
   const setVariant = (index, key, value) =>
     setForm((f) => ({ ...f, variants: f.variants.map((v, i) => (i === index ? { ...v, [key]: value } : v)) }));
@@ -164,7 +179,7 @@ export default function ProductForm() {
     const next = {};
     if (form.name.trim().length < 2) next.name = 'Enter a product name';
     if (!form.sku.trim()) next.sku = 'SKU is required';
-    if (!(Number(form.weightKg) > 0)) next.weightKg = 'Weight is required for Shiprocket';
+    if (!(Number(form.weightKg) > 0)) next.weightKg = 'Weight is required for shipping';
 
     if (hasVariants) {
       if (!form.variantLabel.trim()) next.variantLabel = 'Name the option type, e.g. Weight or Size';
@@ -210,6 +225,7 @@ export default function ProductForm() {
           mrp: Number(v.mrp),
           stock: Number(v.stock),
           weightKg: Number(v.weightKg),
+          image: v.image || null,
           isActive: Boolean(v.isActive),
         })),
         lowStockAt: Number(form.lowStockAt),
@@ -307,21 +323,92 @@ export default function ProductForm() {
 
           <section className="card p-5">
             <h2 className="text-base font-semibold">Images</h2>
-            <p className="mt-1 text-sm text-ink-500">Up to 8 images. The first one is used as the main thumbnail.</p>
+            <p className="mt-1 text-sm text-ink-500">
+              Up to 8 images. Drag images to sort them — the first is the main thumbnail and carousel images follow this order.
+              New images appear in the home page carousel by default; untick <strong>Show carousel</strong> to remove one, or tick it again to add it back.
+            </p>
 
             <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
               {form.images.map((img, i) => (
-                <div key={`${img.url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-ink-100 bg-ink-50">
-                  <img src={mediaUrl(img.url)} alt="" className="h-full w-full object-cover" />
-                  {i === 0 && <span className="absolute left-1.5 top-1.5 badge bg-brand-700 text-[10px] text-white">Main</span>}
-                  <button
-                    type="button"
-                    onClick={() => setForm((f) => ({ ...f, images: f.images.filter((_, idx) => idx !== i) }))}
-                    className="absolute right-1.5 top-1.5 rounded-md bg-white/90 p-1 text-rose-600 opacity-0 transition group-hover:opacity-100"
-                    aria-label="Remove image"
-                  >
-                    <TrashIcon width={14} height={14} />
-                  </button>
+                <div
+                  key={`${img.url}-${i}`}
+                  draggable
+                  onDragStart={(e) => {
+                    // Firefox requires a payload before it will permit a drop.
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', String(i));
+                    setDraggedImage(i);
+                  }}
+                  onDragEnd={() => setDraggedImage(null)}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const from = draggedImage ?? Number(e.dataTransfer.getData('text/plain'));
+                    moveImage(from, i);
+                    setDraggedImage(null);
+                  }}
+                  className={cx('cursor-grab transition-opacity active:cursor-grabbing', draggedImage === i && 'opacity-50')}
+                >
+                  <div className="group relative aspect-square overflow-hidden rounded-lg border border-ink-100 bg-ink-50">
+                    <img src={mediaUrl(img.url)} alt="" className="h-full w-full object-cover" />
+                    {i === 0 && <span className="absolute left-1.5 top-1.5 badge bg-brand-700 text-[10px] text-white">Main</span>}
+                    <span className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">Drag to sort</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          images: f.images.filter((_, idx) => idx !== i),
+                          // An option must never point at an image that is gone.
+                          variants: f.variants.map((v) => (v.image === img.url ? { ...v, image: '' } : v)),
+                        }))
+                      }
+                      className="absolute right-1.5 top-1.5 rounded-md bg-white/90 p-1 text-rose-600 opacity-0 transition group-hover:opacity-100"
+                      aria-label="Remove image"
+                    >
+                      <TrashIcon width={14} height={14} />
+                    </button>
+                  </div>
+
+                  <label className="mt-1.5 flex cursor-pointer items-start gap-1.5 text-[11px] leading-snug text-ink-600">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+                      checked={Boolean(img.showInCarousel)}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          images: f.images.map((image, idx) =>
+                            idx === i ? { ...image, showInCarousel: e.target.checked } : image,
+                          ),
+                        }))
+                      }
+                    />
+                    Show carousel
+                  </label>
+                  <div className="mt-1 flex gap-1" aria-label={`Reorder image ${i + 1}`}>
+                    <button
+                      type="button"
+                      onClick={() => moveImage(i, i - 1)}
+                      disabled={i === 0}
+                      className="rounded px-1.5 py-0.5 text-[11px] text-ink-600 hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-40"
+                      aria-label={`Move image ${i + 1} earlier`}
+                    >
+                      ← Move
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveImage(i, i + 1)}
+                      disabled={i === form.images.length - 1}
+                      className="rounded px-1.5 py-0.5 text-[11px] text-ink-600 hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-40"
+                      aria-label={`Move image ${i + 1} later`}
+                    >
+                      Move →
+                    </button>
+                  </div>
                 </div>
               ))}
 
@@ -357,7 +444,7 @@ export default function ProductForm() {
                     e.preventDefault();
                     const url = e.currentTarget.value.trim();
                     if (!url) return;
-                    setForm((f) => ({ ...f, images: [...f.images, { url, alt: '' }].slice(0, 8) }));
+                    setForm((f) => ({ ...f, images: [...f.images, { url, alt: '', showInCarousel: true }].slice(0, 8) }));
                     e.currentTarget.value = '';
                   }}
                 />
@@ -471,6 +558,43 @@ export default function ProductForm() {
                         </label>
                       </div>
 
+                      {form.images.length > 0 && (
+                        <div className="mt-3">
+                          <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-ink-500">
+                            Photo shown for this option
+                          </span>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setVariant(index, 'image', '')}
+                              aria-pressed={!variant.image}
+                              className={cx(
+                                'h-12 rounded-lg border-2 px-2.5 text-xs font-medium transition',
+                                variant.image ? 'border-ink-200 text-ink-500 hover:border-ink-300' : 'border-brand-600 text-brand-700',
+                              )}
+                            >
+                              Main image
+                            </button>
+                            {form.images.map((img, imgIndex) => (
+                              <button
+                                key={`${img.url}-${imgIndex}`}
+                                type="button"
+                                onClick={() => setVariant(index, 'image', img.url)}
+                                aria-label={`Use image ${imgIndex + 1} for this option`}
+                                aria-pressed={variant.image === img.url}
+                                className={cx(
+                                  'h-12 w-12 overflow-hidden rounded-lg border-2 bg-white transition',
+                                  variant.image === img.url ? 'border-brand-600' : 'border-ink-200 hover:border-ink-300',
+                                )}
+                              >
+                                <img src={mediaUrl(img.url)} alt="" className="h-full w-full object-cover" />
+                              </button>
+                            ))}
+                          </div>
+                          <p className="hint">The product page switches to this photo when the option is chosen.</p>
+                        </div>
+                      )}
+
                       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-3">
                         <label className="flex items-center gap-2 text-xs text-ink-600">
                           <input
@@ -521,7 +645,7 @@ export default function ProductForm() {
           <section className="card p-5">
             <h2 className="text-base font-semibold">Shipping dimensions</h2>
             <p className="mt-1 text-sm text-ink-500">
-              Shiprocket needs these to quote couriers and generate an AWB. Use the packed parcel, not the bare product.
+              Amazon Shipping needs these to quote a rate and print a label. Use the packed parcel, not the bare product.
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-4">
               <Field label="Weight (kg)" required error={errors.weightKg}>

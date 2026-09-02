@@ -69,7 +69,8 @@ function resolveSellable(product, variantId) {
     if (variantId) throw new DemoError(400, `${product.name} does not come in multiple options`);
     return {
       variantId: null, variantName: null, sku: product.sku, price: product.price,
-      mrp: product.mrp, stock: product.stock, weightKg: product.weightKg, label: product.name,
+      mrp: product.mrp, stock: product.stock, weightKg: product.weightKg,
+      image: product.images?.[0]?.url ?? null, label: product.name,
     };
   }
   if (!variantId) {
@@ -81,6 +82,7 @@ function resolveSellable(product, variantId) {
   return {
     variantId: variant.id, variantName: variant.name, sku: variant.sku, price: variant.price,
     mrp: variant.mrp, stock: variant.stock, weightKg: variant.weightKg,
+    image: variant.image || product.images?.[0]?.url || null,
     label: `${product.name} — ${variant.name}`,
   };
 }
@@ -91,7 +93,7 @@ function resolveSellable(product, variantId) {
  */
 const pick = (row, keys) => Object.fromEntries(keys.map((k) => [k, row[k]]));
 
-const VARIANT_FIELDS = ['id', 'name', 'sku', 'price', 'mrp', 'stock', 'weightKg', 'isActive', 'sortOrder'];
+const VARIANT_FIELDS = ['id', 'name', 'sku', 'price', 'mrp', 'stock', 'weightKg', 'image', 'isActive', 'sortOrder'];
 const toVariant = (v) => pick(v, VARIANT_FIELDS);
 
 const CARD_FIELDS = [
@@ -240,6 +242,7 @@ function guestQuote(data, body) {
         mrp: sellable.mrp,
         sku: sellable.sku,
         weightKg: sellable.weightKg,
+        image: sellable.image,
         lineTotal: round2(sellable.price * item.quantity),
         inStock: sellable.stock >= item.quantity,
         maxQuantity: sellable.stock,
@@ -410,7 +413,7 @@ function adminStats(data) {
     salesSeries: [...buckets.values()],
     topProducts: [...sold.values()].sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 6),
     statusCounts: Object.fromEntries(statuses),
-    integrations: { razorpay: false, shiprocket: false },
+    integrations: { razorpay: false, shipping: false },
   };
 }
 
@@ -438,6 +441,25 @@ const ROUTES = [
       products: data.products.filter((p) => p.category?.slug === slug).slice(0, 24).map(toCard),
     };
   }],
+
+  ['GET', /^\/products\/carousel$/, (data) =>
+    data.products
+      .filter((p) => p.isActive !== false)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .flatMap((product) =>
+        (product.images || [])
+          .filter((img) => img.showInCarousel)
+          .map((img) => ({
+            id: img.id,
+            url: img.url,
+            alt: img.alt,
+            product: withVariantSummary({
+              ...pick(product, ['name', 'slug', 'shortDesc', 'description', 'price', 'mrp', 'variantLabel']),
+              variants: activeVariants(product).map(toVariant),
+            }),
+          })),
+      )
+      .slice(0, 8)],
 
   ['GET', /^\/products\/facets$/, (data) => {
     const prices = data.products.map((p) => p.price);
@@ -475,10 +497,15 @@ const ROUTES = [
   ['POST', /^\/cart\/quote$/, (data, _p, _params, body) => guestQuote(data, body)],
 
   // ------------------------------------------------------------------- auth
+  // The real API verifies the identifier with a one-time code first. There is
+  // no way to deliver one here, so the demo answers "straight to the password"
+  // and the sign-in form skips that step.
+  ['POST', /^\/auth\/login\/start$/, () => ({ step: 'PASSWORD', verification: 'disabled' })],
+
   ['POST', /^\/auth\/login$/, (data, _p, _params, body) => {
-    const email = String(body?.email || '').trim().toLowerCase();
-    const account = data.accounts.find((a) => a.email === email && a.password === body?.password);
-    if (!account) throw new DemoError(401, 'Email or password is incorrect');
+    const identifier = String(body?.identifier || body?.email || '').trim().toLowerCase();
+    const account = data.accounts.find((a) => a.email === identifier && a.password === body?.password);
+    if (!account) throw new DemoError(401, 'Those sign-in details are incorrect');
 
     const user = data.users.find((u) => u.id === account.userId);
     if (!user) throw new DemoError(401, 'That demo account is missing from the snapshot');

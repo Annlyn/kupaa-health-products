@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { api, mediaUrl } from '../../api/client';
-import { ClockIcon, DownloadIcon, MapPinIcon, PackageIcon, RefreshIcon, TruckIcon } from '../../components/Icons';
+import { api, download, mediaUrl } from '../../api/client';
+import { ClockIcon, DownloadIcon, EditIcon, MailIcon, MapPinIcon, PackageIcon, RefreshIcon, TruckIcon } from '../../components/Icons';
 import { Badge, ConfirmDialog, Field, Modal, PageLoader, Spinner, cx } from '../../components/ui';
 import { ORDER_FLOW, dateTime, money, statusClass } from '../../lib/format';
 import { useFetch, useTitle } from '../../lib/hooks';
@@ -23,12 +23,12 @@ export default function AdminOrderDetail() {
   useTitle(order ? `${order.orderNumber} · Admin` : 'Order · Admin');
 
   const [shipOpen, setShipOpen] = useState(false);
-  const [couriers, setCouriers] = useState(null);
-  const [selectedCourier, setSelectedCourier] = useState(null);
-  const [schedulePickup, setSchedulePickup] = useState(true);
+  const [rates, setRates] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
   const [busy, setBusy] = useState(false);
 
   const [tracking, setTracking] = useState(null);
+  const [trackingEdit, setTrackingEdit] = useState(null);
   const [refundOpen, setRefundOpen] = useState(false);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
@@ -38,22 +38,22 @@ export default function AdminOrderDetail() {
 
   const openShipDialog = async () => {
     setShipOpen(true);
-    setCouriers(null);
+    setRates(null);
     try {
-      const { data } = await api.get(`/admin/orders/${id}/couriers`);
-      setCouriers(data);
-      setSelectedCourier(data.recommended ?? data.couriers?.[0]?.courierCompanyId ?? null);
+      const { data } = await api.get(`/admin/orders/${id}/rates`);
+      setRates(data);
+      setSelectedService(data.recommended ?? data.services?.[0]?.serviceId ?? null);
     } catch (err) {
       toast.error(err.message);
-      setCouriers({ serviceable: false, couriers: [] });
+      setRates({ serviceable: false, services: [] });
     }
   };
 
   const ship = async () => {
     setBusy(true);
     try {
-      await api.post(`/admin/orders/${id}/ship`, { courierCompanyId: selectedCourier || undefined, schedulePickup });
-      toast.success('Shipment created and AWB assigned');
+      await api.post(`/admin/orders/${id}/ship`, { serviceId: selectedService || undefined });
+      toast.success('Label bought — tracking number assigned');
       setShipOpen(false);
       reload();
     } catch (err) {
@@ -81,7 +81,7 @@ export default function AdminOrderDetail() {
     try {
       const { data } = await api.get(`/admin/orders/${id}/track`);
       setTracking(data);
-      toast.success(`Courier says: ${data.status}`);
+      toast.success(`Amazon Shipping says: ${data.status}`);
     } catch (err) {
       toast.error(err.message);
     }
@@ -91,7 +91,64 @@ export default function AdminOrderDetail() {
     setBusy(true);
     try {
       await api.get(`/admin/orders/${id}/documents`);
-      toast.success('Documents generated');
+      toast.success('Shipping label ready');
+      reload();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const downloadLabel = async () => {
+    setBusy(true);
+    try {
+      await download(`/admin/orders/${id}/label`, `LABEL-${order.orderNumber}.pdf`);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Opens the manual editor seeded with whatever the carrier already gave us. */
+  const openTrackingEdit = () =>
+    setTrackingEdit({
+      awbCode: order.shipment?.awbCode ?? '',
+      courierName: order.shipment?.courierName ?? '',
+      trackingUrl: order.shipment?.trackingUrl ?? '',
+      etd: order.shipment?.etd ?? '',
+      status: order.shipment?.status ?? '',
+      note: '',
+    });
+
+  const saveTracking = async () => {
+    setBusy(true);
+    try {
+      await api.patch(`/admin/orders/${id}/shipment`, trackingEdit);
+      toast.success('Tracking updated');
+      setTrackingEdit(null);
+      reload();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const getInvoice = async () => {
+    try {
+      await download(`/admin/orders/${id}/invoice`, `INV-${order.orderNumber}.pdf`);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const whatsappInvoice = async () => {
+    setBusy(true);
+    try {
+      const { data } = await api.post(`/admin/orders/${id}/invoice/whatsapp`);
+      toast.success(`Invoice sent to +${data.to}${data.mock ? ' (mock mode)' : ''}`);
       reload();
     } catch (err) {
       toast.error(err.message);
@@ -168,7 +225,7 @@ export default function AdminOrderDetail() {
           <div className="flex flex-wrap gap-2">
             {canShip && !order.shipment?.awbCode && (
               <button className="btn-primary" onClick={openShipDialog}>
-                <TruckIcon width={16} height={16} /> Ship with Shiprocket
+                <TruckIcon width={16} height={16} /> Ship with Amazon
               </button>
             )}
             {NEXT_STATUS[order.status]?.map((status) => (
@@ -180,6 +237,15 @@ export default function AdminOrderDetail() {
                 Mark {status.toLowerCase()}
               </button>
             ))}
+            <button className="btn-outline" onClick={openTrackingEdit}>
+              <EditIcon width={15} height={15} /> {order.shipment?.awbCode ? 'Edit tracking' : 'Add tracking'}
+            </button>
+            <button className="btn-outline" onClick={getInvoice}>
+              <DownloadIcon width={15} height={15} /> Invoice
+            </button>
+            <button className="btn-outline" onClick={whatsappInvoice} disabled={busy}>
+              <MailIcon width={15} height={15} /> {order.invoiceSentAt ? 'Resend invoice' : 'WhatsApp invoice'}
+            </button>
             {order.paymentStatus === 'PAID' && (
               <button className="btn-outline text-amber-700" onClick={() => setRefundOpen(true)}>
                 Refund
@@ -277,21 +343,24 @@ export default function AdminOrderDetail() {
                       <RefreshIcon width={14} height={14} /> Refresh tracking
                     </button>
                   )}
-                  <button className="btn-outline btn-sm" onClick={getDocuments} disabled={busy}>
-                    <DownloadIcon width={14} height={14} /> Get documents
+                  {order.shipment.carrierShipmentId && !order.shipment.labelUrl && (
+                    <button className="btn-outline btn-sm" onClick={getDocuments} disabled={busy}>
+                      <DownloadIcon width={14} height={14} /> Get label
+                    </button>
+                  )}
+                  <button className="btn-outline btn-sm" onClick={openTrackingEdit}>
+                    <EditIcon width={14} height={14} /> Edit tracking
                   </button>
                 </div>
               </div>
 
               <dl className="mt-4 grid gap-x-8 gap-y-2.5 text-sm sm:grid-cols-2">
                 {[
-                  ['Shiprocket order', order.shipment.shiprocketOrderId],
-                  ['Shipment ID', order.shipment.shiprocketShipmentId],
-                  ['AWB', order.shipment.awbCode],
-                  ['Courier', order.shipment.courierName],
+                  ['Amazon shipment', order.shipment.carrierShipmentId],
+                  ['Tracking ID', order.shipment.awbCode],
+                  ['Service', order.shipment.courierName],
                   ['Status', order.shipment.status],
                   ['Freight charge', order.shipment.freightCharge != null ? money(order.shipment.freightCharge) : null],
-                  ['Pickup scheduled', order.shipment.pickupScheduledAt ? dateTime(order.shipment.pickupScheduledAt) : null],
                   ['Expected delivery', order.shipment.etd],
                 ]
                   .filter(([, v]) => v)
@@ -304,20 +373,10 @@ export default function AdminOrderDetail() {
               </dl>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                {order.shipment.labelUrl && (
-                  <a href={order.shipment.labelUrl} target="_blank" rel="noreferrer" className="btn-secondary btn-sm">
-                    Shipping label
-                  </a>
-                )}
-                {order.shipment.manifestUrl && (
-                  <a href={order.shipment.manifestUrl} target="_blank" rel="noreferrer" className="btn-secondary btn-sm">
-                    Manifest
-                  </a>
-                )}
-                {order.shipment.invoiceUrl && (
-                  <a href={order.shipment.invoiceUrl} target="_blank" rel="noreferrer" className="btn-secondary btn-sm">
-                    Invoice
-                  </a>
+                {order.shipment.carrierShipmentId && (
+                  <button className="btn-secondary btn-sm" onClick={downloadLabel} disabled={busy}>
+                    <DownloadIcon width={14} height={14} /> Download label
+                  </button>
                 )}
                 {order.shipment.trackingUrl && (
                   <a href={order.shipment.trackingUrl} target="_blank" rel="noreferrer" className="btn-outline btn-sm">
@@ -422,6 +481,12 @@ export default function AdminOrderDetail() {
                   <dd className="break-all text-xs font-medium">{order.razorpayPaymentId}</dd>
                 </div>
               )}
+              {order.invoiceSentAt && (
+                <div>
+                  <dt className="text-ink-500">Invoice on WhatsApp</dt>
+                  <dd className="text-xs font-medium">{dateTime(order.invoiceSentAt)}</dd>
+                </div>
+              )}
               {order.refundId && (
                 <div>
                   <dt className="text-ink-500">Refund ID</dt>
@@ -442,70 +507,124 @@ export default function AdminOrderDetail() {
             <button className="btn-outline" onClick={() => setShipOpen(false)} disabled={busy}>
               Cancel
             </button>
-            <button className="btn-primary" onClick={ship} disabled={busy || !couriers?.serviceable}>
-              {busy && <Spinner className="h-4 w-4" />} Create shipment & assign AWB
+            <button className="btn-primary" onClick={ship} disabled={busy || !rates?.serviceable}>
+              {busy && <Spinner className="h-4 w-4" />} Buy label
             </button>
           </>
         }
       >
-        {!couriers ? (
+        {!rates ? (
           <div className="flex justify-center py-8">
             <Spinner className="h-6 w-6 text-brand-600" />
           </div>
-        ) : !couriers.serviceable ? (
-          <p className="text-sm text-rose-600">No courier serves {order.shipPincode} for this parcel. Contact the customer.</p>
+        ) : !rates.serviceable ? (
+          <p className="text-sm text-rose-600">
+            Amazon Shipping does not serve {order.shipPincode} for this parcel. Contact the customer.
+          </p>
         ) : (
           <>
             <p className="text-sm text-ink-600">
-              Parcel weight {couriers.weightKg} kg to {order.shipPincode}. Pick a courier — cheapest is preselected.
+              Parcel weight {rates.weightKg} kg to {order.shipPincode}. Pick a service — cheapest is preselected. Amazon
+              collects from your registered pickup address on its usual round, so there is no pickup to book.
             </p>
 
             <ul className="mt-4 space-y-2">
-              {couriers.couriers.map((courier) => (
-                <li key={courier.courierCompanyId}>
+              {rates.services.map((service) => (
+                <li key={service.serviceId}>
                   <label
                     className={cx(
                       'flex cursor-pointer items-center gap-3 rounded-xl border-2 p-3.5 transition',
-                      selectedCourier === courier.courierCompanyId ? 'border-brand-600 bg-brand-50/40' : 'border-ink-100 hover:border-ink-200',
+                      selectedService === service.serviceId ? 'border-brand-600 bg-brand-50/40' : 'border-ink-100 hover:border-ink-200',
                     )}
                   >
                     <input
                       type="radio"
-                      name="courier"
+                      name="shipping-service"
                       className="h-4 w-4 text-brand-600 focus:ring-brand-500"
-                      checked={selectedCourier === courier.courierCompanyId}
-                      onChange={() => setSelectedCourier(courier.courierCompanyId)}
+                      checked={selectedService === service.serviceId}
+                      onChange={() => setSelectedService(service.serviceId)}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-ink-900">{courier.name}</p>
+                      <p className="text-sm font-semibold text-ink-900">{service.name}</p>
                       <p className="text-xs text-ink-500">
-                        {courier.etd || `${courier.estimatedDays} days`}
-                        {courier.rating ? ` · rated ${courier.rating}` : ''}
-                        {courier.cod ? ' · COD available' : ''}
+                        {service.etd ? `Delivers by ${service.etd}` : `${service.estimatedDays} days`}
+                        {service.cod ? ' · collects COD' : ''}
                       </p>
                     </div>
-                    <span className="text-sm font-bold text-ink-950">{money(courier.rate)}</span>
+                    <span className="text-sm font-bold text-ink-950">{money(service.rate)}</span>
                   </label>
                 </li>
               ))}
             </ul>
 
-            <label className="mt-4 flex items-center gap-2.5 text-sm text-ink-700">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
-                checked={schedulePickup}
-                onChange={(e) => setSchedulePickup(e.target.checked)}
-              />
-              Request courier pickup straight away
-            </label>
-
-            {couriers.mock && (
+            {rates.mock && (
               <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                Shiprocket credentials are not set, so this creates a simulated shipment. Add them under Integrations to go live.
+                Amazon Shipping credentials are not set, so this creates a simulated shipment. Add them under Integrations
+                to go live.
               </p>
             )}
           </>
+        )}
+      </Modal>
+
+      <Modal
+        open={Boolean(trackingEdit)}
+        onClose={() => setTrackingEdit(null)}
+        title="Tracking details"
+        footer={
+          <>
+            <button className="btn-outline" onClick={() => setTrackingEdit(null)} disabled={busy}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={saveTracking} disabled={busy}>
+              {busy && <Spinner className="h-4 w-4" />} Save tracking
+            </button>
+          </>
+        }
+      >
+        {trackingEdit && (
+          <div className="space-y-4">
+            <p className="text-sm text-ink-600">
+              Type these in when the carrier is not filling them for you — a parcel handed over at a counter, a courier
+              booked outside Amazon, or a number Amazon reissued. Leave a field empty to clear it.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                ['awbCode', 'Tracking number', 'e.g. 1Z999AA10123456784'],
+                ['courierName', 'Courier or service', 'e.g. Amazon Shipping · Standard'],
+                ['status', 'Carrier status', 'e.g. In transit'],
+                ['etd', 'Expected delivery', 'e.g. 2026-09-08'],
+              ].map(([key, label, placeholder]) => (
+                <Field key={key} label={label}>
+                  <input
+                    className="input"
+                    placeholder={placeholder}
+                    value={trackingEdit[key]}
+                    onChange={(e) => setTrackingEdit((t) => ({ ...t, [key]: e.target.value }))}
+                  />
+                </Field>
+              ))}
+            </div>
+
+            <Field label="Tracking page link" hint="Left blank, an Amazon Shipping number gets its tracking link filled in">
+              <input
+                className="input"
+                placeholder="https://…"
+                value={trackingEdit.trackingUrl}
+                onChange={(e) => setTrackingEdit((t) => ({ ...t, trackingUrl: e.target.value }))}
+              />
+            </Field>
+
+            <Field label="Note (internal)" hint="Added to the activity log with the change">
+              <input
+                className="input"
+                placeholder="Why this was edited"
+                value={trackingEdit.note}
+                onChange={(e) => setTrackingEdit((t) => ({ ...t, note: e.target.value }))}
+              />
+            </Field>
+          </div>
         )}
       </Modal>
 

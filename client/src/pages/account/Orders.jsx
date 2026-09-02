@@ -150,7 +150,7 @@ export default function Orders() {
                       </p>
                       {order.shipment?.awbCode && (
                         <p className="mt-1 flex items-center gap-1.5 text-xs text-ink-500">
-                          <TruckIcon width={14} height={14} /> AWB {order.shipment.awbCode}
+                          <TruckIcon width={14} height={14} /> Tracking {order.shipment.awbCode}
                           {order.shipment.courierName ? ` · ${order.shipment.courierName}` : ''}
                         </p>
                       )}

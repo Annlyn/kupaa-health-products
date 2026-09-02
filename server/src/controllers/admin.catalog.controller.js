@@ -10,7 +10,13 @@ import { syncProductAggregates, variantSelect } from '../services/variant.servic
 import { uploadDir } from '../middleware/upload.js';
 import { like } from '../lib/search.js';
 
-const imageInput = z.object({ url: z.string().min(1), alt: z.string().max(160).optional().or(z.literal('')) });
+const imageInput = z.object({
+  url: z.string().min(1),
+  alt: z.string().max(160).optional().or(z.literal('')),
+  // New product imagery is featured by default; admins can opt an image out
+  // in the product form without affecting the image itself.
+  showInCarousel: z.boolean().default(true),
+});
 
 const variantInput = z.object({
   id: z.string().optional().nullable(),
@@ -20,6 +26,8 @@ const variantInput = z.object({
   mrp: z.coerce.number().min(0),
   stock: z.coerce.number().int().min(0).default(0),
   weightKg: z.coerce.number().min(0.01, 'Weight is required for shipping').max(50).default(0.3),
+  // A ProductImage url, picked from the images on this product.
+  image: z.string().trim().max(400).optional().nullable().or(z.literal('')),
   isActive: z.boolean().default(true),
 });
 
@@ -67,13 +75,33 @@ export const schemas = {
     .refine((v) => v.variants.length === 0 || Boolean(v.variantLabel?.trim()), {
       message: 'Name the option type, e.g. Weight or Size',
       path: ['variantLabel'],
+    })
+    .refine((v) => v.variants.every((x) => !x.image || v.images.some((img) => img.url === x.image)), {
+      message: 'An option points at an image that is not on this product',
+      path: ['variants'],
     }),
 
   productList: z.object({
     q: z.string().trim().optional(),
     category: z.string().optional(),
     status: z.enum(['all', 'active', 'inactive', 'low', 'out']).default('all'),
-    sort: z.enum(['newest', 'name', 'price_asc', 'price_desc', 'stock']).default('newest'),
+    sort: z
+      .enum([
+        'newest',
+        'name',
+        'name_desc',
+        'category',
+        'category_desc',
+        'price_asc',
+        'price_desc',
+        'stock',
+        'stock_desc',
+        'status',
+        'status_desc',
+        'sold',
+        'sold_asc',
+      ])
+      .default('newest'),
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }),
@@ -114,9 +142,17 @@ export const listProducts = asyncHandler(async (req, res) => {
   const orderBy = {
     newest: { createdAt: 'desc' },
     name: { name: 'asc' },
+    name_desc: { name: 'desc' },
+    category: { category: { name: 'asc' } },
+    category_desc: { category: { name: 'desc' } },
     price_asc: { price: 'asc' },
     price_desc: { price: 'desc' },
     stock: { stock: 'asc' },
+    stock_desc: { stock: 'desc' },
+    status: { isActive: 'desc' },
+    status_desc: { isActive: 'asc' },
+    sold: { _count: { orderItems: 'desc' } },
+    sold_asc: { _count: { orderItems: 'asc' } },
   }[sort];
 
   const [items, total] = await Promise.all([
@@ -170,7 +206,9 @@ export const createProduct = asyncHandler(async (req, res) => {
         hsn: clean(body.hsn),
         tags: clean(body.tags),
         variantLabel: variants.length ? clean(body.variantLabel) : null,
-        images: { create: images.map((img, i) => ({ url: img.url, alt: clean(img.alt), sortOrder: i })) },
+        images: {
+          create: images.map((img, i) => ({ url: img.url, alt: clean(img.alt), sortOrder: i, showInCarousel: img.showInCarousel })),
+        },
         variants: {
           create: variants.map((v, i) => ({
             name: v.name,
@@ -179,6 +217,7 @@ export const createProduct = asyncHandler(async (req, res) => {
             mrp: v.mrp,
             stock: v.stock,
             weightKg: v.weightKg,
+            image: clean(v.image),
             isActive: v.isActive,
             sortOrder: i,
           })),
@@ -227,6 +266,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
         mrp: v.mrp,
         stock: v.stock,
         weightKg: v.weightKg,
+        image: clean(v.image),
         isActive: v.isActive,
         sortOrder: i,
       };
@@ -248,7 +288,9 @@ export const updateProduct = asyncHandler(async (req, res) => {
         hsn: clean(body.hsn),
         tags: clean(body.tags),
         variantLabel: variants.length ? clean(body.variantLabel) : null,
-        images: { create: images.map((img, i) => ({ url: img.url, alt: clean(img.alt), sortOrder: i })) },
+        images: {
+          create: images.map((img, i) => ({ url: img.url, alt: clean(img.alt), sortOrder: i, showInCarousel: img.showInCarousel })),
+        },
       },
     });
 
@@ -440,7 +482,7 @@ export const duplicateProduct = asyncHandler(async (req, res) => {
       isFeatured: false,
       ratingAvg: 0,
       ratingCount: 0,
-      images: { create: images.map((img, i) => ({ url: img.url, alt: img.alt, sortOrder: i })) },
+      images: { create: images.map((img, i) => ({ url: img.url, alt: img.alt, sortOrder: i, showInCarousel: img.showInCarousel })) },
     },
   });
 
@@ -455,6 +497,7 @@ export const duplicateProduct = asyncHandler(async (req, res) => {
         mrp: v.mrp,
         stock: v.stock,
         weightKg: v.weightKg,
+        image: v.image,
         isActive: v.isActive,
         sortOrder: i,
       },

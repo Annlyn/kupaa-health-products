@@ -119,7 +119,7 @@ export default function Footer() {
             © {new Date().getFullYear()} {settings.storeName}. All rights reserved.
           </p>
           <p className="text-center sm:text-right">
-            Payments secured by Razorpay · Shipping powered by Shiprocket
+            Payments secured by Razorpay · Delivered by Amazon Shipping
             {settings.footerNote && (
               <>
                 <br className="sm:hidden" />

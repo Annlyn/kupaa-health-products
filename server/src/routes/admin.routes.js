@@ -10,7 +10,8 @@ import { validate } from '../middleware/validate.js';
 import { uploadImages } from '../middleware/upload.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/apiError.js';
-import { getPickupLocations, isMock } from '../services/shiprocket.service.js';
+import { isMock, shipFromAddress } from '../services/amazon.service.js';
+import { isMock as whatsappMock, ownerNumber, whatsappEnabled } from '../services/whatsapp.service.js';
 import { env } from '../config/env.js';
 import { getSettings } from '../services/settings.service.js';
 
@@ -60,9 +61,13 @@ router.get('/orders/export.csv', adminOrders.exportCsv);
 router.get('/orders', validate({ query: adminOrders.schemas.list }), adminOrders.list);
 router.get('/orders/:id', adminOrders.getOne);
 router.patch('/orders/:id/status', validate({ body: adminOrders.schemas.setStatus }), adminOrders.setStatus);
-router.get('/orders/:id/couriers', adminOrders.couriers);
+router.get('/orders/:id/rates', adminOrders.rates);
 router.post('/orders/:id/ship', validate({ body: adminOrders.schemas.ship }), adminOrders.ship);
 router.get('/orders/:id/documents', adminOrders.documents);
+router.get('/orders/:id/label', adminOrders.downloadLabel);
+router.patch('/orders/:id/shipment', validate({ body: adminOrders.schemas.shipment }), adminOrders.updateShipment);
+router.get('/orders/:id/invoice', adminOrders.invoice);
+router.post('/orders/:id/invoice/whatsapp', adminOrders.whatsappInvoice);
 router.get('/orders/:id/track', adminOrders.trackOrder);
 router.post('/orders/:id/cancel-shipment', adminOrders.cancelShipmentForOrder);
 router.post('/orders/:id/refund', validate({ body: adminOrders.schemas.refund }), adminOrders.refund);
@@ -89,18 +94,29 @@ router.post('/settings/reset', validate({ body: settings.schemas.reset }), setti
 router.get(
   '/integrations',
   asyncHandler(async (_req, res) => {
-    const pickupLocations = await getPickupLocations().catch(() => []);
     res.json({
       ok: true,
       data: {
         razorpay: { enabled: Boolean(env.razorpay.keyId), keyId: env.razorpay.keyId ? `${env.razorpay.keyId.slice(0, 8)}…` : null, webhookConfigured: Boolean(env.razorpay.webhookSecret) },
-        shiprocket: {
+        shipping: {
+          provider: 'Amazon Shipping',
           enabled: !isMock(),
           mockMode: isMock(),
-          pickupLocation: env.shiprocket.pickupLocation,
-          pickupPincode: env.shiprocket.pickupPincode,
-          webhookConfigured: Boolean(env.shiprocket.webhookToken),
-          pickupLocations,
+          endpoint: env.amazon.endpoint,
+          carrierId: env.amazon.carrierId,
+          webhookConfigured: Boolean(env.amazon.webhookToken),
+          shipFrom: shipFromAddress(),
+        },
+        whatsapp: {
+          enabled: whatsappEnabled(),
+          mockMode: whatsappMock(),
+          apiVersion: env.whatsapp.apiVersion,
+          phoneNumberId: env.whatsapp.phoneNumberId ? `…${env.whatsapp.phoneNumberId.slice(-4)}` : null,
+          // Masked: the owner knows their own number, and this page is one
+          // screenshot away from a support thread.
+          ownerNumber: ownerNumber() ? `+${ownerNumber().slice(0, 2)}•••••${ownerNumber().slice(-3)}` : null,
+          templates: env.whatsapp.templates,
+          templateLanguage: env.whatsapp.templateLanguage,
         },
         store: await getSettings(),
       },

@@ -205,6 +205,26 @@ export const api = {
   refreshSession,
 };
 
+/**
+ * Pulls a file endpoint (PDF, CSV) through the same authenticated transport as
+ * everything else and hands the browser a download, rather than pointing an
+ * <a href> at an API path no bearer token can reach.
+ */
+export async function download(path, filename) {
+  const res = await api.raw(path);
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}));
+    throw new ApiError(payload?.error?.message || `Download failed (${res.status})`, res.status);
+  }
+
+  const url = URL.createObjectURL(await res.blob());
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 /** Builds `?a=1&b=2`, dropping empty values. */
 export const qs = (params) => {
   const search = new URLSearchParams();

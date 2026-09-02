@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CheckCircle, ClockIcon, MapPinIcon, PackageIcon, TruckIcon } from '../../components/Icons';
-import { Badge, Breadcrumbs, EmptyState, PageLoader, cx } from '../../components/ui';
+import toast from 'react-hot-toast';
+import { CheckCircle, ClockIcon, DownloadIcon, MapPinIcon, PackageIcon, TruckIcon } from '../../components/Icons';
+import { Badge, Breadcrumbs, EmptyState, PageLoader, Spinner, cx } from '../../components/ui';
 import { ORDER_FLOW, dateTime, money, statusClass } from '../../lib/format';
-import { mediaUrl } from '../../api/client';
+import { download, mediaUrl } from '../../api/client';
 import { useFetch, useTitle } from '../../lib/hooks';
 
 function ProgressTrail({ status }) {
@@ -48,8 +50,20 @@ export default function OrderDetail() {
   const { id } = useParams();
   const { data: order, loading } = useFetch(`/orders/${id}`, [id]);
   const { data: tracking } = useFetch(order ? `/orders/${id}/track` : null, [order?.id]);
+  const [downloading, setDownloading] = useState(false);
 
   useTitle(order ? `Order ${order.orderNumber}` : 'Order');
+
+  const getInvoice = async () => {
+    setDownloading(true);
+    try {
+      await download(`/orders/${id}/invoice`, `INV-${order.orderNumber}.pdf`);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (loading) return <PageLoader label="Loading order" />;
   if (!order) {
@@ -83,11 +97,14 @@ export default function OrderDetail() {
           <h1 className="text-2xl font-bold sm:text-3xl">{order.orderNumber}</h1>
           <p className="mt-1 text-sm text-ink-500">Placed on {dateTime(order.placedAt)}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge className={statusClass(order.status)}>{order.status}</Badge>
           <Badge className={statusClass(order.paymentStatus)}>
             {order.paymentMethod === 'COD' ? 'Cash on delivery' : 'Online'} · {order.paymentStatus}
           </Badge>
+          <button className="btn-outline btn-sm" onClick={getInvoice} disabled={downloading}>
+            {downloading ? <Spinner className="h-3.5 w-3.5" /> : <DownloadIcon width={14} height={14} />} Invoice
+          </button>
         </div>
       </header>
 
@@ -131,11 +148,11 @@ export default function OrderDetail() {
               </h2>
               <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-1.5 text-sm">
                 <p>
-                  <span className="text-ink-500">AWB:</span> <span className="font-medium">{tracking.awb}</span>
+                  <span className="text-ink-500">Tracking:</span> <span className="font-medium">{tracking.awb}</span>
                 </p>
                 {tracking.courierName && (
                   <p>
-                    <span className="text-ink-500">Courier:</span> <span className="font-medium">{tracking.courierName}</span>
+                    <span className="text-ink-500">Service:</span> <span className="font-medium">{tracking.courierName}</span>
                   </p>
                 )}
                 {tracking.etd && (
@@ -167,7 +184,7 @@ export default function OrderDetail() {
 
               {tracking.trackingUrl && (
                 <a href={tracking.trackingUrl} target="_blank" rel="noreferrer" className="btn-outline btn-sm mt-2">
-                  Open courier page
+                  Open tracking page
                 </a>
               )}
             </section>

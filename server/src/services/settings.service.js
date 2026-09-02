@@ -15,6 +15,7 @@ import { ApiError } from '../utils/apiError.js';
 const groups = {
   identity: 'Store identity',
   commerce: 'Pricing & delivery rules',
+  notifications: 'WhatsApp notifications',
   announcement: 'Announcement bar',
   home: 'Home page',
   footer: 'Footer & contact',
@@ -59,6 +60,22 @@ export const SETTINGS_SCHEMA = {
     default: () => 20,
   },
 
+  // -------------------------------------------------------- notifications
+  whatsappNotifyOwner: {
+    group: 'notifications',
+    type: 'boolean',
+    label: 'WhatsApp me when an order is placed',
+    hint: 'Goes to WHATSAPP_OWNER_NUMBER in server/.env, along with a follow-up when an online payment lands',
+    default: () => true,
+  },
+  whatsappSendInvoice: {
+    group: 'notifications',
+    type: 'boolean',
+    label: 'WhatsApp the invoice to the customer once they pay online',
+    hint: 'Cash-on-delivery orders are invoiced on delivery, so nothing is sent for them',
+    default: () => true,
+  },
+
   // --------------------------------------------------------- announcement
   announcementEnabled: { group: 'announcement', type: 'boolean', label: 'Show the announcement bar', default: () => true },
   announcementText: {
@@ -66,7 +83,7 @@ export const SETTINGS_SCHEMA = {
     type: 'string',
     label: 'Announcement text',
     max: 200,
-    default: () => 'Free delivery on orders above ₹999 · Lab-tested formulas · Ships across India',
+    default: () => 'Lab-tested formulas · Ships across India',
   },
 
   // ------------------------------------------------------------------ home
@@ -128,7 +145,7 @@ export const SETTINGS_SCHEMA = {
     default: () => [
       { title: 'Third-party tested', copy: 'Every batch assayed for potency, purity and heavy metals.' },
       { title: 'Clinically dosed', copy: 'The amounts used in studies — not fairy-dusted labels.' },
-      { title: 'Fast, tracked delivery', copy: 'Dispatched in 24 hours with live Shiprocket tracking.' },
+      { title: 'Fast, tracked delivery', copy: 'Dispatched in 24 hours with live Amazon Shipping tracking.' },
       { title: 'Easy 7-day returns', copy: 'Unopened packs, no questions asked.' },
     ],
   },
@@ -230,7 +247,7 @@ export const SETTINGS_SCHEMA = {
         'Orders placed before 2 PM IST on a working day are dispatched the same day; everything else goes out the next working day.',
         'Delivery typically takes 2–5 working days in metros and 4–8 days elsewhere. Remote PIN codes may take longer.',
         'Delivery is free on orders above ₹999. Below that a flat ₹59 shipping fee applies.',
-        'Every parcel ships with an AWB tracking number, sent by email at dispatch and visible under My Orders.',
+        'Every parcel ships with an Amazon Shipping tracking number, sent by email at dispatch and visible under My Orders.',
         'If a courier attempts delivery three times without success, the parcel is returned to us and we refund the order minus shipping.',
       ].join('\n'),
   },
@@ -257,7 +274,7 @@ export const SETTINGS_SCHEMA = {
       [
         'We collect only what we need to fulfil your order: your name, email, phone number and delivery address.',
         'Payment details are never stored on our servers. Card, UPI and netbanking data goes directly to Razorpay, a PCI-DSS Level 1 certified payment processor.',
-        'Delivery details are shared with Shiprocket and the assigned courier purely to deliver your parcel.',
+        'Delivery details are shared with Amazon Shipping purely so they can deliver your parcel.',
         'Passwords are stored as bcrypt hashes and are never recoverable in plain text, by us or anyone else.',
         'You can request a copy of your data, or ask us to delete your account entirely, by writing to our support address.',
       ].join('\n'),

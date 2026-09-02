@@ -227,7 +227,10 @@ export default function AdminSettings() {
               return (
                 <div key={key} className={cx(isWide ? '' : 'max-w-md', dirty && 'rounded-lg ring-2 ring-amber-200 ring-offset-4')}>
                   {field.type === 'boolean' ? (
-                    <SettingInput field={field} value={draft[key]} onChange={(v) => setDraft((d) => ({ ...d, [key]: v }))} />
+                    <>
+                      <SettingInput field={field} value={draft[key]} onChange={(v) => setDraft((d) => ({ ...d, [key]: v }))} />
+                      {field.hint && <p className="hint">{field.hint}</p>}
+                    </>
                   ) : (
                     <Field label={field.label} hint={field.hint}>
                       <SettingInput field={field} value={draft[key]} onChange={(v) => setDraft((d) => ({ ...d, [key]: v }))} />

@@ -7,9 +7,11 @@ import { newOrderNumber } from '../utils/ids.js';
 import { round2 } from '../utils/money.js';
 import { assertPurchasable, quote } from '../services/pricing.service.js';
 import { confirmOrder, logEvent, orderInclude } from '../services/order.service.js';
+import { notifyOwnerNewOrder } from '../services/notify.service.js';
+import { respondWithInvoice } from '../services/invoice.service.js';
 import { createRazorpayOrder, razorpayEnabled } from '../services/razorpay.service.js';
 import { addressSchema } from './address.controller.js';
-import { checkServiceability, trackByAwb } from '../services/shiprocket.service.js';
+import { checkServiceability, trackByAwb } from '../services/amazon.service.js';
 import { getSettings } from '../services/settings.service.js';
 import { adjustStock, readStock, resolveSellable, variantSelect } from '../services/variant.service.js';
 
@@ -77,13 +79,13 @@ export const create = asyncHandler(async (req, res) => {
 
   const address = await resolveShippingAddress(req);
 
-  // Refuse the order early if no courier serves the PIN code.
+  // Refuse the order early if Amazon Shipping does not serve the PIN code.
   const totalWeight = lines.reduce((w, l) => w + l.weightKg * l.quantity, 0);
   const serviceability = await checkServiceability({
     deliveryPincode: address.pincode,
     weightKg: totalWeight,
     cod: paymentMethod === 'COD',
-  }).catch(() => ({ serviceable: true, couriers: [] })); // never block checkout on a Shiprocket outage
+  }).catch(() => ({ serviceable: true, services: [] })); // never block checkout on a carrier outage
 
   if (!serviceability.serviceable) {
     throw ApiError.badRequest(`Sorry, we cannot deliver to ${address.pincode} yet`);
@@ -130,7 +132,7 @@ export const create = asyncHandler(async (req, res) => {
             name: line.product.name,
             variantName: line.variantName,
             sku: line.sku,
-            image: null,
+            image: line.image ?? null,
             price: round2(line.unitPrice),
             quantity: line.quantity,
             weightKg: line.weightKg,
@@ -141,17 +143,25 @@ export const create = asyncHandler(async (req, res) => {
     });
   });
 
-  // Attach a thumbnail to each item snapshot (kept out of the transaction).
-  const images = await prisma.productImage.findMany({
-    where: { productId: { in: lines.map((l) => l.product.id) } },
-    orderBy: { sortOrder: 'asc' },
-  });
-  for (const item of order.items) {
-    const img = images.find((i) => i.productId === item.productId);
-    if (img) await prisma.orderItem.update({ where: { id: item.id }, data: { image: img.url } });
+  // Backfill a thumbnail for any line that had none — a variant without its own
+  // photo, on a product whose images were not loaded with the cart.
+  const missing = order.items.filter((item) => !item.image && item.productId);
+  if (missing.length) {
+    const images = await prisma.productImage.findMany({
+      where: { productId: { in: missing.map((i) => i.productId) } },
+      orderBy: { sortOrder: 'asc' },
+    });
+    for (const item of missing) {
+      const img = images.find((i) => i.productId === item.productId);
+      if (img) await prisma.orderItem.update({ where: { id: item.id }, data: { image: img.url } });
+    }
   }
 
   await logEvent(order.id, 'PENDING', `Order placed (${paymentMethod === 'COD' ? 'Cash on delivery' : 'Online payment'})`);
+
+  // The owner's WhatsApp alert must not hold up the response, and it records
+  // its own outcome on the order timeline either way.
+  void notifyOwnerNewOrder(order);
 
   if (paymentMethod === 'COD') {
     const confirmed = await confirmOrder(order.id, { message: 'COD order confirmed' });
@@ -249,4 +259,14 @@ export const track = asyncHandler(async (req, res) => {
       courier,
     },
   });
+});
+
+/** GET /api/orders/:id/invoice — the customer's own invoice, as a PDF. */
+export const invoice = asyncHandler(async (req, res) => {
+  const order = await prisma.order.findFirst({
+    where: { OR: [{ id: req.params.id }, { orderNumber: req.params.id }], userId: req.user.id },
+    include: orderInclude,
+  });
+  if (!order) throw ApiError.notFound('Order not found');
+  await respondWithInvoice(res, order);
 });

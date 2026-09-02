@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAccessToken, qs } from '../../api/client';
+import { download, qs } from '../../api/client';
 import { DownloadIcon, SearchIcon, TruckIcon } from '../../components/Icons';
 import { Badge, EmptyState, Pagination, Spinner, cx } from '../../components/ui';
 import { dateShort, money, statusClass } from '../../lib/format';
@@ -19,33 +19,34 @@ export default function AdminOrders() {
   const [range, setRange] = useState({ from: '', to: '' });
   const [page, setPage] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [downloadingLabel, setDownloadingLabel] = useState(null);
 
   const q = useDebounced(search, 350);
   const path = `/admin/orders${qs({ q, status, paymentStatus, from: range.from, to: range.to, page, limit: 20 })}`;
   const { data: orders, meta, loading } = useFetch(path, [q, status, paymentStatus, range.from, range.to, page]);
 
-  /** Downloads the CSV through fetch so the auth header can be attached. */
+  /** The API needs a bearer token, so the file comes through the api client. */
   const exportCsv = async () => {
     setExporting(true);
     try {
-      const res = await fetch(`/api/admin/orders/export.csv${qs({ status })}`, {
-        headers: { Authorization: `Bearer ${getAccessToken()}` },
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Export failed');
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `kupaa-orders-${new Date().toISOString().slice(0, 10)}.csv`;
-      link.click();
-      URL.revokeObjectURL(url);
+      await download(`/admin/orders/export.csv${qs({ status })}`, `kupaa-orders-${new Date().toISOString().slice(0, 10)}.csv`);
       toast.success('Export downloaded');
     } catch (err) {
       toast.error(err.message);
     } finally {
       setExporting(false);
+    }
+  };
+
+  const downloadLabel = async (order) => {
+    setDownloadingLabel(order.id);
+    try {
+      await download(`/admin/orders/${order.id}/label`, `LABEL-${order.orderNumber}.pdf`);
+      toast.success('Shipping label downloaded');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDownloadingLabel(null);
     }
   };
 
@@ -163,9 +164,21 @@ export default function AdminOrders() {
                   </td>
                   <td className="text-xs">
                     {order.shipment?.awbCode ? (
-                      <span className="flex items-center gap-1.5 text-ink-700">
-                        <TruckIcon width={14} height={14} /> {order.shipment.awbCode}
-                      </span>
+                      <div className="space-y-1.5">
+                        <span className="flex items-center gap-1.5 text-ink-700">
+                          <TruckIcon width={14} height={14} /> {order.shipment.awbCode}
+                        </span>
+                        {order.shipment.carrierShipmentId && (
+                          <button
+                            className="inline-flex items-center gap-1 text-brand-700 hover:underline disabled:opacity-50"
+                            onClick={() => downloadLabel(order)}
+                            disabled={downloadingLabel === order.id}
+                          >
+                            <DownloadIcon width={13} height={13} />
+                            {downloadingLabel === order.id ? 'Downloading...' : 'Download label'}
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-ink-400">Not shipped</span>
                     )}
