@@ -196,9 +196,18 @@ export const SETTINGS_SCHEMA = {
     ],
     max: 3,
     default: () => [
-      { title: 'Free delivery above ₹999', copy: 'Dispatched within 24 hours, tracked end to end.' },
-      { title: 'Lab-tested, every batch', copy: 'Third-party assays for potency and heavy metals.' },
-      { title: 'No fillers, no shortcuts', copy: 'Clean labels with clinically studied doses.' },
+      {
+        "title": "Lab-tested, every batch",
+        "copy": "Third-party assays for potency and heavy metals."
+      },
+      {
+        "title": "Fast, tracked delivery",
+        "copy": "Dispatched within 24 hours, tracked end to end."
+      },
+      {
+        "title": "Easy 7-day returns",
+        "copy": "Unopened packs, no questions asked."
+      }
     ],
   },
   footerNote: {

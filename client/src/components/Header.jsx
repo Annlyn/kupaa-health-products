@@ -82,7 +82,7 @@ function SearchBox({ onDone }) {
           onChange={(e) => setTerm(e.target.value)}
           onFocus={() => suggestions.length && setOpen(true)}
           className="input pl-10 pr-9"
-          placeholder="Search vitamins, ashwagandha, whey protein…"
+          placeholder="Search"
           aria-label="Search products"
         />
         {term && (

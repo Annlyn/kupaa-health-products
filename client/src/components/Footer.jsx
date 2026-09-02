@@ -37,7 +37,7 @@ const COLUMNS = [
   },
 ];
 
-const PROMISE_ICONS = [TruckIcon, ShieldIcon, LeafIcon, PackageIcon];
+const PROMISE_ICONS = [ShieldIcon, TruckIcon, PackageIcon]
 
 export default function Footer() {
   const settings = useStore();

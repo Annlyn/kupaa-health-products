@@ -31,7 +31,7 @@ function Hero({ settings }) {
 
           {settings.heroSubtitle && <p className="mt-5 max-w-lg text-base leading-relaxed text-brand-100/90">{settings.heroSubtitle}</p>}
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          {/* <div className="mt-8 flex flex-wrap gap-3">
             {settings.heroPrimaryLabel && (
               <Link to={settings.heroPrimaryHref || '/shop'} className="btn bg-white px-6 py-3 text-brand-900 hover:bg-brand-50">
                 {settings.heroPrimaryLabel} <ChevronRight width={17} height={17} />
@@ -45,7 +45,7 @@ function Hero({ settings }) {
                 {settings.heroSecondaryLabel}
               </Link>
             )}
-          </div>
+          </div> */}
 
           {settings.heroStats?.length > 0 && (
             <dl className="mt-10 grid max-w-md gap-6 border-t border-white/15 pt-6" style={{ gridTemplateColumns: `repeat(${settings.heroStats.length}, minmax(0, 1fr))` }}>
@@ -98,7 +98,7 @@ export default function Home() {
     <>
       <Hero settings={settings} />
 
-      {settings.trustItems?.length > 0 && (
+      {/* {settings.trustItems?.length > 0 && (
         <section className="border-b border-ink-100 bg-white">
           <div className="container-page grid gap-6 py-10 sm:grid-cols-2 lg:grid-cols-4">
             {settings.trustItems.map((item, i) => {
@@ -117,9 +117,9 @@ export default function Home() {
             })}
           </div>
         </section>
-      )}
+      )} */}
 
-      <section ref={categorySection.ref} className="container-page py-14">
+      {/* <section ref={categorySection.ref} className="container-page py-14">
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold sm:text-3xl">{settings.categoriesTitle}</h2>
@@ -172,7 +172,7 @@ export default function Home() {
               : Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section ref={newestSection.ref} className="container-page py-14">
         <div className="flex items-end justify-between gap-4">
@@ -181,7 +181,7 @@ export default function Home() {
             {settings.newestSubtitle && <p className="mt-1.5 text-sm text-ink-500">{settings.newestSubtitle}</p>}
           </div>
           <Link to="/shop" className="hidden shrink-0 text-sm font-semibold text-brand-700 hover:underline sm:block">
-            Browse everything →
+            Go to shop →
           </Link>
         </div>
 
