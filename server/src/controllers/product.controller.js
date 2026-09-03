@@ -129,12 +129,24 @@ export const bySlug = asyncHandler(async (req, res) => {
   });
   if (!product) throw ApiError.notFound('That product is no longer available');
 
+  const relatedWhere = { isActive: true, id: { not: product.id }, ...(product.categoryId ? { categoryId: product.categoryId } : {}) };
   const related = await prisma.product.findMany({
-    where: { isActive: true, id: { not: product.id }, categoryId: product.categoryId },
+    where: relatedWhere,
     select: productCard,
     take: 4,
     orderBy: { ratingAvg: 'desc' },
   });
+
+  if (related.length < 4) {
+    const existingIds = [product.id, ...related.map((item) => item.id)];
+    const fallback = await prisma.product.findMany({
+      where: { isActive: true, id: { notIn: existingIds } },
+      select: productCard,
+      take: 4 - related.length,
+      orderBy: { ratingAvg: 'desc' },
+    });
+    related.push(...fallback);
+  }
 
   const breakdown = await prisma.review.groupBy({
     by: ['rating'],

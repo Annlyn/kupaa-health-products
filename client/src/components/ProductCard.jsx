@@ -154,17 +154,22 @@ export default function ProductCard({ product, wishlisted, onWishlistChange, hom
       )}
 
       <div className="flex flex-1 flex-col p-4">
-        {product.category && <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700">{product.category.name}</p>}
+        <div className="flex h-4 items-start">
+          {product.category && <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-brand-700">{product.category.name}</p>}
+        </div>
 
-        <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-ink-900">
-          <Link to={`/product/${product.slug}`} className="hover:text-brand-700">
-            {product.name}
-          </Link>
-        </h3>
+        <div className="mt-1 flex min-h-10 items-start gap-2">
+          <h3 className="min-w-0 flex-1 line-clamp-2 text-sm font-semibold leading-snug text-ink-900">
+            <Link to={`/product/${product.slug}`} className="hover:text-brand-700">
+              {product.name}
+            </Link>
+          </h3>
+          <div className="flex h-5 shrink-0 justify-end pt-0.5">
+            {product.ratingCount > 0 && <Rating value={product.ratingAvg} count={product.ratingCount} size={13} />}
+          </div>
+        </div>
 
         {product.shortDesc && <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-500">{product.shortDesc}</p>}
-
-        {product.ratingCount > 0 && <Rating value={product.ratingAvg} count={product.ratingCount} className="mt-2" />}
 
         <div className="mt-auto pt-3">
           <div className="flex items-baseline gap-2">

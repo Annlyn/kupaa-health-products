@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { money } from '../lib/format';
-import { CartIcon, CloseIcon, HeartIcon, LeafIcon, MenuIcon, SearchIcon, UserIcon } from './Icons';
+import { CartIcon, HeartIcon, LeafIcon, SearchIcon, UserIcon } from './Icons';
 import { cx } from './ui';
 
 const NAV = [
@@ -126,7 +126,6 @@ export default function Header() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { count, openDrawer } = useCart();
   const { announcementEnabled, announcementText } = useStore();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -144,10 +143,6 @@ export default function Header() {
 
       <div className="container-page">
         <div className="flex h-20 items-center gap-4">
-          <button className="btn-ghost -ml-2 lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
-            <MenuIcon />
-          </button>
-
           <Logo />
 
           <div className="ml-auto hidden max-w-md flex-1 lg:block">
@@ -255,47 +250,6 @@ export default function Header() {
         </nav>
       </div>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-ink-950/40" onClick={() => setMobileOpen(false)} />
-          <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-white shadow-lift">
-            <div className="flex items-center justify-between border-b border-ink-100 px-4 py-4">
-              <Logo />
-              <button className="btn-ghost" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-                <CloseIcon />
-              </button>
-            </div>
-            <nav className="flex-1 overflow-y-auto p-2">
-              {NAV.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-ink-700 hover:bg-ink-50"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="my-2 border-t border-ink-100" />
-              <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2.5 text-sm hover:bg-ink-50">
-                Wishlist
-              </Link>
-              <Link to="/account" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2.5 text-sm hover:bg-ink-50">
-                My account
-              </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50"
-                >
-                  Admin dashboard
-                </Link>
-              )}
-            </nav>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
