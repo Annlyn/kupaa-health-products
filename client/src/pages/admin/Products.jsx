@@ -15,15 +15,6 @@ const STATUS_TABS = [
   ['out', 'Out of stock'],
 ];
 
-const SORT_COLUMNS = {
-  product: { asc: 'name', desc: 'name_desc' },
-  category: { asc: 'category', desc: 'category_desc' },
-  price: { asc: 'price_asc', desc: 'price_desc' },
-  stock: { asc: 'stock', desc: 'stock_desc' },
-  status: { asc: 'status', desc: 'status_desc' },
-  sold: { asc: 'sold_asc', desc: 'sold' },
-};
-
 export default function AdminProducts() {
   useTitle('Products · Admin');
 
@@ -33,7 +24,6 @@ export default function AdminProducts() {
   const search0 = params.get('q') ?? '';
   const status = params.get('status') ?? 'all';
   const category = params.get('category') ?? '';
-  const sort = params.get('sort') ?? 'newest';
   const page = Number(params.get('page') ?? 1);
 
   const [search, setSearch] = useState(search0);
@@ -62,23 +52,14 @@ export default function AdminProducts() {
   }, [q]);
 
   const setPage = (value) => setFilter({ page: value });
-  const toggleSort = (column) => {
-    const options = SORT_COLUMNS[column];
-    setFilter({ sort: sort === options.asc ? options.desc : options.asc });
-  };
-  const sortIndicator = (column) => {
-    const options = SORT_COLUMNS[column];
-    if (sort === options.asc) return '↑';
-    if (sort === options.desc) return '↓';
-    return '↕';
-  };
   const { data: categories } = useFetch('/admin/categories');
-  const path = `/admin/products${qs({ q, status, category, sort, page, limit: 20 })}`;
-  const { data: products, meta, loading, reload } = useFetch(path, [q, status, category, sort, page]);
+  const path = `/admin/products${qs({ q, status, category, page, limit: 20 })}`;
+  const { data: products, meta, loading, reload } = useFetch(path, [q, status, category, page]);
 
   const [deleting, setDeleting] = useState(null);
   const [busy, setBusy] = useState(false);
   const [stockEdit, setStockEdit] = useState({});
+  const [positionEdit, setPositionEdit] = useState({});
 
   const [selected, setSelected] = useState([]);
   const [bulkDelete, setBulkDelete] = useState(false);
@@ -161,6 +142,22 @@ export default function AdminProducts() {
     }
   };
 
+  const savePosition = async (product) => {
+    const value = positionEdit[product.id];
+    const position = value === undefined || value === '' ? 0 : Number(value);
+    if (!Number.isInteger(position) || position < 0) return setPositionEdit((s) => ({ ...s, [product.id]: undefined }));
+    if (position === product.displayOrder) return setPositionEdit((s) => ({ ...s, [product.id]: undefined }));
+
+    try {
+      await api.patch(`/admin/products/${product.id}/position`, { position });
+      toast.success(`Homepage position updated for ${product.name}`);
+      setPositionEdit((s) => ({ ...s, [product.id]: undefined }));
+      reload();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   return (
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -196,21 +193,6 @@ export default function AdminProducts() {
             ))}
           </select>
 
-          <select className="input w-auto" value={sort} onChange={(e) => setFilter({ sort: e.target.value })}>
-            <option value="newest">Newest first</option>
-            <option value="name">Name A–Z</option>
-            <option value="name_desc">Name Z–A</option>
-            <option value="category">Category A–Z</option>
-            <option value="category_desc">Category Z–A</option>
-            <option value="price_asc">Price low → high</option>
-            <option value="price_desc">Price high → low</option>
-            <option value="stock">Stock low → high</option>
-            <option value="stock_desc">Stock high → low</option>
-            <option value="status">Active first</option>
-            <option value="status_desc">Archived first</option>
-            <option value="sold">Most sold first</option>
-            <option value="sold_asc">Least sold first</option>
-          </select>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
@@ -280,25 +262,13 @@ export default function AdminProducts() {
                     aria-label="Select all products on this page"
                   />
                 </th>
-                {[
-                  ['product', 'Product', 'text-left'],
-                  ['category', 'Category', 'text-left'],
-                  ['price', 'Price', 'text-right'],
-                  ['stock', 'Stock', 'text-center'],
-                  ['status', 'Status', 'text-center'],
-                  ['sold', 'Sold', 'text-center'],
-                ].map(([column, label, align]) => (
-                  <th key={column} className={align} aria-sort={sort === SORT_COLUMNS[column].asc ? 'ascending' : sort === SORT_COLUMNS[column].desc ? 'descending' : 'none'}>
-                    <button
-                      type="button"
-                      onClick={() => toggleSort(column)}
-                      className="inline-flex items-center gap-1 hover:text-brand-700"
-                      title={`Sort by ${label.toLowerCase()}`}
-                    >
-                      {label} <span className={sort === SORT_COLUMNS[column].asc || sort === SORT_COLUMNS[column].desc ? 'text-brand-700' : 'text-ink-400'} aria-hidden>{sortIndicator(column)}</span>
-                    </button>
-                  </th>
-                ))}
+                <th className="text-left">Product</th>
+                <th className="text-left">Category</th>
+                <th className="text-center">Position</th>
+                <th className="text-right">Price</th>
+                <th className="text-center">Stock</th>
+                <th className="text-center">Status</th>
+                <th className="text-center">Sold</th>
                 <th className="text-right">Actions</th>
               </tr>
             </thead>
@@ -336,6 +306,20 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="text-sm">{product.category?.name ?? '—'}</td>
+                    <td className="text-center">
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        placeholder="—"
+                        className="w-16 rounded-md border border-ink-200 px-2 py-1 text-center text-sm"
+                        value={positionEdit[product.id] ?? (product.displayOrder || '')}
+                        onChange={(e) => setPositionEdit((s) => ({ ...s, [product.id]: e.target.value }))}
+                        onBlur={() => savePosition(product)}
+                        onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+                        aria-label={`Homepage position for ${product.name}`}
+                      />
+                    </td>
                     <td className="text-right">
                       <p className="font-semibold">{money(product.price)}</p>
                       {discount > 0 && (

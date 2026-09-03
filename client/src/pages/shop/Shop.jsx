@@ -18,6 +18,7 @@ const SORTS = [
 export default function Shop() {
   const [params, setParams] = useSearchParams();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [searchDraft, setSearchDraft] = useState(params.get('q') || '');
 
   const query = {
     q: params.get('q') || '',
@@ -31,13 +32,20 @@ export default function Shop() {
   };
 
   const { data: facets } = useFetch('/products/facets');
-  const path = useMemo(() => `/products${qs({ ...query, limit: 12 })}`, [params]); // eslint-disable-line react-hooks/exhaustive-deps
+  const path = useMemo(
+    () => `/products${qs({ ...query, home: query.sort === 'newest' ? 'true' : '', limit: 12 })}`,
+    [params],
+  ); // eslint-disable-line react-hooks/exhaustive-deps
   const { data: products, meta, loading } = useFetch(path);
 
   const [priceDraft, setPriceDraft] = useState({ min: query.minPrice, max: query.maxPrice });
   useEffect(() => {
     setPriceDraft({ min: query.minPrice, max: query.maxPrice });
   }, [query.minPrice, query.maxPrice]);
+
+  useEffect(() => {
+    setSearchDraft(query.q);
+  }, [query.q]);
 
   const activeCategory = facets?.categories?.find((c) => c.slug === query.category);
   useTitle(query.q ? `Search: ${query.q}` : activeCategory ? activeCategory.name : 'Shop all products');
@@ -158,6 +166,24 @@ export default function Shop() {
       <Breadcrumbs
         items={[{ label: 'Home', to: '/' }, { label: 'Shop', to: '/shop' }, ...(activeCategory ? [{ label: activeCategory.name }] : [])]}
       />
+
+      <form
+        role="search"
+        className="relative mt-5"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setFilter({ q: searchDraft.trim() });
+        }}
+      >
+        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" width={18} height={18} />
+        <input
+          className="input pl-10"
+          placeholder="Search products"
+          value={searchDraft}
+          onChange={(event) => setSearchDraft(event.target.value)}
+          aria-label="Search products"
+        />
+      </form>
 
       <header className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>

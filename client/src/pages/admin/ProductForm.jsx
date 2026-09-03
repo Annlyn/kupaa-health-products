@@ -26,6 +26,7 @@ const BLANK = {
   tags: '',
   isActive: true,
   isFeatured: false,
+  displayOrder: 0,
   images: [],
   variantLabel: '',
   variants: [],
@@ -254,6 +255,7 @@ export default function ProductForm() {
         lengthCm: Number(form.lengthCm),
         breadthCm: Number(form.breadthCm),
         heightCm: Number(form.heightCm),
+        displayOrder: Number(form.displayOrder),
         categoryId: form.categoryId || null,
       };
       // The API derives these; sending them back would be rejected.
@@ -338,6 +340,9 @@ export default function ProductForm() {
               </Field>
               <Field label="Tags" className="sm:col-span-2" hint="Comma separated — used by search and filters">
                 <input className="input" placeholder="vitamin d, immunity, softgel" value={form.tags} onChange={set('tags')} />
+              </Field>
+              <Field label="Home display order" hint="Lower numbers appear first on the home page. Use 1, 2, 3...">
+                <input type="number" min="0" step="1" className="input" value={form.displayOrder} onChange={set('displayOrder')} />
               </Field>
             </div>
           </section>

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, mediaUrl } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { money } from '../lib/format';
-import { CartIcon, HeartIcon, LeafIcon, SearchIcon, UserIcon } from './Icons';
+import { CartIcon, CloseIcon, HeartIcon, LeafIcon, PackageIcon, SearchIcon, TruckIcon, UserIcon } from './Icons';
 import { cx } from './ui';
 
 const NAV = [
@@ -29,7 +29,7 @@ export function Logo({ className = '' }) {
   );
 }
 
-function SearchBox({ onDone }) {
+function SearchBox({ onDone, onClose, autoFocus = false }) {
   const [params] = useSearchParams();
   const [term, setTerm] = useState(params.get('q') || '');
   const [suggestions, setSuggestions] = useState([]);
@@ -75,21 +75,23 @@ function SearchBox({ onDone }) {
         <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" width={18} height={18} />
         <input
           value={term}
+          autoFocus={autoFocus}
           onChange={(e) => setTerm(e.target.value)}
           onFocus={() => suggestions.length && setOpen(true)}
           className="input pl-10 pr-9"
           placeholder="Search"
           aria-label="Search products"
         />
-        {term && (
+        {(term || onClose) && (
           <button
             type="button"
             onClick={() => {
+              if (onClose) return onClose();
               setTerm('');
               setSuggestions([]);
             }}
             className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-ink-400 hover:text-ink-700"
-            aria-label="Clear search"
+            aria-label={onClose ? 'Close search' : 'Clear search'}
           >
             <CloseIcon width={15} height={15} />
           </button>
@@ -126,6 +128,8 @@ export default function Header() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { count, openDrawer } = useCart();
   const { announcementEnabled, announcementText } = useStore();
+  const { pathname } = useLocation();
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -145,9 +149,11 @@ export default function Header() {
         <div className="flex h-20 items-center gap-4">
           <Logo />
 
-          <div className="ml-auto hidden max-w-md flex-1 lg:block">
-            <SearchBox />
-          </div>
+          {pathname !== '/shop' && (
+            <div className="ml-auto hidden max-w-md flex-1 lg:block">
+              <SearchBox />
+            </div>
+          )}
 
           <nav className="ml-auto flex items-center gap-1 lg:ml-2">
             <Link to="/wishlist" className="btn-ghost hidden sm:inline-flex" aria-label="Wishlist">
@@ -228,9 +234,31 @@ export default function Header() {
           </nav>
         </div>
 
-        <div className="pb-3 lg:hidden">
-          <SearchBox />
-        </div>
+        {pathname === '/' && <div className="pb-2 lg:hidden">
+          {mobileSearchOpen ? (
+            <SearchBox autoFocus onDone={() => setMobileSearchOpen(false)} onClose={() => setMobileSearchOpen(false)} />
+          ) : (
+            <nav className="flex items-center justify-around border-t border-ink-100 pt-2" aria-label="Mobile navigation">
+              <NavLink to="/shop" className="flex flex-col items-center gap-0.5 px-5 py-1 text-ink-600 transition hover:text-brand-700">
+                <PackageIcon width={18} height={18} />
+                <span className="text-[10px] font-medium">Shop all</span>
+              </NavLink>
+              <NavLink to="/track" className="flex flex-col items-center gap-0.5 px-5 py-1 text-ink-600 transition hover:text-brand-700">
+                <TruckIcon width={18} height={18} />
+                <span className="text-[10px] font-medium">Track order</span>
+              </NavLink>
+              <button
+                type="button"
+                onClick={() => setMobileSearchOpen(true)}
+                className="flex flex-col items-center gap-0.5 px-5 py-1 text-ink-600 transition hover:text-brand-700"
+                aria-label="Search products"
+              >
+                <SearchIcon width={18} height={18} />
+                <span className="text-[10px] font-medium">Search</span>
+              </button>
+            </nav>
+          )}
+        </div>}
 
         <nav className="hidden gap-6 border-t border-ink-100 py-2.5 lg:flex">
           {NAV.map((item) => (

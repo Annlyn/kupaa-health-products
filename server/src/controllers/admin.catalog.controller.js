@@ -54,6 +54,7 @@ export const schemas = {
     tags: z.string().trim().max(300).optional().or(z.literal('')),
     isActive: z.boolean().default(true),
     isFeatured: z.boolean().default(false),
+    displayOrder: z.coerce.number().int().min(0).max(100000).default(0),
     images: z.array(imageInput).max(8).default([]),
 
     variantLabel: z.string().trim().max(30).optional().or(z.literal('')).nullable(),
@@ -365,6 +366,14 @@ export const adjustStock = asyncHandler(async (req, res) => {
 
   const stock = set != null ? Math.max(0, Math.trunc(Number(set))) : Math.max(0, product.stock + (Number.isFinite(delta) ? delta : 0));
   const updated = await prisma.product.update({ where: { id: product.id }, data: { stock } });
+  res.json({ ok: true, data: updated });
+});
+
+/** PATCH /api/admin/products/:id/position — quick inline homepage ordering. */
+export const updatePosition = asyncHandler(async (req, res) => {
+  const position = Number(req.body.position);
+  if (!Number.isInteger(position) || position < 0 || position > 100000) throw ApiError.badRequest('Position must be a whole number or blank');
+  const updated = await prisma.product.update({ where: { id: req.params.id }, data: { displayOrder: position } });
   res.json({ ok: true, data: updated });
 });
 

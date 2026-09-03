@@ -49,6 +49,7 @@ router.get('/products/:id', catalog.getProduct);
 router.post('/products/:id/duplicate', catalog.duplicateProduct);
 router.put('/products/:id', validate({ body: catalog.schemas.product }), catalog.updateProduct);
 router.patch('/products/:id/stock', catalog.adjustStock);
+router.patch('/products/:id/position', catalog.updatePosition);
 router.delete('/products/:id', catalog.deleteProduct);
 
 router.get('/categories', catalog.listCategories);

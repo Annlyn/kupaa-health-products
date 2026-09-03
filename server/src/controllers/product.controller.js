@@ -12,6 +12,7 @@ export const listQuerySchema = z.object({
   maxPrice: z.coerce.number().min(0).optional(),
   inStock: z.enum(['true', 'false']).optional(),
   featured: z.enum(['true', 'false']).optional(),
+  home: z.enum(['true', 'false']).optional(),
   tag: z.string().trim().optional(),
   sort: z.enum(['newest', 'price_asc', 'price_desc', 'rating', 'name']).default('newest'),
   page: z.coerce.number().int().min(1).default(1),
@@ -24,6 +25,7 @@ const ORDER_BY = {
   price_desc: [{ price: 'desc' }],
   rating: [{ ratingAvg: 'desc' }, { ratingCount: 'desc' }],
   name: [{ name: 'asc' }],
+  home: [{ displayOrder: 'asc' }, { createdAt: 'desc' }],
 };
 
 export const productCard = {
@@ -41,6 +43,7 @@ export const productCard = {
   tags: true,
   createdAt: true,
   variantLabel: true,
+  displayOrder: true,
   category: { select: { id: true, name: true, slug: true } },
   images: { select: { url: true, alt: true }, orderBy: { sortOrder: 'asc' } },
   variants: { where: { isActive: true }, select: variantSelect, orderBy: { sortOrder: 'asc' } },
@@ -51,7 +54,7 @@ export const withVariantSummary = (product) => ({ ...product, ...summarise(produ
 
 /** GET /api/products */
 export const list = asyncHandler(async (req, res) => {
-  const { q, category, minPrice, maxPrice, inStock, featured, tag, sort, page, limit } = req.query;
+  const { q, category, minPrice, maxPrice, inStock, featured, home, tag, sort, page, limit } = req.query;
 
   const where = { isActive: true };
   if (category) where.category = { slug: category };
@@ -77,16 +80,37 @@ export const list = asyncHandler(async (req, res) => {
     prisma.product.findMany({
       where,
       select: productCard,
-      orderBy: ORDER_BY[sort],
-      skip: (page - 1) * limit,
-      take: limit,
+      orderBy: home === 'true' ? { createdAt: 'desc' } : ORDER_BY[sort],
+      skip: home === 'true' ? 0 : (page - 1) * limit,
+      take: home === 'true' ? undefined : limit,
     }),
     prisma.product.count({ where }),
   ]);
 
+  if (home === 'true') {
+    const positioned = items
+      .filter((item) => item.displayOrder > 0)
+      .sort((a, b) => a.displayOrder - b.displayOrder || new Date(b.createdAt) - new Date(a.createdAt));
+    const unpositioned = items
+      .filter((item) => !item.displayOrder)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const slots = new Map();
+    for (const item of positioned) {
+      if (slots.has(item.displayOrder)) unpositioned.push(item);
+      else slots.set(item.displayOrder, item);
+    }
+
+    const ordered = [];
+    const lastPosition = Math.max(0, ...slots.keys());
+    for (let position = 1; position <= lastPosition; position += 1) {
+      ordered.push(slots.get(position) ?? unpositioned.shift());
+    }
+    items.splice(0, items.length, ...ordered.filter(Boolean), ...unpositioned);
+  }
+
   res.json({
     ok: true,
-    data: items.map(withVariantSummary),
+    data: items.slice(0, home === 'true' ? limit : undefined).map(withVariantSummary),
     meta: { page, limit, total, pages: Math.max(1, Math.ceil(total / limit)) },
   });
 });

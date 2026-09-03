@@ -88,7 +88,7 @@ export default function Home() {
   // it scrolls near the viewport, so first paint costs no product requests.
   const categorySection = useFetchOnVisible('/categories');
   const featuredSection = useFetchOnVisible('/products?featured=true&limit=4');
-  const newestSection = useFetchOnVisible('/products?sort=newest&limit=8');
+  const newestSection = useFetchOnVisible('/products?home=true&limit=8');
 
   return (
     <>

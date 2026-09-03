@@ -162,6 +162,7 @@ model Product {
 
   isActive   Boolean @default(true)
   isFeatured Boolean @default(false)
+  displayOrder Int @default(0)
 
   ratingAvg   Float @default(0)
   ratingCount Int   @default(0)
@@ -178,6 +179,7 @@ model Product {
 
   @@index([categoryId])
   @@index([isActive])
+  @@index([displayOrder])
 }
 
 model ProductImage {
