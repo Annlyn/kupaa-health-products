@@ -27,7 +27,7 @@ export function Rating({ value = 0, count, size = 14, className = '' }) {
     <span className={cx('inline-flex items-center gap-1', className)}>
       <span className="flex" aria-label={`Rated ${value} out of 5`}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <StarIcon key={n} width={size} height={size} className={n <= Math.round(value) ? 'text-amber-400' : 'text-ink-200'} />
+          <StarIcon key={n} width={size} height={size} className={n <= Math.round(value) ? 'text-brand-600' : 'text-ink-200'} />
         ))}
       </span>
       {count !== undefined && <span className="text-xs text-ink-500">({count})</span>}
@@ -159,7 +159,7 @@ export function Field({ label, error, hint, children, required, className = '' }
     <div className={className}>
       {label && (
         <label className="label">
-          {label} {required && <span className="text-rose-500">*</span>}
+          {label} {required && <span className="text-brand-600">*</span>}
         </label>
       )}
       {children}
@@ -203,9 +203,9 @@ export function SkeletonCard() {
 export function StatTile({ label, value, sub, icon: Icon, tone = 'brand' }) {
   const tones = {
     brand: 'bg-brand-50 text-brand-700',
-    amber: 'bg-amber-50 text-amber-700',
-    violet: 'bg-violet-50 text-violet-700',
-    rose: 'bg-rose-50 text-rose-700',
+    ink: 'bg-ink-100 text-ink-700',
+    dark: 'bg-kupaa-charcoal text-white',
+    alert: 'bg-kupaa-black text-white',
   };
   return (
     <div className="card p-5">

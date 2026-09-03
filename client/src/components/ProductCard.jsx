@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api, mediaUrl } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -32,7 +32,8 @@ export function ProductImage({ product, src: override, className = '' }) {
   );
 }
 
-export default function ProductCard({ product, wishlisted, onWishlistChange }) {
+export default function ProductCard({ product, wishlisted, onWishlistChange, homeCard = false }) {
+  const navigate = useNavigate();
   const { add } = useCart();
   const { isAuthenticated } = useAuth();
   const [adding, setAdding] = useState(false);
@@ -48,8 +49,11 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
   // the product page rather than guessing on their behalf.
   const needsChoice = Boolean(product.hasVariants);
 
+  const openProduct = () => navigate(`/product/${product.slug}`);
+
   const handleAdd = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setAdding(true);
     try {
       await add(product, 1);
@@ -62,6 +66,7 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
 
   const handleWishlist = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isAuthenticated) return toast('Sign in to save items to your wishlist', { icon: '💚' });
     try {
       const { data } = await api.post(`/wishlist/${product.id}`);
@@ -74,22 +79,39 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
   };
 
   return (
-    <article className="group card flex flex-col overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-lift">
+    <article
+      className={cx('group card flex flex-col overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-lift', homeCard && 'cursor-pointer')}
+      onClick={homeCard ? openProduct : undefined}
+      onKeyDown={
+        homeCard
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openProduct();
+              }
+            }
+          : undefined
+      }
+      role={homeCard ? 'link' : undefined}
+      tabIndex={homeCard ? 0 : undefined}
+    >
       <div className="relative aspect-square overflow-hidden bg-ink-50">
-        {/* Tapping the photo opens it full size; the title and the button below
-            are the way through to the product page. */}
         <button
           type="button"
-          onClick={() => images.length && setZoomed(true)}
-          disabled={!images.length}
-          aria-label={`View full size image of ${product.name}`}
-          className="block h-full w-full cursor-zoom-in"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (homeCard) return openProduct();
+            if (images.length) setZoomed(true);
+          }}
+          disabled={!images.length && !homeCard}
+          aria-label={homeCard ? `View ${product.name}` : `View full size image of ${product.name}`}
+          className={cx('block h-full w-full', homeCard ? 'cursor-pointer' : 'cursor-zoom-in')}
         >
           <ProductImage product={product} className="transition duration-500 group-hover:scale-105" />
         </button>
 
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-          {discount > 0 && <span className="badge bg-rose-600 text-white shadow-sm">{discount}% off</span>}
+          {discount > 0 && <span className="badge bg-brand-700 text-white shadow-sm">{discount}% off</span>}
           {product.isFeatured && <span className="badge bg-white/95 text-brand-800 shadow-sm">Bestseller</span>}
         </div>
 
@@ -99,7 +121,7 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
           aria-pressed={saved}
           className={cx(
             'absolute right-3 top-3 rounded-full p-2 shadow-sm backdrop-blur transition',
-            saved ? 'bg-rose-600 text-white' : 'bg-white/90 text-ink-500 hover:text-rose-600',
+            saved ? 'bg-brand-700 text-white' : 'bg-white/90 text-ink-500 hover:text-brand-700',
           )}
         >
           <HeartIcon width={17} height={17} fill={saved ? 'currentColor' : 'none'} />
@@ -158,10 +180,10 @@ export default function ProductCard({ product, wishlisted, onWishlistChange }) {
               {product.variantCount} {(product.variantLabel || 'options').toLowerCase()} available
             </p>
           ) : (
-            lowStock && <p className="mt-1 text-xs font-medium text-amber-600">Only {product.stock} left</p>
+            lowStock && <p className="mt-1 text-xs font-medium text-brand-700">Only {product.stock} left</p>
           )}
 
-          {needsChoice ? (
+          {needsChoice && !homeCard ? (
             <Link to={`/product/${product.slug}`} className="btn-outline mt-3 w-full">
               Choose {(product.variantLabel || 'an option').toLowerCase()} <ChevronRight width={15} height={15} />
             </Link>

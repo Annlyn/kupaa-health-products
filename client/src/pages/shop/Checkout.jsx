@@ -146,7 +146,7 @@ export default function Checkout() {
         order_id: payment.razorpayOrderId,
         prefill: payment.prefill,
         notes: { orderNumber: order.orderNumber },
-        theme: { color: '#0a7668' },
+        theme: { color: '#526B5A' },
         handler: async (response) => {
           try {
             await api.post('/payments/verify', {
@@ -337,15 +337,15 @@ export default function Checkout() {
             )}
 
             {delivery && (
-              <div className={cx('mt-4 rounded-lg px-3.5 py-3 text-sm', delivery.serviceable ? 'bg-emerald-50' : 'bg-rose-50')}>
+              <div className={cx('mt-4 rounded-lg px-3.5 py-3 text-sm', delivery.serviceable ? 'bg-brand-50' : 'bg-ink-100')}>
                 {delivery.serviceable ? (
-                  <p className="flex flex-wrap items-center gap-2 text-emerald-800">
+                  <p className="flex flex-wrap items-center gap-2 text-brand-800">
                     <TruckIcon width={16} height={16} />
                     <span className="font-medium">Delivers to {delivery.pincode}</span>
-                    {delivery.fastest && <span className="text-emerald-700">· {delivery.fastest.name}, {delivery.fastest.etd || `${delivery.fastest.estimatedDays} days`}</span>}
+                    {delivery.fastest && <span className="text-brand-700">· {delivery.fastest.name}, {delivery.fastest.etd || `${delivery.fastest.estimatedDays} days`}</span>}
                   </p>
                 ) : (
-                  <p className="font-medium text-rose-700">We cannot deliver to {delivery.pincode} yet. Please try another PIN code.</p>
+                  <p className="font-medium text-ink-800">We cannot deliver to {delivery.pincode} yet. Please try another PIN code.</p>
                 )}
               </div>
             )}
@@ -374,7 +374,7 @@ export default function Checkout() {
                   <p className="font-semibold text-ink-900">Pay online</p>
                   <p className="mt-0.5 text-ink-500">UPI, credit & debit cards, netbanking and wallets via Razorpay.</p>
                   {!paymentConfig?.razorpay.enabled && (
-                    <p className="mt-1 text-xs font-medium text-amber-600">Online payment is not configured on this store yet.</p>
+                    <p className="mt-1 text-xs font-medium text-ink-600">Online payment is not configured on this store yet.</p>
                   )}
                 </div>
               </label>
@@ -445,7 +445,7 @@ export default function Checkout() {
                 <dd className="font-medium">{money(totals.subtotal)}</dd>
               </div>
               {totals.discount > 0 && (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-brand-700">
                   <dt>Discount ({totals.couponCode})</dt>
                   <dd className="font-medium">−{money(totals.discount)}</dd>
                 </div>

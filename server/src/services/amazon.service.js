@@ -135,12 +135,15 @@ export function buildPackage(order, { weightKg, declaredValue } = {}) {
   const weight = weightKg ?? items.reduce((w, i) => w + (i.weightKg || 0.3) * i.quantity, 0);
   const value = declaredValue ?? items.reduce((t, i) => t + i.price * i.quantity, 0);
   const units = items.reduce((n, i) => n + i.quantity, 0);
+  const length = Math.max(15, ...items.map((i) => i.lengthCm || i.product?.lengthCm || 15));
+  const width = Math.max(10, ...items.map((i) => i.breadthCm || i.product?.breadthCm || 10));
+  const height = Math.max(5, ...items.map((i) => i.heightCm || i.product?.heightCm || 5));
 
   return {
     dimensions: {
-      length: 15,
-      width: 12,
-      height: Math.max(5, Math.ceil(3 + units * 2)),
+      length,
+      width,
+      height: Math.max(height, Math.ceil(height + Math.max(0, units - 1) * 2)),
       unit: 'CENTIMETER',
     },
     weight: { value: Math.max(0.05, round2(weight)), unit: 'KILOGRAM' },

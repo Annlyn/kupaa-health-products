@@ -20,8 +20,8 @@ createRoot(document.getElementById('root')).render(
               position="bottom-center"
               toastOptions={{
                 duration: 3200,
-                style: { background: '#1d2126', color: '#fff', fontSize: '14px', borderRadius: '10px' },
-                success: { iconTheme: { primary: '#14b89d', secondary: '#fff' } },
+                style: { background: '#111111', color: '#FFFFFF', fontSize: '14px', borderRadius: '10px' },
+                success: { iconTheme: { primary: '#526B5A', secondary: '#FFFFFF' } },
                 error: { iconTheme: { primary: '#f43f5e', secondary: '#fff' } },
               }}
             />

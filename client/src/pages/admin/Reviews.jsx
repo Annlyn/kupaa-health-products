@@ -59,7 +59,7 @@ export default function AdminReviews() {
               )}
             >
               <span className="flex items-center gap-1 font-semibold">
-                {star} <StarIcon width={13} height={13} className={rating === String(star) ? 'text-white' : 'text-amber-400'} />
+                {star} <StarIcon width={13} height={13} className={rating === String(star) ? 'text-white' : 'text-brand-600'} />
               </span>
               <span className={rating === String(star) ? 'text-brand-100' : 'text-ink-500'}>{count}</span>
             </button>
@@ -102,7 +102,7 @@ export default function AdminReviews() {
                 <div className="flex items-center gap-3">
                   <Rating value={review.rating} />
                   <button
-                    className="rounded p-1.5 text-ink-400 hover:bg-rose-50 hover:text-rose-600"
+                    className="rounded p-1.5 text-ink-400 hover:bg-ink-200 hover:text-kupaa-black"
                     onClick={() => setDeleting(review)}
                     aria-label="Delete review"
                   >

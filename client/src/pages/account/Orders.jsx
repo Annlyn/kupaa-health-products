@@ -30,7 +30,7 @@ async function retryPayment(order, onDone) {
       description: payment.description,
       order_id: payment.razorpayOrderId,
       prefill: payment.prefill,
-      theme: { color: '#0a7668' },
+      theme: { color: '#526B5A' },
       handler: async (response) => {
         try {
           await api.post('/payments/verify', {
@@ -177,7 +177,7 @@ export default function Orders() {
                       </button>
                     )}
                     {['PENDING', 'CONFIRMED'].includes(order.status) && (
-                      <button className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50" onClick={() => cancel(order)} disabled={cancelling === order.id}>
+                      <button className="btn-ghost btn-sm text-kupaa-black hover:bg-ink-200" onClick={() => cancel(order)} disabled={cancelling === order.id}>
                         {cancelling === order.id ? <Spinner className="h-3.5 w-3.5" /> : null} Cancel order
                       </button>
                     )}

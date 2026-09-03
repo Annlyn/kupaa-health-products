@@ -149,7 +149,7 @@ export default function Addresses() {
                     <button className="btn-outline btn-sm" onClick={() => open(address)}>
                       Edit
                     </button>
-                    <button className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50" onClick={() => setDeleting(address)}>
+                    <button className="btn-ghost btn-sm text-kupaa-black hover:bg-ink-200" onClick={() => setDeleting(address)}>
                       Delete
                     </button>
                   </div>

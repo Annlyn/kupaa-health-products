@@ -105,7 +105,7 @@ export default function CartDrawer() {
                     )}
                     <p className="mt-0.5 text-xs text-ink-500">{money(line.unitPrice)} each</p>
                     {!line.inStock && (
-                      <p className="mt-1 text-xs font-medium text-rose-600">
+                      <p className="mt-1 text-xs font-medium text-ink-500">
                         {line.maxQuantity === 0 ? 'Out of stock' : `Only ${line.maxQuantity} left`}
                       </p>
                     )}
@@ -134,7 +134,7 @@ export default function CartDrawer() {
                       <span className="text-sm font-bold text-ink-950">{money(line.lineTotal)}</span>
 
                       <button
-                        className="rounded p-1.5 text-ink-400 hover:bg-rose-50 hover:text-rose-600"
+                        className="rounded p-1.5 text-ink-400 hover:bg-ink-200 hover:text-kupaa-black"
                         onClick={() => remove(line)}
                         aria-label={`Remove ${line.product.name}`}
                       >
@@ -153,7 +153,7 @@ export default function CartDrawer() {
                   <dd className="font-medium">{money(totals.subtotal)}</dd>
                 </div>
                 {totals.discount > 0 && (
-                  <div className="flex justify-between text-emerald-700">
+                  <div className="flex justify-between text-brand-700">
                     <dt>Discount {totals.couponCode && `(${totals.couponCode})`}</dt>
                     <dd className="font-medium">−{money(totals.discount)}</dd>
                   </div>

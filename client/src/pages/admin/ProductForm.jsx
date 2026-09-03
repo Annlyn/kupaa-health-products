@@ -31,7 +31,20 @@ const BLANK = {
   variants: [],
 };
 
-const BLANK_VARIANT = { id: null, name: '', sku: '', price: '', mrp: '', stock: 0, weightKg: 0.3, image: '', isActive: true };
+const BLANK_VARIANT = {
+  id: null,
+  name: '',
+  sku: '',
+  price: '',
+  mrp: '',
+  stock: 0,
+  weightKg: 0.3,
+  lengthCm: 15,
+  breadthCm: 10,
+  heightCm: 5,
+  image: '',
+  isActive: true,
+};
 
 export default function ProductForm() {
   const { id } = useParams();
@@ -73,6 +86,9 @@ export default function ProductForm() {
           mrp: v.mrp,
           stock: v.stock,
           weightKg: v.weightKg,
+          lengthCm: Number(v.lengthCm),
+          breadthCm: Number(v.breadthCm),
+          heightCm: Number(v.heightCm),
           image: v.image || '',
           isActive: v.isActive,
         })) || [],
@@ -168,6 +184,9 @@ export default function ProductForm() {
           price: f.price,
           mrp: f.mrp,
           weightKg: f.weightKg,
+          lengthCm: f.lengthCm,
+          breadthCm: f.breadthCm,
+          heightCm: f.heightCm,
         },
       ],
       variantLabel: f.variantLabel || 'Size',
@@ -191,7 +210,9 @@ export default function ProductForm() {
       else if (form.variants.some((v) => !v.sku.trim())) next.variants = 'Every option needs its own SKU';
       else if (form.variants.some((v) => !(Number(v.price) > 0))) next.variants = 'Every option needs a price';
       else if (form.variants.some((v) => Number(v.mrp) < Number(v.price))) next.variants = 'An option has an MRP below its price';
-      else if (form.variants.some((v) => !(Number(v.weightKg) > 0))) next.variants = 'Every option needs a shipping weight';
+      else if (form.variants.some((v) => !(Number(v.weightKg) > 0 && Number(v.lengthCm) > 0 && Number(v.breadthCm) > 0 && Number(v.heightCm) > 0))) {
+        next.variants = 'Every option needs packed dimensions';
+      }
       else if (new Set(names).size !== names.length) next.variants = 'Two options share the same name';
       else if (new Set(skus).size !== skus.length) next.variants = 'Two options share the same SKU';
     } else {
@@ -366,7 +387,7 @@ export default function ProductForm() {
                           variants: f.variants.map((v) => (v.image === img.url ? { ...v, image: '' } : v)),
                         }))
                       }
-                      className="absolute right-1.5 top-1.5 rounded-md bg-white/90 p-1 text-rose-600 opacity-0 transition group-hover:opacity-100"
+                      className="absolute right-1.5 top-1.5 rounded-md bg-white/90 p-1 text-kupaa-black opacity-0 transition group-hover:opacity-100"
                       aria-label="Remove image"
                     >
                       <TrashIcon width={14} height={14} />
@@ -458,8 +479,8 @@ export default function ProductForm() {
               <div>
                 <h2 className="text-base font-semibold">Options the customer chooses</h2>
                 <p className="mt-1 text-sm text-ink-500">
-                  Sizes, weights or pack counts — 500 g and 1 kg, say. Each carries its own price, stock, SKU and shipping
-                  weight. Leave this empty for a product that comes one way only.
+                  Sizes, weights or pack counts — 500 g and 1 kg, say. Each carries its own price, stock, SKU and packed shipping
+                  dimensions. Leave this empty for a product that comes one way only.
                 </p>
               </div>
               <button type="button" className="btn-outline btn-sm shrink-0" onClick={addVariant}>
@@ -558,6 +579,15 @@ export default function ProductForm() {
                         </label>
                       </div>
 
+                      <label className="mt-3 block max-w-xs">
+                        <span className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-ink-500">L × B × H cm</span>
+                        <div className="flex gap-1">
+                          <input type="number" min="1" step="0.5" className="input py-2 text-sm" aria-label="Length in cm" value={variant.lengthCm} onChange={(e) => setVariant(index, 'lengthCm', e.target.value)} />
+                          <input type="number" min="1" step="0.5" className="input py-2 text-sm" aria-label="Breadth in cm" value={variant.breadthCm} onChange={(e) => setVariant(index, 'breadthCm', e.target.value)} />
+                          <input type="number" min="1" step="0.5" className="input py-2 text-sm" aria-label="Height in cm" value={variant.heightCm} onChange={(e) => setVariant(index, 'heightCm', e.target.value)} />
+                        </div>
+                      </label>
+
                       {form.images.length > 0 && (
                         <div className="mt-3">
                           <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-ink-500">
@@ -608,13 +638,13 @@ export default function ProductForm() {
 
                         <div className="flex items-center gap-3">
                           {Number(variant.mrp) > Number(variant.price) && (
-                            <span className="text-xs font-medium text-emerald-600">
+                            <span className="text-xs font-medium text-brand-600">
                               {percentOff(Number(variant.mrp), Number(variant.price))}% off
                             </span>
                           )}
                           <button
                             type="button"
-                            className="rounded p-1.5 text-ink-400 hover:bg-rose-50 hover:text-rose-600"
+                            className="rounded p-1.5 text-ink-400 hover:bg-ink-200 hover:text-kupaa-black"
                             onClick={() => removeVariant(index)}
                             aria-label={`Remove option ${variant.name || index + 1}`}
                           >
@@ -642,35 +672,41 @@ export default function ProductForm() {
             )}
           </section>
 
+          {!hasVariants && (
+            <section className="card p-5">
+              <h2 className="text-base font-semibold">Shipping dimensions</h2>
+              <p className="mt-1 text-sm text-ink-500">
+                Amazon Shipping needs these to quote a rate and print a label. Use the packed parcel, not the bare product.
+              </p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-4">
+                <Field label="Weight (kg)" required error={errors.weightKg}>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    className={cx('input', errors.weightKg && 'input-error')}
+                    value={form.weightKg}
+                    onChange={set('weightKg')}
+                  />
+                </Field>
+                <Field label="Length (cm)">
+                  <input type="number" step="0.5" min="1" className="input" value={form.lengthCm} onChange={set('lengthCm')} />
+                </Field>
+                <Field label="Breadth (cm)">
+                  <input type="number" step="0.5" min="1" className="input" value={form.breadthCm} onChange={set('breadthCm')} />
+                </Field>
+                <Field label="Height (cm)">
+                  <input type="number" step="0.5" min="1" className="input" value={form.heightCm} onChange={set('heightCm')} />
+                </Field>
+              </div>
+            </section>
+          )}
+
           <section className="card p-5">
-            <h2 className="text-base font-semibold">Shipping dimensions</h2>
-            <p className="mt-1 text-sm text-ink-500">
-              Amazon Shipping needs these to quote a rate and print a label. Use the packed parcel, not the bare product.
-            </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-4">
-              <Field label="Weight (kg)" required error={errors.weightKg}>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  className={cx('input', errors.weightKg && 'input-error')}
-                  value={form.weightKg}
-                  onChange={set('weightKg')}
-                />
-              </Field>
-              <Field label="Length (cm)">
-                <input type="number" step="0.5" min="1" className="input" value={form.lengthCm} onChange={set('lengthCm')} />
-              </Field>
-              <Field label="Breadth (cm)">
-                <input type="number" step="0.5" min="1" className="input" value={form.breadthCm} onChange={set('breadthCm')} />
-              </Field>
-              <Field label="Height (cm)">
-                <input type="number" step="0.5" min="1" className="input" value={form.heightCm} onChange={set('heightCm')} />
-              </Field>
-              <Field label="HSN code" className="sm:col-span-2" hint="Used on the shipping invoice">
-                <input className="input" value={form.hsn} onChange={set('hsn')} />
-              </Field>
-            </div>
+            <h2 className="text-base font-semibold">Invoice details</h2>
+            <Field label="HSN code" hint="Used on the shipping invoice">
+              <input className="input" value={form.hsn} onChange={set('hsn')} />
+            </Field>
           </section>
         </div>
 
@@ -741,7 +777,7 @@ export default function ProductForm() {
                   {discount > 0 && (
                     <button
                       type="button"
-                      className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50"
+                      className="btn-ghost btn-sm text-kupaa-black hover:bg-ink-200"
                       onClick={() => {
                         setDiscountDraft('');
                         setForm((f) => ({ ...f, price: f.mrp }));
@@ -754,7 +790,7 @@ export default function ProductForm() {
               </Field>
 
               {discount > 0 ? (
-                <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                <p className="rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-800">
                   Customers save {money(Number(form.mrp) - Number(form.price))} — a {discount}% discount.
                 </p>
               ) : (

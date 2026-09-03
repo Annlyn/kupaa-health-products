@@ -199,3 +199,32 @@ export const MapPinIcon = make(
     <circle cx="12" cy="10" r="2.6" />
   </>,
 );
+export const HelpIcon = make(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.6 9.2A2.5 2.5 0 1 1 12 12.4v1.3M12 17v.1" />
+  </>,
+);
+export const PlayIcon = make(<path d="M9 7.5 17 12l-8 4.5z" />);
+
+// Social glyphs. Drawn as strokes like everything else here, so they inherit
+// `currentColor` and sit at the same weight as the rest of the set.
+export const InstagramIcon = make(
+  <>
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <path d="M17.2 6.9v.1" />
+  </>,
+);
+export const YoutubeIcon = make(
+  <>
+    <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+    <path d="M10.5 9.4 15 12l-4.5 2.6z" />
+  </>,
+);
+export const FacebookIcon = make(
+  <>
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <path d="M14.8 8.2h-1.5a2 2 0 0 0-2 2v8.4M9.6 12.9h4.4" />
+  </>,
+);

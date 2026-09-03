@@ -24,7 +24,7 @@ export default function OrderSuccess() {
   return (
     <div className="container-page py-12">
       <div className="mx-auto max-w-2xl text-center">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-brand-100 text-brand-700">
           <CheckCircle width={34} height={34} />
         </span>
         <h1 className="mt-5 font-display text-3xl font-bold">Thank you, your order is confirmed</h1>
@@ -75,7 +75,7 @@ export default function OrderSuccess() {
               <dd>{money(order.subtotal)}</dd>
             </div>
             {order.discount > 0 && (
-              <div className="flex justify-between text-emerald-700">
+              <div className="flex justify-between text-brand-700">
                 <dt>Discount {order.couponCode && `(${order.couponCode})`}</dt>
                 <dd>−{money(order.discount)}</dd>
               </div>

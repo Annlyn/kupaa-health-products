@@ -217,7 +217,7 @@ export default function OrderDetail() {
                 <dd>{money(order.subtotal)}</dd>
               </div>
               {order.discount > 0 && (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-brand-700">
                   <dt>Discount {order.couponCode && `(${order.couponCode})`}</dt>
                   <dd>−{money(order.discount)}</dd>
                 </div>

@@ -6,7 +6,39 @@ import { Badge, ConfirmDialog, Field, PageLoader, Spinner, cx } from '../../comp
 import { useStoreContext } from '../../context/StoreContext';
 import { useFetch, useTitle } from '../../lib/hooks';
 
-/** Repeatable list of small objects — hero stats, trust items, promo bullets. */
+/**
+ * One cell of a list row. A sub-field is a plain input unless its spec asks for
+ * `multiline` (an FAQ answer) or supplies `options` (a social platform).
+ */
+function ListCell({ sub, value, onChange }) {
+  if (sub.options) {
+    return (
+      <select className="input py-2 text-sm" value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">Choose…</option>
+        {sub.options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  if (sub.multiline) {
+    return (
+      <textarea
+        className="input min-h-24 py-2 text-sm"
+        value={value}
+        maxLength={sub.max ?? 200}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    );
+  }
+
+  return <input className="input py-2 text-sm" value={value} maxLength={sub.max ?? 200} onChange={(e) => onChange(e.target.value)} />;
+}
+
+/** Repeatable list of small objects — hero stats, trust items, FAQ entries. */
 function ListEditor({ field, value, onChange }) {
   const rows = Array.isArray(value) ? value : [];
   const blank = Object.fromEntries(field.fields.map((f) => [f.key, '']));
@@ -20,20 +52,15 @@ function ListEditor({ field, value, onChange }) {
           <span className="mt-2 w-5 shrink-0 text-center text-xs font-bold text-ink-400">{index + 1}</span>
           <div className="grid flex-1 gap-2 sm:grid-cols-2">
             {field.fields.map((sub) => (
-              <label key={sub.key} className="block">
+              <label key={sub.key} className={cx('block', sub.multiline && 'sm:col-span-2')}>
                 <span className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-ink-500">{sub.label}</span>
-                <input
-                  className="input py-2 text-sm"
-                  value={row[sub.key] ?? ''}
-                  maxLength={sub.max ?? 200}
-                  onChange={(e) => setRow(index, sub.key, e.target.value)}
-                />
+                <ListCell sub={sub} value={row[sub.key] ?? ''} onChange={(next) => setRow(index, sub.key, next)} />
               </label>
             ))}
           </div>
           <button
             type="button"
-            className="mt-1 rounded p-1.5 text-ink-400 hover:bg-rose-50 hover:text-rose-600"
+            className="mt-1 rounded p-1.5 text-ink-400 hover:bg-ink-200 hover:text-kupaa-black"
             onClick={() => onChange(rows.filter((_, i) => i !== index))}
             aria-label={`Remove entry ${index + 1}`}
           >
@@ -169,7 +196,7 @@ export default function AdminSettings() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {changedKeys.length > 0 && <Badge className="bg-amber-50 text-amber-700">{changedKeys.length} unsaved</Badge>}
+          {changedKeys.length > 0 && <Badge className="bg-brand-50 text-brand-700">{changedKeys.length} unsaved</Badge>}
           <button className="btn-outline" onClick={() => setDraft(data.values)} disabled={!changedKeys.length || saving}>
             Discard
           </button>
@@ -194,7 +221,7 @@ export default function AdminSettings() {
                     )}
                   >
                     {g.label}
-                    {dirty && <span className={cx('h-1.5 w-1.5 rounded-full', activeGroup === g.key ? 'bg-white' : 'bg-amber-500')} />}
+                    {dirty && <span className={cx('h-1.5 w-1.5 rounded-full', activeGroup === g.key ? 'bg-white' : 'bg-brand-600')} />}
                   </button>
                 </li>
               );
@@ -225,7 +252,7 @@ export default function AdminSettings() {
               const dirty = changedKeys.includes(key);
 
               return (
-                <div key={key} className={cx(isWide ? '' : 'max-w-md', dirty && 'rounded-lg ring-2 ring-amber-200 ring-offset-4')}>
+                <div key={key} className={cx(isWide ? '' : 'max-w-md', dirty && 'rounded-lg ring-2 ring-brand-300 ring-offset-4')}>
                   {field.type === 'boolean' ? (
                     <>
                       <SettingInput field={field} value={draft[key]} onChange={(v) => setDraft((d) => ({ ...d, [key]: v }))} />

@@ -87,7 +87,7 @@ export default function AdminLayout() {
         </NavLink>
         <button
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-300 hover:bg-white/10"
         >
           <LogoutIcon width={17} height={17} /> Sign out
         </button>

@@ -20,6 +20,9 @@ export const variantSelect = {
   mrp: true,
   stock: true,
   weightKg: true,
+  lengthCm: true,
+  breadthCm: true,
+  heightCm: true,
   image: true,
   isActive: true,
   sortOrder: true,
@@ -48,6 +51,9 @@ export function resolveSellable(product, variantId) {
       mrp: product.mrp,
       stock: product.stock,
       weightKg: product.weightKg,
+      lengthCm: product.lengthCm,
+      breadthCm: product.breadthCm,
+      heightCm: product.heightCm,
       image: product.images?.[0]?.url ?? null,
       label: product.name,
     };
@@ -68,6 +74,9 @@ export function resolveSellable(product, variantId) {
     mrp: variant.mrp,
     stock: variant.stock,
     weightKg: variant.weightKg,
+    lengthCm: variant.lengthCm,
+    breadthCm: variant.breadthCm,
+    heightCm: variant.heightCm,
     // The option's own photo when it has one, so a cart line and an invoice
     // show the pack that was actually bought.
     image: variant.image || product.images?.[0]?.url || null,

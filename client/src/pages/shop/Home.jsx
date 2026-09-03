@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Carousel from '../../components/Carousel';
 import ProductCard from '../../components/ProductCard';
+import Faq from '../../components/Faq';
+import SocialFeed from '../../components/SocialFeed';
 import { CheckCircle, ChevronRight, LeafIcon, PackageIcon, ShieldIcon, TruckIcon } from '../../components/Icons';
 import { SkeletonCard } from '../../components/ui';
 import { mediaUrl } from '../../api/client';
@@ -31,7 +33,6 @@ function useHeroSlides(settings) {
     const slide = (image, product) => ({
       image,
       alt: product.name,
-      eyebrow: settings.heroBadge || undefined,
       title: product.name,
       // A product with no copy of its own borrows the store's hero line rather
       // than leaving the faded band with a bare name in it.
@@ -47,12 +48,12 @@ function useHeroSlides(settings) {
 /** What the hero falls back to when the catalogue has no imagery at all. */
 function TextHero({ settings }) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800">
+    <section className="relative overflow-hidden bg-brand-950">
       <div
         className="pointer-events-none absolute inset-0 opacity-25"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 18% 20%, rgba(95,233,206,.5), transparent 45%), radial-gradient(circle at 82% 70%, rgba(20,184,157,.45), transparent 50%)',
+            'radial-gradient(circle at 18% 20%, rgba(82,107,90,.35), transparent 45%), radial-gradient(circle at 82% 70%, rgba(82,107,90,.2), transparent 50%)',
         }}
       />
       <div className="container-page relative py-20 md:py-28">
@@ -163,7 +164,7 @@ export default function Home() {
 
           <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {featuredSection.data
-              ? featuredSection.data.map((p) => <ProductCard key={p.id} product={p} />)
+              ? featuredSection.data.map((p) => <ProductCard key={p.id} product={p} homeCard />)
               : Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
           </div>
         </div>
@@ -182,12 +183,16 @@ export default function Home() {
 
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {newestSection.data
-            ? newestSection.data.map((p) => <ProductCard key={p.id} product={p} />)
+            ? newestSection.data.map((p) => <ProductCard key={p.id} product={p} homeCard />)
             : Array.from({ length: 8 }, (_, i) => <SkeletonCard key={i} />)}
         </div>
       </section>
 
-      {settings.promoEnabled && (
+      <Faq />
+
+      <SocialFeed />
+
+      {/* {settings.promoEnabled && (
         <section className="container-page pb-16">
           <div className="overflow-hidden rounded-2xl bg-brand-900 px-6 py-12 text-center sm:px-12">
             <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">{settings.promoTitle}</h2>
@@ -210,7 +215,7 @@ export default function Home() {
             )}
           </div>
         </section>
-      )}
+      )} */}
     </>
   );
 }

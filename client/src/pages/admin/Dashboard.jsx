@@ -47,7 +47,7 @@ export default function Dashboard() {
       </header>
 
       {(!data.integrations.razorpay || !data.integrations.shipping) && (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-900">
           <AlertIcon width={18} height={18} className="shrink-0" />
           <p className="flex-1">
             {!data.integrations.razorpay && 'Razorpay is not configured — only cash on delivery is available. '}
@@ -61,14 +61,14 @@ export default function Dashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label="Revenue this month" value={money(data.revenueMonth)} sub={`${money(data.revenueTotal)} all time`} icon={RupeeIcon} />
-        <StatTile label="Orders" value={data.orderCount} sub={`${data.pendingCount} awaiting fulfilment`} icon={TruckIcon} tone="violet" />
-        <StatTile label="Customers" value={data.customerCount} sub={`Avg order ${money(data.avgOrderValue)}`} icon={UsersIcon} tone="amber" />
+        <StatTile label="Orders" value={data.orderCount} sub={`${data.pendingCount} awaiting fulfilment`} icon={TruckIcon} tone="ink" />
+        <StatTile label="Customers" value={data.customerCount} sub={`Avg order ${money(data.avgOrderValue)}`} icon={UsersIcon} tone="dark" />
         <StatTile
           label="Active products"
           value={data.productCount}
           sub={data.lowStock.length ? `${data.lowStock.length} low on stock` : 'Stock levels healthy'}
           icon={PackageIcon}
-          tone={data.lowStock.length ? 'rose' : 'brand'}
+          tone={data.lowStock.length ? 'alert' : 'brand'}
         />
       </div>
 
@@ -89,27 +89,27 @@ export default function Dashboard() {
                 <AreaChart data={data.salesSeries} margin={{ top: 5, right: 8, left: -12, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#14b89d" stopOpacity={0.28} />
-                      <stop offset="100%" stopColor="#14b89d" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#526B5A" stopOpacity={0.28} />
+                      <stop offset="100%" stopColor="#526B5A" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eceef1" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E1DC" vertical={false} />
                   <XAxis
                     dataKey="date"
                     tickFormatter={(v) => new Date(v).getDate()}
-                    tick={{ fontSize: 11, fill: '#8595a5' }}
+                    tick={{ fontSize: 11, fill: '#6F6F6F' }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
                     tickFormatter={(v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : v)}
-                    tick={{ fontSize: 11, fill: '#8595a5' }}
+                    tick={{ fontSize: 11, fill: '#6F6F6F' }}
                     axisLine={false}
                     tickLine={false}
                     width={44}
                   />
                   <Tooltip content={<RevenueTooltip />} />
-                  <Area type="monotone" dataKey="revenue" stroke="#079480" strokeWidth={2} fill="url(#revenueFill)" />
+                  <Area type="monotone" dataKey="revenue" stroke="#526B5A" strokeWidth={2} fill="url(#revenueFill)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -207,7 +207,7 @@ export default function Dashboard() {
 
         <section className="card p-5">
           <h2 className="flex items-center gap-2 text-base font-semibold">
-            <AlertIcon width={17} height={17} className="text-amber-500" /> Low stock alerts
+            <AlertIcon width={17} height={17} className="text-ink-500" /> Low stock alerts
           </h2>
 
           {data.lowStock.length ? (
@@ -220,7 +220,7 @@ export default function Dashboard() {
                     </Link>
                     <p className="text-xs text-ink-500">SKU {p.sku}</p>
                   </div>
-                  <span className={`badge shrink-0 ${p.stock === 0 ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>
+                  <span className={`badge shrink-0 ${p.stock === 0 ? 'bg-kupaa-black text-white' : 'bg-ink-100 text-ink-700'}`}>
                     {p.stock === 0 ? 'Out of stock' : `${p.stock} left`}
                   </span>
                 </li>

@@ -232,7 +232,7 @@ export default function AdminOrderDetail() {
               <button
                 key={status}
                 onClick={() => setConfirmStatus(status)}
-                className={status === 'CANCELLED' ? 'btn-outline text-rose-600' : 'btn-outline'}
+                className={status === 'CANCELLED' ? 'btn-outline text-kupaa-black' : 'btn-outline'}
               >
                 Mark {status.toLowerCase()}
               </button>
@@ -247,7 +247,7 @@ export default function AdminOrderDetail() {
               <MailIcon width={15} height={15} /> {order.invoiceSentAt ? 'Resend invoice' : 'WhatsApp invoice'}
             </button>
             {order.paymentStatus === 'PAID' && (
-              <button className="btn-outline text-amber-700" onClick={() => setRefundOpen(true)}>
+              <button className="btn-outline text-ink-700" onClick={() => setRefundOpen(true)}>
                 Refund
               </button>
             )}
@@ -309,7 +309,7 @@ export default function AdminOrderDetail() {
                 <dd>{money(order.subtotal)}</dd>
               </div>
               {order.discount > 0 && (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-brand-700">
                   <dt>Discount {order.couponCode && `(${order.couponCode})`}</dt>
                   <dd>−{money(order.discount)}</dd>
                 </div>
@@ -452,7 +452,7 @@ export default function AdminOrderDetail() {
               {order.shipCountry}
             </address>
             {order.notes && (
-              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              <p className="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-900">
                 <span className="font-semibold">Customer note:</span> {order.notes}
               </p>
             )}
@@ -518,7 +518,7 @@ export default function AdminOrderDetail() {
             <Spinner className="h-6 w-6 text-brand-600" />
           </div>
         ) : !rates.serviceable ? (
-          <p className="text-sm text-rose-600">
+          <p className="text-sm text-ink-700">
             Amazon Shipping does not serve {order.shipPincode} for this parcel. Contact the customer.
           </p>
         ) : (
@@ -558,7 +558,7 @@ export default function AdminOrderDetail() {
             </ul>
 
             {rates.mock && (
-              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              <p className="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-800">
                 Amazon Shipping credentials are not set, so this creates a simulated shipment. Add them under Integrations
                 to go live.
               </p>

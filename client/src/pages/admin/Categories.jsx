@@ -109,7 +109,7 @@ export default function AdminCategories() {
                     <h2 className="truncate font-semibold text-ink-900">{category.name}</h2>
                     <p className="truncate text-xs text-ink-500">/{category.slug}</p>
                   </div>
-                  <Badge className={category.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-ink-100 text-ink-600'}>
+                  <Badge className={category.isActive ? 'bg-brand-50 text-brand-700' : 'bg-ink-100 text-ink-600'}>
                     {category.isActive ? 'Active' : 'Hidden'}
                   </Badge>
                 </div>
@@ -125,7 +125,7 @@ export default function AdminCategories() {
                       Edit
                     </button>
                     <button
-                      className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50"
+                      className="btn-ghost btn-sm text-kupaa-black hover:bg-ink-200"
                       onClick={() => setDeleting(category)}
                       disabled={category.productCount > 0}
                       title={category.productCount > 0 ? 'Move its products first' : undefined}

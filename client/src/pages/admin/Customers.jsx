@@ -115,7 +115,7 @@ export default function AdminCustomers() {
                     </select>
                   </td>
                   <td className="text-center">
-                    <Badge className={user.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}>
+                    <Badge className={user.isActive ? 'bg-brand-50 text-brand-700' : 'bg-ink-200 text-ink-700'}>
                       {user.isActive ? 'Active' : 'Disabled'}
                     </Badge>
                   </td>
@@ -125,7 +125,7 @@ export default function AdminCustomers() {
                         View
                       </button>
                       <button
-                        className={cx('btn-ghost btn-sm', user.isActive ? 'text-rose-600 hover:bg-rose-50' : 'text-emerald-700 hover:bg-emerald-50')}
+                        className={cx('btn-ghost btn-sm', user.isActive ? 'text-kupaa-black hover:bg-ink-200' : 'text-brand-700 hover:bg-brand-50')}
                         onClick={() => update(user, { isActive: !user.isActive })}
                       >
                         {user.isActive ? 'Disable' : 'Enable'}
@@ -159,7 +159,7 @@ export default function AdminCustomers() {
                 <p className="text-sm text-ink-500">{detail.email}</p>
                 <p className="text-sm text-ink-500">{detail.phone || 'No phone on file'}</p>
               </div>
-              <Badge className={detail.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}>
+              <Badge className={detail.isActive ? 'bg-brand-50 text-brand-700' : 'bg-ink-200 text-ink-700'}>
                 {detail.isActive ? 'Active' : 'Disabled'}
               </Badge>
             </div>

@@ -66,7 +66,7 @@ function PincodeCheck({ weightKg }) {
       {result &&
         (result.serviceable ? (
           <div className="mt-3 space-y-1.5 text-sm">
-            <p className="flex items-center gap-2 font-medium text-emerald-700">
+            <p className="flex items-center gap-2 font-medium text-brand-700">
               <CheckCircle width={16} height={16} /> Delivers to {result.pincode}
             </p>
             {result.fastest && (
@@ -81,7 +81,7 @@ function PincodeCheck({ weightKg }) {
             </p>
           </div>
         ) : (
-          <p className="mt-3 text-sm font-medium text-rose-600">Sorry, we do not deliver to {result.pincode} yet.</p>
+          <p className="mt-3 text-sm font-medium text-ink-700">Sorry, we do not deliver to {result.pincode} yet.</p>
         ))}
     </div>
   );
@@ -120,7 +120,7 @@ function ReviewForm({ slug, onDone }) {
             type="button"
             onClick={() => setRating(n)}
             aria-label={`${n} star${n > 1 ? 's' : ''}`}
-            className={cx('text-2xl transition', n <= rating ? 'text-amber-400' : 'text-ink-200 hover:text-amber-200')}
+            className={cx('text-2xl transition', n <= rating ? 'text-brand-600' : 'text-ink-200 hover:text-brand-300')}
           >
             ★
           </button>
@@ -218,6 +218,9 @@ export default function ProductDetail() {
   const unitStock = selected?.stock ?? product.stock;
   const unitSku = selected?.sku ?? product.sku;
   const unitWeight = selected?.weightKg ?? product.weightKg;
+  const unitLength = selected?.lengthCm ?? product.lengthCm;
+  const unitBreadth = selected?.breadthCm ?? product.breadthCm;
+  const unitHeight = selected?.heightCm ?? product.heightCm;
 
   const discount = percentOff(unitMrp, unitPrice);
   const outOfStock = unitStock <= 0;
@@ -358,7 +361,7 @@ export default function ProductDetail() {
                     >
                       <span className="block text-sm font-semibold text-ink-900">{variant.name}</span>
                       <span className="block text-xs text-ink-600">{money(variant.price)}</span>
-                      {sold && <span className="mt-0.5 block text-[10px] font-semibold uppercase text-rose-600">Sold out</span>}
+                      {sold && <span className="mt-0.5 block text-[10px] font-semibold uppercase text-ink-400">Sold out</span>}
                     </button>
                   );
                 })}
@@ -371,7 +374,7 @@ export default function ProductDetail() {
             {unitMrp > unitPrice && (
               <>
                 <span className="text-lg text-ink-400 line-through">{money(unitMrp)}</span>
-                <span className="badge bg-rose-50 text-rose-700">Save {discount}%</span>
+                <span className="badge bg-brand-50 text-brand-700">Save {discount}%</span>
               </>
             )}
           </div>
@@ -379,13 +382,13 @@ export default function ProductDetail() {
 
           <div className="mt-5">
             {outOfStock ? (
-              <p className="text-sm font-semibold text-rose-600">
+              <p className="text-sm font-semibold text-ink-500">
                 {selected ? `${selected.name} is out of stock` : 'Currently out of stock'}
               </p>
             ) : unitStock <= 5 ? (
-              <p className="text-sm font-semibold text-amber-600">Hurry — only {unitStock} left in stock</p>
+              <p className="text-sm font-semibold text-brand-700">Hurry — only {unitStock} left in stock</p>
             ) : (
-              <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-700">
+              <p className="flex items-center gap-1.5 text-sm font-medium text-brand-700">
                 <CheckCircle width={16} height={16} /> In stock, dispatched within 24 hours
               </p>
             )}
@@ -485,7 +488,7 @@ export default function ProductDetail() {
                 ...(selected ? [[product.variantLabel || 'Option', selected.name]] : []),
                 ['Category', product.category?.name ?? '—'],
                 ['Net weight', `${unitWeight} kg`],
-                ['Pack dimensions', `${product.lengthCm} × ${product.breadthCm} × ${product.heightCm} cm`],
+                ['Pack dimensions', `${unitLength} × ${unitBreadth} × ${unitHeight} cm`],
                 ['HSN code', product.hsn || '—'],
                 ['Dispatch', 'Within 24 hours of confirmation'],
                 ['Delivery', 'Typically 2–5 business days across India'],
@@ -513,7 +516,7 @@ export default function ProductDetail() {
                         <span className="w-8 text-ink-500">{star}★</span>
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-100">
                           <div
-                            className="h-full rounded-full bg-amber-400"
+                            className="h-full rounded-full bg-brand-600"
                             style={{ width: `${product.ratingCount ? (count / product.ratingCount) * 100 : 0}%` }}
                           />
                         </div>
@@ -564,9 +567,11 @@ export default function ProductDetail() {
       {product.related?.length > 0 && (
         <section className="mt-10">
           <h2 className="text-2xl font-bold">You might also like</h2>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-6 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4">
             {product.related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <div key={p.id} className="w-[78vw] min-w-[78vw] snap-start sm:w-[260px] sm:min-w-[260px] lg:w-[280px] lg:min-w-[280px]">
+                <ProductCard product={p} />
+              </div>
             ))}
           </div>
         </section>

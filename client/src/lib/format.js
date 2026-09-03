@@ -51,17 +51,21 @@ export const initials = (name = '') =>
     .map((p) => p[0]?.toUpperCase())
     .join('') || '?';
 
+/* The fulfilment pipeline reads as a deepening sage: a pale tint on the way in,
+   solid Herbal Sage once the parcel lands. States that fell out of the pipeline
+   (cancelled, returned, refunded) sit in neutral ink so they recede, and only a
+   hard failure keeps a warning red. */
 export const STATUS_STYLES = {
-  PENDING: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
-  CONFIRMED: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-  PACKED: 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200',
-  SHIPPED: 'bg-violet-50 text-violet-700 ring-1 ring-violet-200',
-  DELIVERED: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-  CANCELLED: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
-  RETURNED: 'bg-orange-50 text-orange-700 ring-1 ring-orange-200',
-  PAID: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-  FAILED: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
-  REFUNDED: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200',
+  PENDING: 'bg-ink-100 text-ink-600 ring-1 ring-ink-200',
+  CONFIRMED: 'bg-brand-50 text-brand-700 ring-1 ring-brand-200',
+  PACKED: 'bg-brand-100 text-brand-800 ring-1 ring-brand-300',
+  SHIPPED: 'bg-brand-200 text-kupaa-black ring-1 ring-brand-400',
+  DELIVERED: 'bg-brand-700 text-white ring-1 ring-brand-800',
+  CANCELLED: 'bg-ink-100 text-ink-500 ring-1 ring-ink-200',
+  RETURNED: 'bg-ink-200 text-ink-700 ring-1 ring-ink-300',
+  PAID: 'bg-brand-700 text-white ring-1 ring-brand-800',
+  FAILED: 'bg-kupaa-black text-white ring-1 ring-kupaa-black',
+  REFUNDED: 'bg-ink-100 text-ink-600 ring-1 ring-ink-200',
 };
 
 export const statusClass = (status) => STATUS_STYLES[status] || 'bg-ink-100 text-ink-700 ring-1 ring-ink-200';

@@ -212,6 +212,9 @@ model ProductVariant {
   stock Int   @default(0)
 
   weightKg Float @default(0.3)
+  lengthCm Float @default(15)
+  breadthCm Float @default(10)
+  heightCm Float @default(5)
 
   /// Which product photo this option shows. Holds a ProductImage `url` rather
   /// than its id, because saving a product rewrites the image rows (and their
@@ -357,6 +360,9 @@ model OrderItem {
   price       Float
   quantity    Int
   weightKg    Float   @default(0.3)
+  lengthCm    Float   @default(15)
+  breadthCm   Float   @default(10)
+  heightCm    Float   @default(5)
 
   @@index([orderId])
 }

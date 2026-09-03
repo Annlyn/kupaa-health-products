@@ -341,7 +341,7 @@ export default function AdminProducts() {
                       {discount > 0 && (
                         <p className="text-xs text-ink-400">
                           <span className="line-through">{money(product.mrp)}</span>{' '}
-                          <span className="font-medium text-emerald-600">−{discount}%</span>
+                          <span className="font-medium text-brand-600">−{discount}%</span>
                         </p>
                       )}
                     </td>
@@ -352,9 +352,9 @@ export default function AdminProducts() {
                         className={cx(
                           'w-20 rounded-md border px-2 py-1 text-center text-sm',
                           product.stock === 0
-                            ? 'border-rose-200 bg-rose-50 text-rose-700'
+                            ? 'border-kupaa-black bg-kupaa-black text-white'
                             : product.stock <= product.lowStockAt
-                              ? 'border-amber-200 bg-amber-50 text-amber-700'
+                              ? 'border-ink-200 bg-ink-50 text-ink-700'
                               : 'border-ink-200',
                         )}
                         value={stockEdit[product.id] ?? product.stock}
@@ -365,10 +365,10 @@ export default function AdminProducts() {
                       />
                     </td>
                     <td className="text-center">
-                      <Badge className={product.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-ink-100 text-ink-600'}>
+                      <Badge className={product.isActive ? 'bg-brand-50 text-brand-700' : 'bg-ink-100 text-ink-600'}>
                         {product.isActive ? 'Active' : 'Archived'}
                       </Badge>
-                      {product.isFeatured && <Badge className="ml-1 bg-amber-50 text-amber-700">Featured</Badge>}
+                      {product.isFeatured && <Badge className="ml-1 bg-brand-50 text-brand-700">Featured</Badge>}
                     </td>
                     <td className="text-center text-sm text-ink-600">{product._count?.orderItems ?? 0}</td>
                     <td>
@@ -385,7 +385,7 @@ export default function AdminProducts() {
                           <CopyIcon width={16} height={16} />
                         </button>
                         <button
-                          className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50"
+                          className="btn-ghost btn-sm text-kupaa-black hover:bg-ink-200"
                           onClick={() => setDeleting(product)}
                           aria-label={`Delete ${product.name}`}
                         >
@@ -496,7 +496,7 @@ export default function AdminProducts() {
         </p>
 
         {archiveCount > 0 && (
-          <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+          <p className="mt-3 rounded-lg bg-ink-50 px-3 py-2.5 text-sm text-ink-900">
             {archiveCount} of these appear in past orders. By default they are archived rather than deleted.
           </p>
         )}
@@ -510,7 +510,7 @@ export default function AdminProducts() {
           <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-lg border border-ink-200 px-3 py-2.5 text-sm text-ink-700 hover:bg-ink-50">
             <input
               type="checkbox"
-              className="mt-0.5 h-4 w-4 rounded border-ink-300 text-rose-600 focus:ring-rose-500"
+              className="mt-0.5 h-4 w-4 rounded border-ink-300 text-kupaa-black focus:ring-kupaa-black"
               checked={forceDelete}
               onChange={(e) => setForceDelete(e.target.checked)}
             />

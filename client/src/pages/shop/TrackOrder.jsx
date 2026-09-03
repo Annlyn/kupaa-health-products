@@ -81,7 +81,7 @@ export default function TrackOrder() {
             </div>
 
             {result.mock && (
-              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              <p className="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-800">
                 Amazon Shipping credentials are not configured, so this is simulated tracking data.
               </p>
             )}

@@ -115,7 +115,7 @@ export default function Register() {
                 {RULES.map((rule) => {
                   const ok = rule.test(form.password);
                   return (
-                    <li key={rule.label} className={cx('flex items-center gap-1.5 text-xs', ok ? 'text-emerald-600' : 'text-ink-400')}>
+                    <li key={rule.label} className={cx('flex items-center gap-1.5 text-xs', ok ? 'text-brand-600' : 'text-ink-400')}>
                       <CheckCircle width={13} height={13} /> {rule.label}
                     </li>
                   );

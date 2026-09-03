@@ -18,6 +18,8 @@ const groups = {
   notifications: 'WhatsApp notifications',
   announcement: 'Announcement bar',
   home: 'Home page',
+  faq: 'FAQ section',
+  social: 'Social feed',
   footer: 'Footer & contact',
   policies: 'Policy pages',
 };
@@ -194,6 +196,97 @@ export const SETTINGS_SCHEMA = {
   promoCtaLabel: { group: 'home', type: 'string', label: 'Promo button label', max: 40, default: () => 'Build your daily stack' },
   promoCtaHref: { group: 'home', type: 'string', label: 'Promo button link', max: 200, default: () => '/shop?category=vitamins-supplements' },
 
+  // ------------------------------------------------------------------- faq
+  faqEnabled: { group: 'faq', type: 'boolean', label: 'Show the FAQ section on the home page', default: () => true },
+  faqTitle: { group: 'faq', type: 'string', label: 'FAQ title', max: 80, default: () => 'Frequently asked questions' },
+  faqSubtitle: {
+    group: 'faq',
+    type: 'string',
+    label: 'FAQ subtitle',
+    max: 160,
+    required: false,
+    default: () => 'The things customers ask us most, answered plainly.',
+  },
+  faqItems: {
+    group: 'faq',
+    type: 'list',
+    label: 'Questions & answers',
+    hint: 'Shown in this order. The first one is open when the page loads.',
+    fields: [
+      { key: 'question', label: 'Question', max: 160 },
+      { key: 'answer', label: 'Answer', max: 900, multiline: true },
+    ],
+    max: 12,
+    default: () => [
+      {
+        question: 'How soon will my order be dispatched?',
+        answer:
+          'Orders placed before 2 PM IST on a working day leave the same day; everything else goes out the next working day. You get an Amazon Shipping tracking number by email the moment it ships.',
+      },
+      {
+        question: 'Are your supplements third-party tested?',
+        answer:
+          'Yes. Every batch is assayed by an independent NABL-accredited lab for potency, purity and heavy metals. Ask us for the certificate of analysis for any batch number and we will send it across.',
+      },
+      {
+        question: 'Do you use proprietary blends?',
+        answer:
+          'Never. Each label states the exact milligram dose of every active ingredient, at the amounts used in published studies — no fairy dusting, no hidden blends.',
+      },
+      {
+        question: 'Can I return a product if it does not suit me?',
+        answer:
+          'Unopened packs in their original packaging can be returned within 7 days of delivery. Opened supplements cannot be returned for hygiene reasons unless the product arrived damaged, incorrect or expired.',
+      },
+      {
+        question: 'Is cash on delivery available?',
+        answer:
+          'Yes, on most PIN codes across India. A small handling fee applies and it is shown at checkout before you confirm the order.',
+      },
+      {
+        question: 'Should I check with a doctor first?',
+        answer:
+          'Please do, especially if you are pregnant, nursing, on prescription medication or managing a chronic condition. Supplements support a diet; they are not a substitute for medical treatment.',
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------- social
+  socialEnabled: { group: 'social', type: 'boolean', label: 'Show the social feed on the home page', default: () => true },
+  socialTitle: { group: 'social', type: 'string', label: 'Social section title', max: 80, default: () => 'From our feed' },
+  socialSubtitle: {
+    group: 'social',
+    type: 'string',
+    label: 'Social section subtitle',
+    max: 160,
+    required: false,
+    default: () => 'Recipes, lab reports and behind-the-scenes — follow along.',
+  },
+  socialInstagramUrl: {
+    group: 'social',
+    type: 'string',
+    label: 'Instagram profile URL',
+    max: 200,
+    required: false,
+    hint: 'Leave any of these blank to hide that follow button.',
+    default: () => 'https://instagram.com/kupaahealth',
+  },
+  socialYoutubeUrl: {
+    group: 'social',
+    type: 'string',
+    label: 'YouTube channel URL',
+    max: 200,
+    required: false,
+    default: () => 'https://youtube.com/@kupaahealth',
+  },
+  socialFacebookUrl: {
+    group: 'social',
+    type: 'string',
+    label: 'Facebook page URL',
+    max: 200,
+    required: false,
+    default: () => 'https://facebook.com/kupaahealth',
+  },
   // ---------------------------------------------------------------- footer
   footerBlurb: {
     group: 'footer',

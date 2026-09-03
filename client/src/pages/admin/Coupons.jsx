@@ -169,8 +169,8 @@ export default function AdminCoupons() {
                         !coupon.isActive
                           ? 'bg-ink-100 text-ink-600'
                           : isExpired(coupon)
-                            ? 'bg-rose-50 text-rose-700'
-                            : 'bg-emerald-50 text-emerald-700'
+                            ? 'bg-ink-200 text-ink-700'
+                            : 'bg-brand-50 text-brand-700'
                       }
                     >
                       {!coupon.isActive ? 'Disabled' : isExpired(coupon) ? 'Expired' : 'Live'}
@@ -181,7 +181,7 @@ export default function AdminCoupons() {
                       <button className="btn-outline btn-sm" onClick={() => open(coupon)}>
                         Edit
                       </button>
-                      <button className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50" onClick={() => setDeleting(coupon)}>
+                      <button className="btn-ghost btn-sm text-kupaa-black hover:bg-ink-200" onClick={() => setDeleting(coupon)}>
                         Delete
                       </button>
                     </div>

@@ -75,13 +75,13 @@ export default function Cart() {
                         )}
                         <p className="mt-0.5 text-xs text-ink-500">SKU {line.sku}</p>
                         {!line.inStock && (
-                          <p className="mt-1.5 text-xs font-semibold text-rose-600">
+                          <p className="mt-1.5 text-xs font-semibold text-ink-500">
                             {line.maxQuantity === 0 ? 'Out of stock — remove to continue' : `Only ${line.maxQuantity} available`}
                           </p>
                         )}
                       </div>
                       <button
-                        className="h-fit rounded p-1.5 text-ink-400 hover:bg-rose-50 hover:text-rose-600"
+                        className="h-fit rounded p-1.5 text-ink-400 hover:bg-ink-200 hover:text-kupaa-black"
                         onClick={() => remove(line)}
                         aria-label={`Remove ${line.product.name}`}
                       >
@@ -124,7 +124,7 @@ export default function Cart() {
               <Link to="/shop" className="btn-ghost">
                 ← Continue shopping
               </Link>
-              <button className="btn-ghost text-rose-600 hover:bg-rose-50" onClick={clear}>
+              <button className="btn-ghost text-kupaa-black hover:bg-ink-200" onClick={clear}>
                 Clear cart
               </button>
             </div>
@@ -136,11 +136,11 @@ export default function Cart() {
 
               <form onSubmit={submitCoupon} className="mt-4">
                 {totals.couponCode ? (
-                  <div className="flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2.5 text-sm">
-                    <span className="flex items-center gap-2 font-semibold text-emerald-800">
+                  <div className="flex items-center justify-between rounded-lg bg-brand-50 px-3 py-2.5 text-sm">
+                    <span className="flex items-center gap-2 font-semibold text-brand-800">
                       <TagIcon width={16} height={16} /> {totals.couponCode}
                     </span>
-                    <button type="button" onClick={removeCoupon} className="text-xs font-medium text-emerald-700 underline">
+                    <button type="button" onClick={removeCoupon} className="text-xs font-medium text-brand-700 underline">
                       Remove
                     </button>
                   </div>
@@ -167,7 +167,7 @@ export default function Cart() {
                   <dd className="font-medium">{money(totals.subtotal)}</dd>
                 </div>
                 {totals.discount > 0 && (
-                  <div className="flex justify-between text-emerald-700">
+                  <div className="flex justify-between text-brand-700">
                     <dt>Discount</dt>
                     <dd className="font-medium">−{money(totals.discount)}</dd>
                   </div>

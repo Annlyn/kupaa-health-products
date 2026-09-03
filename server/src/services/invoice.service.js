@@ -35,10 +35,10 @@ export async function respondWithInvoice(res, order, settings) {
   res.end(pdf);
 }
 
-const INK = '#111827';
-const MUTED = '#6b7280';
-const RULE = '#e5e7eb';
-const BRAND = '#0f766e';
+const INK = '#181818';
+const MUTED = '#6F6F6F';
+const RULE = '#E4E1DC';
+const BRAND = '#526B5A';
 
 /** Renders the invoice and resolves with the whole PDF as one buffer. */
 export async function buildInvoicePdf(order, settings) {
@@ -138,7 +138,7 @@ export async function buildInvoicePdf(order, settings) {
   ];
 
   const headerRow = (top) => {
-    doc.rect(left, top, width, 22).fill('#f3f4f6');
+    doc.rect(left, top, width, 22).fill('#F6F4F0');
     doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(9);
     for (const col of columns) doc.text(col.label.toUpperCase(), col.x + 6, top + 7, { width: col.w - 12, align: col.align });
     return top + 22;

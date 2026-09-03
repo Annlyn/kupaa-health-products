@@ -6,7 +6,7 @@ import { useFetch, useTitle } from '../../lib/hooks';
 
 function StatusPill({ ok, okLabel = 'Connected', offLabel = 'Not configured' }) {
   return (
-    <Badge className={ok ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}>
+    <Badge className={ok ? 'bg-brand-50 text-brand-700' : 'bg-ink-50 text-ink-700'}>
       {ok ? <CheckCircle width={13} height={13} /> : <AlertIcon width={13} height={13} />}
       {ok ? okLabel : offLabel}
     </Badge>
@@ -88,7 +88,7 @@ export default function Integrations() {
         </div>
 
         {!data.razorpay.enabled && (
-          <p className="mt-4 rounded-lg bg-amber-50 px-3.5 py-3 text-sm text-amber-900">
+          <p className="mt-4 rounded-lg bg-ink-50 px-3.5 py-3 text-sm text-ink-900">
             Without keys the storefront only offers cash on delivery. Razorpay test keys (<code className="font-mono">rzp_test_…</code>)
             work fine for development.
           </p>

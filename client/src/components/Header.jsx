@@ -203,7 +203,7 @@ export default function Header() {
                           setMenuOpen(false);
                           logout();
                         }}
-                        className="block w-full border-t border-ink-100 px-4 py-2 text-left text-sm text-rose-600 hover:bg-rose-50"
+                        className="block w-full border-t border-ink-100 px-4 py-2 text-left text-sm text-kupaa-black hover:bg-ink-200"
                       >
                         Sign out
                       </button>

@@ -8,7 +8,7 @@
     -webkit-font-smoothing: antialiased;
   }
   body {
-    @apply bg-white text-ink-800 font-sans antialiased;
+    @apply bg-ink-50 text-ink-900 font-sans antialiased;
   }
   h1, h2, h3, h4 {
     @apply font-display tracking-tight text-ink-950;
@@ -23,9 +23,36 @@
 }
 
 @layer components {
-  /* The image panel begins on the right on desktop. Masking the image (instead
-     of laying a translucent colour over it) makes its left edge disappear
-     smoothly into the exact carousel background colour. */
+  /* Masking the image (instead of laying a translucent colour over it) makes its
+     edge disappear smoothly into the exact carousel background colour, so there
+     is never a seam or band where the fade ends.
+
+     Narrow screens read top-to-bottom: the photograph holds the upper third at
+     full strength, then fades from the middle down to nothing, leaving the copy
+     on solid brand green. Wide screens fade left-to-right instead, because the
+     copy sits beside the image rather than under it. */
+  .carousel-image {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 36%,
+      rgba(0, 0, 0, 0.78) 52%,
+      rgba(0, 0, 0, 0.42) 66%,
+      rgba(0, 0, 0, 0.16) 80%,
+      rgba(0, 0, 0, 0.04) 90%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 36%,
+      rgba(0, 0, 0, 0.78) 52%,
+      rgba(0, 0, 0, 0.42) 66%,
+      rgba(0, 0, 0, 0.16) 80%,
+      rgba(0, 0, 0, 0.04) 90%,
+      transparent 100%
+    );
+  }
   @media (min-width: 768px) {
     .carousel-image {
       -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.15) 14%, #000 52%);
@@ -54,7 +81,7 @@
     @apply btn text-ink-600 hover:bg-ink-100 hover:text-ink-900;
   }
   .btn-danger {
-    @apply btn bg-rose-600 text-white hover:bg-rose-700 active:scale-[.98];
+    @apply btn bg-kupaa-black text-white hover:bg-kupaa-charcoal active:scale-[.98];
   }
   .btn-sm {
     @apply px-3 py-1.5 text-xs rounded-md;
@@ -66,7 +93,7 @@
            focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
   }
   .input-error {
-    @apply border-rose-400 focus:border-rose-500 focus:ring-rose-500/20;
+    @apply border-kupaa-black focus:border-kupaa-black focus:ring-kupaa-black/25;
   }
   .label {
     @apply mb-1.5 block text-sm font-medium text-ink-700;
@@ -74,8 +101,11 @@
   .hint {
     @apply mt-1 text-xs text-ink-500;
   }
+  /* With no red in the palette, a validation message has to earn its urgency
+     through weight rather than hue — semibold near-black against the ink-500
+     hint text beside it. */
   .error-text {
-    @apply mt-1 text-xs font-medium text-rose-600;
+    @apply mt-1 text-xs font-semibold text-kupaa-black;
   }
 
   .card {

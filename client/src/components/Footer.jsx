@@ -44,7 +44,7 @@ export default function Footer() {
   const [first, ...rest] = String(settings.storeName || 'Kupaa').split(' ');
 
   return (
-    <footer className="mt-20 border-t border-ink-100 bg-ink-50/60">
+    <footer className="border-t border-ink-100 bg-ink-50/60">
       {settings.footerPromises?.length > 0 && (
         <div className="container-page grid gap-6 border-b border-ink-100 py-10 sm:grid-cols-3">
           {settings.footerPromises.map((promise, i) => {
