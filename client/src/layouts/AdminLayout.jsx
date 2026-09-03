@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useStore } from '../context/StoreContext';
 import {
   CloseIcon,
   DashboardIcon,
@@ -32,8 +31,6 @@ const LINKS = [
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
-  const { storeName } = useStore();
-  const shortName = String(storeName || 'Store').split(' ')[0];
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -65,14 +62,15 @@ export default function AdminLayout() {
 
   const sidebarBody = (
     <>
-      <div className="flex items-center gap-2.5 border-b border-white/10 px-5 py-5">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white">
-          <LeafIcon width={19} height={19} />
-        </span>
-        <div className="leading-none">
-          <p className="font-display text-base font-bold text-white">{shortName}</p>
-          <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-300">Admin console</p>
+      <div className="flex flex-col items-center border-b border-white/10 px-5 py-5">
+        <div className="relative -translate-x-1 h-20 w-52 overflow-hidden">
+          <img
+            src={`${import.meta.env.BASE_URL}logo_white.png`}
+            alt="Kupaa logo"
+            className="h-full w-full object-contain"
+          />
         </div>
+        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-300">Admin Console</p>
       </div>
 
       {nav}
@@ -111,7 +109,7 @@ export default function AdminLayout() {
           <button className="btn-ghost" onClick={() => setOpen(true)} aria-label="Open admin menu">
             {open ? <CloseIcon /> : <MenuIcon />}
           </button>
-          <span className="font-display text-base font-bold">{shortName} Admin</span>
+          <span className="font-display text-base font-bold">Admin Console</span>
         </header>
 
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">

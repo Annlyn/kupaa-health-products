@@ -15,18 +15,15 @@ const NAV = [
 
 export function Logo({ className = '' }) {
   const { storeName } = useStore();
-  const [first, ...rest] = String(storeName || 'Kupaa').split(' ');
 
   return (
-    <Link to="/" className={cx('flex -ml-2 items-center gap-2.5 sm:-ml-1', className)} aria-label={`${storeName} home`}>
-      <span className="grid h-20 w-20 shrink-0 place-items-center">
-        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Kupaa Health Products" className="h-24 w-24 object-contain" />
-      </span>
-      <span className="flex flex-col justify-center leading-none">
-        <span className="block font-display text-lg font-bold text-ink-950">{first}</span>
-        {rest.length > 0 && (
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-700">{rest.join(' ')}</span>
-        )}
+    <Link to="/" className={cx('flex -ml-2 items-center sm:-ml-1', className)} aria-label={`${storeName} home`}>
+      <span className="relative grid h-20 w-24 shrink-0 place-items-center overflow-hidden sm:h-24 sm:w-28">
+        <img
+          src={`${import.meta.env.BASE_URL}logo.png`}
+          alt="Kupaa logo"
+          className="absolute left-0 top-0 h-full w-[140%] max-w-none object-contain object-left"
+        />
       </span>
     </Link>
   );
