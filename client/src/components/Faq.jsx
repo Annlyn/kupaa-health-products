@@ -77,34 +77,6 @@ export default function Faq() {
           </span>
           <h2 className="mt-4 text-2xl font-bold sm:text-3xl">{settings.faqTitle}</h2>
           {settings.faqSubtitle && <p className="mt-2 text-sm leading-relaxed text-ink-500">{settings.faqSubtitle}</p>}
-
-          <div className="card mt-6 p-5">
-            <p className="text-sm font-semibold text-ink-900">Still not sure?</p>
-            <p className="mt-1 text-xs leading-relaxed text-ink-500">
-              We answer every message within one working day — batch certificates included.
-            </p>
-            <div className="mt-3 space-y-1.5 text-sm">
-              {settings.supportEmail && (
-                <p className="flex items-center gap-2 text-ink-600">
-                  <MailIcon width={15} height={15} className="text-brand-700" />
-                  <a href={`mailto:${settings.supportEmail}`} className="hover:text-brand-700 hover:underline">
-                    {settings.supportEmail}
-                  </a>
-                </p>
-              )}
-              {settings.supportPhone && (
-                <p className="flex items-center gap-2 text-ink-600">
-                  <PhoneIcon width={15} height={15} className="text-brand-700" />
-                  <a href={`tel:${settings.supportPhone.replace(/\s/g, '')}`} className="hover:text-brand-700 hover:underline">
-                    {settings.supportPhone}
-                  </a>
-                </p>
-              )}
-            </div>
-            <Link to="/policies#contact" className="btn-outline btn-sm mt-4">
-              Read the full policies
-            </Link>
-          </div>
         </div>
 
         <div className="space-y-2.5">

@@ -87,8 +87,10 @@
     @apply px-3 py-1.5 text-xs rounded-md;
   }
 
+  /* 16px on phones: anything smaller makes iOS Safari zoom the page in the
+     moment a field takes focus. Back to 14px from sm: up, where it can't. */
   .input {
-    @apply w-full rounded-lg border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900
+    @apply w-full rounded-lg border border-ink-200 bg-white px-3.5 py-2.5 text-base sm:text-sm text-ink-900
            placeholder:text-ink-400 transition
            focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
   }

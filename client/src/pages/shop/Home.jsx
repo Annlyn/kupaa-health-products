@@ -190,7 +190,7 @@ export default function Home() {
 
       <Faq />
 
-      <SocialFeed />
+      {/* <SocialFeed /> */}
 
       {/* {settings.promoEnabled && (
         <section className="container-page pb-16">

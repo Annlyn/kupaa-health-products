@@ -54,6 +54,9 @@ export default function ProductCard({ product, wishlisted, onWishlistChange, hom
   const handleAdd = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    // Home cards are a teaser: the customer picks quantity, size and reads the
+    // detail before committing, so "Add to cart" opens the product page there.
+    if (homeCard) return openProduct();
     setAdding(true);
     try {
       await add(product, 1);

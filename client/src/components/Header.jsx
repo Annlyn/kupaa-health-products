@@ -13,16 +13,28 @@ const NAV = [
   { to: '/track', label: 'Track order' },
 ];
 
-export function Logo({ className = '' }) {
+/**
+ * Both logo files sit on a 2100x1500 canvas with the artwork floating in a lot
+ * of dead space, and each one floats differently — so a caller pairs its `src`
+ * with a `frameClassName` (the visible window) and an `imgClassName` that
+ * oversizes and offsets the image until the artwork fills that window. The
+ * defaults below crop the horizontal lockup down to its mark for the header.
+ */
+export function Logo({
+  className = 'ml-2 sm:-ml-1',
+  src = 'logo.png',
+  frameClassName = 'h-20 w-24 sm:h-24 sm:w-28',
+  imgClassName = 'left-0 top-0 h-full w-[140%] object-contain object-left',
+}) {
   const { storeName } = useStore();
 
   return (
-    <Link to="/" className={cx('flex -ml-2 items-center sm:-ml-1', className)} aria-label={`${storeName} home`}>
-      <span className="relative grid h-20 w-24 shrink-0 place-items-center overflow-hidden sm:h-24 sm:w-28">
+    <Link to="/" className={cx('flex items-center', className)} aria-label={`${storeName} home`}>
+      <span className={cx('relative grid shrink-0 place-items-center overflow-hidden', frameClassName)}>
         <img
-          src={`${import.meta.env.BASE_URL}logo.png`}
+          src={`${import.meta.env.BASE_URL}${src}`}
           alt="Kupaa logo"
-          className="absolute left-0 top-0 h-full w-[140%] max-w-none object-contain object-left"
+          className={cx('absolute max-w-none', imgClassName)}
         />
       </span>
     </Link>
@@ -155,7 +167,7 @@ export default function Header() {
             </div>
           )}
 
-          <nav className="ml-auto flex items-center gap-1 lg:ml-2">
+          <nav className={cx('ml-auto flex items-center gap-1', pathname === '/shop' ? 'lg:ml-auto' : 'lg:ml-2')}>
             <Link to="/wishlist" className="btn-ghost hidden sm:inline-flex" aria-label="Wishlist">
               <HeartIcon />
             </Link>

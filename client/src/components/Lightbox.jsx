@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, CloseIcon } from './Icons';
 import { cx } from './ui';
@@ -13,6 +13,8 @@ import { mediaUrl } from '../api/client';
  */
 export default function Lightbox({ images = [], index = 0, onClose, onIndexChange, title, footer }) {
   const [current, setCurrent] = useState(index);
+  const touchStartX = useRef(null);
+  const swiped = useRef(false);
 
   useEffect(() => setCurrent(index), [index]);
 
@@ -26,6 +28,27 @@ export default function Lightbox({ images = [], index = 0, onClose, onIndexChang
     },
     [count, onIndexChange],
   );
+
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current == null) return;
+    const distance = event.changedTouches[0]?.clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(distance) < 40 || count < 2) return;
+    swiped.current = true;
+    go(current + (distance < 0 ? 1 : -1));
+  };
+
+  const handleViewerClick = (event) => {
+    if (swiped.current) {
+      swiped.current = false;
+      return;
+    }
+    onClose?.(event);
+  };
 
   useEffect(() => {
     const onKey = (e) => {
@@ -67,7 +90,12 @@ export default function Lightbox({ images = [], index = 0, onClose, onIndexChang
       </header>
 
       {/* Clicking the backdrop closes; clicking the photo itself does not. */}
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden px-4 pb-4" onClick={onClose}>
+      <div
+        className="relative flex flex-1 touch-pan-y items-center justify-center overflow-hidden px-4 pb-4"
+        onClick={handleViewerClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <img
           src={mediaUrl(image.url)}
           alt={image.alt || title || ''}

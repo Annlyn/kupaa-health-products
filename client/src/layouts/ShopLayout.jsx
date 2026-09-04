@@ -6,14 +6,18 @@ import CartDrawer from '../components/CartDrawer';
 import { DEMO, DEMO_NOTICE } from 'virtual:demo';
 
 export default function ShopLayout() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
-  // Route changes should start at the top, like a normal page load.
+  // Route changes should start at the top, like a normal page load — unless the
+  // link carried an anchor (the footer's policy links do), which the router
+  // does not scroll to on its own.
   // Note the block body: an effect may only return a cleanup function, and
   // scrollTo's return value is not one.
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [pathname]);
+    const target = hash && document.getElementById(hash.slice(1));
+    if (target) target.scrollIntoView();
+    else window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname, hash]);
 
   return (
     <div className="flex min-h-screen flex-col">
